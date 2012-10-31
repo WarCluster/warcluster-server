@@ -16,6 +16,7 @@ import (
 
 const HOST = "localhost"
 const PORT = 3540
+const NEW_LINE byte = 10;
 
 func main() {
     server, err := net.Listen("tcp", HOST + ":" + strconv.Itoa(PORT))
@@ -49,16 +50,22 @@ func clientConnections(listener net.Listener) chan net.Conn {
 }
 
 func handleConnection(client net.Conn) {
-    b := bufio.NewReader(client)
+    buffer := bufio.NewReadWriter(bufio.NewReader(client), bufio.NewWriter(client))
     for {
-        line, err := b.ReadBytes('\n')
+        line, err := buffer.ReadString(NEW_LINE)
         if err != nil { // EOF, or worse
             fmt.Printf("%v <- $ -> %v\n", client.LocalAddr(), client.RemoteAddr())
             break
         }
-        client.Write([]byte(client.RemoteAddr().String()))
-        client.Write([]byte(" said: "))
-        client.Write(line)
-        client.Write([]byte(">>> "))
+        if line[:5] == "/quit" {
+            buffer.WriteString("Bye\n")
+            buffer.Flush()
+            client.Close()
+        }
+        buffer.WriteString(client.RemoteAddr().String())
+        buffer.WriteString(" said: ")
+        buffer.WriteString(line)
+        buffer.WriteString(">>> ")
+        buffer.Flush()
     }
 }
