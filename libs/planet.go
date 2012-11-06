@@ -1,7 +1,4 @@
-package solar_generator
-
-
-type Player string
+package libs
 
 type Planet struct {
     coords []int
@@ -9,5 +6,6 @@ type Planet struct {
     size int
     ship_count int
     max_ship_count int
-    owner Player
+    owner *Player
 }
+
