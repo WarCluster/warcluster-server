@@ -8,9 +8,10 @@ import (
     "strconv"
 )
 
-const HOST = "localhost"
+const HOST = "kiril.eu"
 const PORT = 3540
 const NEW_LINE byte = 10
+
 var clients map[string]*bufio.ReadWriter
 
 func main() {
