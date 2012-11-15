@@ -16,7 +16,11 @@ type Planet struct {
     Owner string
 }
 
-func (planet *Planet) FormatJSON() (string, []byte) {
+func (planet *Planet) GetKey() string {
+    return ""
+}
+
+func (planet *Planet) PrepareForDB() (string, []byte) {
     key := fmt.Sprintf("planet_%d_%d", planet.coords[0], planet.coords[1])
     result, err := json.Marshal(planet)
     if err != nil {

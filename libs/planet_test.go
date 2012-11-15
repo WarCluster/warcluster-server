@@ -41,23 +41,22 @@ func TestGeneratePlanet(t *testing.T) {
 }
 
 func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
-    planet := Planet{[]int{271, 203}, 3, 1, 0, 0, "gophie"}
-    expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
+    planet := Planet{[]int{271, 203}, 3, 1, 0, 0, ""}
+    expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
     expected_key := "planet_271_203"
 
-    key, json := planet.FormatJSON()
+    key, json := planet.PrepareForDB()
     if key != expected_key || string(json) != expected_json {
         t.Error("Planet JSON formatting gone wrong!")
     }
 }
-
 
 func TestDatabasePreparationsWithAnOwner(t *testing.T) {
     planet := Planet{[]int{271, 203}, 3, 1, 0, 0, "gophie"}
     expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
     expected_key := "planet_271_203"
 
-    key, json := planet.FormatJSON()
+    key, json := planet.PrepareForDB()
     if key != expected_key || string(json) != expected_json {
         t.Error(json)
         t.Error("Planet JSON formatting gone wrong!")
