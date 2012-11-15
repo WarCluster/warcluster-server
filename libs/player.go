@@ -3,21 +3,20 @@ package libs
 
 type Player struct {
     username string
-    hash string
-    home_planet *Planet
-    planets []*Planet
-    missions []*Mission
+    Hash string
+    HomePlanet *Planet
+    ScreenSize []int
+    ScreenPosition []int
+
 }
 
 func (player *Player) String() string {
-    return player.hash
+    return player.username
 }
 
-func CreatePlayer(username, hash string, home_planet *Planet) Player {
-    planets := []*Planet{home_planet}
-    missions := []*Mission{}
-    player := Player{username, hash, home_planet, planets, missions}
-    home_planet.owner = &player
+func CreatePlayer(username, Hash string, HomePlanet *Planet) Player {
+    player := Player{username, Hash, HomePlanet, []int{0, 0}, []int{0, 0}}
+    HomePlanet.Owner = username
     return player
 }
 

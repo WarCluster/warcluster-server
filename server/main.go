@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
     "bufio"
@@ -14,7 +14,7 @@ const NEW_LINE byte = 10
 
 var clients map[string]*bufio.ReadWriter
 
-func main() {
+func Run() {
     clients = make(map[string]*bufio.ReadWriter)
     server, err := net.Listen("tcp", HOST+":"+strconv.Itoa(PORT))
     if server == nil {

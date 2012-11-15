@@ -1,14 +1,28 @@
 package libs
 
-import "math"
+import (
+    "math"
+    "encoding/json"
+    "fmt"
+    "log"
+)
 
 type Planet struct {
     coords []int
-    texture int
-    size int
-    ship_count int
-    max_ship_count int
-    owner *Player
+    Texture int
+    Size int
+    ShipCount int
+    MaxShipCount int
+    Owner string
+}
+
+func (planet *Planet) FormatJSON() (string, []byte) {
+    key := fmt.Sprintf("planet_%d_%d", planet.coords[0], planet.coords[1])
+    result, err := json.Marshal(planet)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return key, result
 }
 
 func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
@@ -22,7 +36,7 @@ func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
     planet_radius := float64(50)
 
     for ix:=0; ix<9; ix++ {
-        planet_in_creation := Planet{[]int{0,0}, 0, 0, 0, 0, nil}
+        planet_in_creation := Planet{[]int{0,0}, 0, 0, 0, 0, ""}
         ring_offset += planet_radius + hashElement(4 * ix)
 
         planet_in_creation.coords[0] = int(float64(sun_position[0]) + ring_offset * math.Cos(
@@ -30,9 +44,10 @@ func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
         planet_in_creation.coords[1] = int(float64(sun_position[1]) + ring_offset * math.Sin(
             hashElement(4 * ix + 1) * 40))
 
-        planet_in_creation.texture = int(hashElement(4 * ix + 2))
-        planet_in_creation.size = 1 + int(hashElement(4 * ix + 3))
+        planet_in_creation.Texture = int(hashElement(4 * ix + 2))
+        planet_in_creation.Size = 1 + int(hashElement(4 * ix + 3))
         result = append(result, planet_in_creation)
     }
     return result, &result[int(hashElement(37)) - 1]
 }
+
