@@ -17,11 +17,11 @@ type Planet struct {
 }
 
 func (planet *Planet) GetKey() string {
-    return ""
+    return fmt.Sprintf("planet_%d_%d", planet.coords[0], planet.coords[1])
 }
 
 func (planet *Planet) PrepareForDB() (string, []byte) {
-    key := fmt.Sprintf("planet_%d_%d", planet.coords[0], planet.coords[1])
+    key := planet.GetKey()
     result, err := json.Marshal(planet)
     if err != nil {
         log.Fatal(err)

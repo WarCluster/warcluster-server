@@ -6,7 +6,7 @@ import (
 )
 
 func TestGeneratePlanet(t *testing.T) {
-    player := CreatePlayer("gophie", GenerateHash("gophie"), new(Planet))
+    hash := "5762908447300427353060676895795336101745023746116233389596883"
     sun_position := []int{500, 300}
     expected_planets := []Planet{
         Planet{[]int{375, 247}, 6, 3, 0, 0, "gophie"},
@@ -19,7 +19,7 @@ func TestGeneratePlanet(t *testing.T) {
         Planet{[]int{352, 798}, 5, 4, 0, 0, "gophie"},
         Planet{[]int{686, 841}, 1, 1, 0, 0, "gophie"},
     }
-    generated_planets, _ := GeneratePlanets(player.Hash, sun_position)
+    generated_planets, _ := GeneratePlanets(hash, sun_position)
 
     if len(generated_planets) != 9 {
         t.Error("Wrong planets count")
