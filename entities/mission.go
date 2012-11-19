@@ -1,6 +1,11 @@
-package libs
+package entities
 
-import "time"
+import (
+    "time"
+    "encoding/json"
+    "fmt"
+    "log"
+)
 
 type Mission struct {
     start_planet *Planet
@@ -8,6 +13,21 @@ type Mission struct {
     Player string
     ShipCount int
     EndPlanet *Planet
+}
+
+// TODO Finish this!
+func (mission *Mission) PrepareForDB() (string, []byte) {
+    key := fmt.Sprintf(
+        "mission_%d_%d_%d",
+        mission.start_planet.coords[0],
+        mission.start_planet.coords[1],
+    )
+
+    result, err := json.Marshal(mission)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return key, result
 }
 
 // func (mission *Mission) End() {

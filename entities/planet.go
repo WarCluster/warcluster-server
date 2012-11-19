@@ -1,4 +1,4 @@
-package libs
+package entities
 
 import (
     "math"
@@ -17,7 +17,7 @@ type Planet struct {
 }
 
 func (planet *Planet) GetKey() string {
-    return fmt.Sprintf("planet_%d_%d", planet.coords[0], planet.coords[1])
+    return fmt.Sprintf("planet.%d_%d", planet.coords[0], planet.coords[1])
 }
 
 func (planet *Planet) PrepareForDB() (string, []byte) {

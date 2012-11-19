@@ -1,4 +1,4 @@
-package libs
+package entities
 
 import (
     "crypto/sha512"

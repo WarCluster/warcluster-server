@@ -1,4 +1,4 @@
-package libs
+package entities
 
 import (
     "fmt"
@@ -19,6 +19,10 @@ func (player *Player) String() string {
     return player.username
 }
 
+func (player *Player) GetKey() string {
+    return fmt.Sprintf("player.%s", player.username)
+}
+
 func (player *Player) GetMissions() []*Mission {
     return []*Mission{}
 }
@@ -30,7 +34,7 @@ func (player *Player) StartMission() error {
 }
 
 func (player *Player) PrepareForDB() (string, []byte) {
-    key := fmt.Sprintf("player_%s", player.username)
+    key := player.GetKey()
     result, err := json.Marshal(player)
     if err != nil {
         log.Fatal(err)
