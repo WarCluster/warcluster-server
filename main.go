@@ -2,37 +2,25 @@ package main
 
 import (
     "log"
-    "github.com/garyburd/redigo/redis"
-    // "./server"
-    "./libs"
-    // "encoding/json"
+    "./entities"
+    "./db_manager"
 )
 
 func main() {
-    db, err := redis.Dial("tcp", ":6379")
-    defer db.Close()
-    if err != nil {
-        log.Fatal(err)
-    }
-
+    defer db_manager.Finalize()
     username := "gophie"
     sun_position := []int{500, 300}
 
-    hash := libs.GenerateHash(username)
-    _, home_planet := libs.GeneratePlanets(hash, sun_position)
-    player := libs.CreatePlayer(username, hash, home_planet)
-    key, prepared_player := player.PrepareForDB()
+    hash := entities.GenerateHash(username)
+    _, home_planet := entities.GeneratePlanets(hash, sun_position)
+    player := entities.CreatePlayer(username, hash, home_planet)
 
     log.Println(player)
-    log.Println(key, string(prepared_player))
-
-
-    db.Send("SET", key, prepared_player)
-    db.Flush()
-
-    result, err := redis.String(db.Do("GET", key))
-    if err != nil {
-        log.Fatal(err)
+    log.Println("------------------------------")
+    db_manager.SetEntity(player)
+    new_player := db_manager.GetEntity(player.GetKey())
+    if new_player != nil {
+        log.Print(new_player)
     }
-    log.Println(key, result)
+
 }
