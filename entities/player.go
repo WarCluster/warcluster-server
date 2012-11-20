@@ -33,7 +33,7 @@ func (player *Player) StartMission() error {
     return nil
 }
 
-func (player *Player) PrepareForDB() (string, []byte) {
+func (player Player) PrepareForDB() (string, []byte) {
     key := player.GetKey()
     result, err := json.Marshal(player)
     if err != nil {
