@@ -28,3 +28,6 @@ pip-log.txt
 
 # Sublime Workspace
 *.sublime-workspace
+
+# Redis db files
+*rdb
