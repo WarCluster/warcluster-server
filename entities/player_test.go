@@ -15,3 +15,29 @@ func TestDatabasePreparations(t *testing.T) {
         t.Error("Player JSON formatting gone wrong!")
     }
 }
+
+func TestDeserialize(t *testing.T) {
+    var player Player
+    serialized_player := []byte("{\"Hash\":\"asdf\",\"HomePlanet\":\"planet.3_4\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}")
+    player = Construct("player.gophie", serialized_player).(Player)
+
+    if player.username != "gophie" {
+        t.Error("Player's name is ", player.username)
+    }
+
+    if player.Hash != "asdf" {
+        t.Error("Player's hash is ", player.Hash)
+    }
+
+    if player.HomePlanet != "planet.3_4" {
+        t.Error("Player's HomePlanet is ", player.HomePlanet)
+    }
+
+    if player.ScreenSize[0] != 1  && player.ScreenSize[1] != 1 {
+        t.Error("Player's ScreenSize is ", player.ScreenSize)
+    }
+
+    if player.ScreenPosition[0] != 2  && player.ScreenPosition[1] != 2 {
+        t.Error("Player's ScreenPosition is ", player.ScreenPosition)
+    }
+}

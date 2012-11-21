@@ -4,7 +4,6 @@ import (
     "fmt"
     "log"
     "github.com/garyburd/redigo/redis"
-    "strings"
     "encoding/json"
     "../entities"
     // "github.com/garyburd/redigo/redisx"
@@ -57,22 +56,12 @@ func SetEntity(entity entities.Entity) bool {
     return true
 }
 
-func GetEntity(key string) entities.Entity {
+func GetEntity(key string) entity.Entity {
     result, err := redis.Bytes(connection.Do("GET", key))
     if err != nil {
         log.Print(err)
         return nil
     }
-    entity_type := strings.Split(key, ".")[0]
-    switch entity_type {
-    case "player":
-        var entity entities.Player
-        unmarshaling_err :=  json.Unmarshal(result, &entity)
-        if unmarshaling_err != nil {
-            log.Print(unmarshaling_err)
-            return nil
-        }
-        return entity
-    }
-    return nil
+
+    return Construct(key, result)
 }

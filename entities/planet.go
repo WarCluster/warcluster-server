@@ -16,7 +16,7 @@ type Planet struct {
     Owner string
 }
 
-func (planet *Planet) GetKey() string {
+func (planet Planet) GetKey() string {
     return fmt.Sprintf("planet.%d_%d", planet.coords[0], planet.coords[1])
 }
 

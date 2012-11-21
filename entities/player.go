@@ -19,7 +19,7 @@ func (player *Player) String() string {
     return player.username
 }
 
-func (player *Player) GetKey() string {
+func (player Player) GetKey() string {
     return fmt.Sprintf("player.%s", player.username)
 }
 
