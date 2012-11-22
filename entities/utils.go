@@ -6,10 +6,12 @@ import (
     "io"
     "strconv"
     "strings"
+    "fmt"
 )
 
 func Construct(key string, data []byte) Entity {
     entity_type := strings.Split(key, ".")[0]
+    fmt.Print()
 
     switch entity_type {
     case "player":
@@ -21,8 +23,11 @@ func Construct(key string, data []byte) Entity {
         var planet Planet
         json.Unmarshal(data, &planet)
         key_coords := strings.Split(key, ".")[1]
-        planet.coords[0], _ = strconv.Atoi(strings.Split(key_coords, "_")[0])
-        planet.coords[1], _ = strconv.Atoi(strings.Split(key_coords, "_")[1])
+        planet_coords := strings.Split(key_coords, "_")
+        planet.coords = []int{0, 0}
+        planet.coords[0], _ = strconv.Atoi(planet_coords[0])
+        planet.coords[1], _ = strconv.Atoi(planet_coords[1])
+        return planet
     }
     return nil
 }
