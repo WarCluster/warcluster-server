@@ -6,7 +6,6 @@ import (
     "github.com/garyburd/redigo/redis"
     "encoding/json"
     "../entities"
-    // "github.com/garyburd/redigo/redisx"
 )
 
 var connection redis.Conn
