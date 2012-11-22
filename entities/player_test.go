@@ -16,7 +16,7 @@ func TestDatabasePreparations(t *testing.T) {
     }
 }
 
-func TestDeserialize(t *testing.T) {
+func TestDeserializePlayer(t *testing.T) {
     var player Player
     serialized_player := []byte("{\"Hash\":\"asdf\",\"HomePlanet\":\"planet.3_4\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}")
     player = Construct("player.gophie", serialized_player).(Player)

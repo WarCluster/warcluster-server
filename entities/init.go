@@ -1,8 +1,8 @@
 package entities
 
 type Entity interface {
-    Serialize() (string, []byte)
     GetKey() string
+    Serialize() (string, []byte)
     String() string
 }
 
