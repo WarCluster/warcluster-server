@@ -22,11 +22,7 @@ func Construct(key string, data []byte) Entity {
     case "planet":
         var planet Planet
         json.Unmarshal(data, &planet)
-        key_coords := strings.Split(key, ".")[1]
-        planet_coords := strings.Split(key_coords, "_")
-        planet.coords = []int{0, 0}
-        planet.coords[0], _ = strconv.Atoi(planet_coords[0])
-        planet.coords[1], _ = strconv.Atoi(planet_coords[1])
+        planet.coords = ExtractPlanetCoords(key)
         return planet
     }
     return nil
@@ -34,6 +30,14 @@ func Construct(key string, data []byte) Entity {
 
 func GenerateHash(username string) string {
     return simplifyHash(usernameHash(username))
+}
+
+func ExtractPlanetCoords(key string) []int {
+    key_coords := strings.Split(key, ".")[1]
+    planet_coords := strings.Split(key_coords, "_")
+    planet_coords_0, _ := strconv.Atoi(planet_coords[0])
+    planet_coords_1, _ := strconv.Atoi(planet_coords[1])
+    return []int{planet_coords_0, planet_coords_1}
 }
 
 func usernameHash(username string) []byte {
@@ -50,3 +54,4 @@ func simplifyHash(hash []byte) string {
     }
     return result
 }
+

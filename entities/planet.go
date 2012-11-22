@@ -5,7 +5,6 @@ import (
     "encoding/json"
     "fmt"
     "log"
-    "strings"
 )
 
 type Planet struct {
