@@ -17,6 +17,7 @@ type Planet struct {
 }
 
 func (self Planet) String() string {
+    // TODO: Improve this
     return self.Owner
 }
 
@@ -25,12 +26,11 @@ func (self Planet) GetKey() string {
 }
 
 func (self Planet) Serialize() (string, []byte) {
-    key := self.GetKey()
     result, err := json.Marshal(self)
     if err != nil {
         log.Fatal(err)
     }
-    return key, result
+    return self.GetKey(), result
 }
 
 func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {

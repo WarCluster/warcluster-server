@@ -34,12 +34,11 @@ func (self *Player) StartMission() error {
 }
 
 func (self Player) Serialize() (string, []byte) {
-    key := self.GetKey()
     result, err := json.Marshal(self)
     if err != nil {
         log.Fatal(err)
     }
-    return key, result
+    return self.GetKey(), result
 }
 
 func CreatePlayer(username, Hash string, HomePlanet *Planet) Player {
