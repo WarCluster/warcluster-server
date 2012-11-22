@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "fmt"
     "log"
+    "strings"
 )
 
 type Planet struct {
@@ -24,6 +25,11 @@ func (self Planet) String() string {
 func (self Planet) GetKey() string {
     return fmt.Sprintf("planet.%d_%d", self.coords[0], self.coords[1])
 }
+
+func (self Planet) GetCoords() []int {
+    return self.coords
+}
+
 
 func (self Planet) Serialize() (string, []byte) {
     result, err := json.Marshal(self)
