@@ -15,10 +15,14 @@ type Mission struct {
     EndPlanet string
 }
 
+func (self Mission) String() string {
+    return self.GetKey()
+}
+
 func (self Mission) GetKey() string {
     start_planet_coords := ExtractPlanetCoords(self.start_planet)
     return fmt.Sprintf(
-        "mission_%d_%d_%d",
+        "mission.%d_%d_%d",
         self.start_time.Unix(),
         start_planet_coords[0],
         start_planet_coords[1],

@@ -7,6 +7,7 @@ import (
     "strconv"
     "strings"
     "fmt"
+    "time"
 )
 
 func Construct(key string, data []byte) Entity {
@@ -24,6 +25,11 @@ func Construct(key string, data []byte) Entity {
         json.Unmarshal(data, &planet)
         planet.coords = ExtractPlanetCoords(key)
         return planet
+    case "mission":
+        var mission Mission
+        json.Unmarshal(data, &mission)
+        mission.start_planet, mission.start_time = ExtractMissionsKey(key)
+        return mission
     }
     return nil
 }
@@ -38,6 +44,15 @@ func ExtractPlanetCoords(key string) []int {
     planet_coords_0, _ := strconv.Atoi(planet_coords[0])
     planet_coords_1, _ := strconv.Atoi(planet_coords[1])
     return []int{planet_coords_0, planet_coords_1}
+}
+
+func ExtractMissionsKey(key string) (string, time.Time) {
+    params_raw := strings.Split(key, ".")[1]
+    params := strings.Split(params_raw, "_")
+    parsed_time, _ := strconv.ParseInt(params[0], 10, 64)
+    start_time := time.Unix(parsed_time, 0)
+    start_planet := fmt.Sprintf("planet.%s_%s", params[1], params[2])
+    return start_planet, start_time
 }
 
 func usernameHash(username string) []byte {
