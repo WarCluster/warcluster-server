@@ -8,26 +8,29 @@ import (
 )
 
 type Mission struct {
-    start_planet *Planet
+    start_planet string
     start_time time.Time
     Player string
     ShipCount int
-    EndPlanet *Planet
+    EndPlanet string
 }
 
-// TODO Finish this!
-func (self *Mission) PrepareForDB() (string, []byte) {
-    key := fmt.Sprintf(
+func (self Mission) GetKey() string {
+    start_planet_coords := ExtractPlanetCoords(self.start_planet)
+    return fmt.Sprintf(
         "mission_%d_%d_%d",
-        self.start_planet.coords[0],
-        self.start_planet.coords[1],
+        self.start_time.Unix(),
+        start_planet_coords[0],
+        start_planet_coords[1],
     )
+}
 
+func (self Mission) Serialize() (string, []byte) {
     result, err := json.Marshal(self)
     if err != nil {
         log.Fatal(err)
     }
-    return key, result
+    return self.GetKey(), result
 }
 
 // func (mission *Mission) End() {
