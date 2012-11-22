@@ -63,3 +63,32 @@ func TestDatabasePreparationsWithAnOwner(t *testing.T) {
     }
 }
 
+func TestDeserializePlanet(t *testing.T) {
+    var planet Planet
+    serialized_planet := []byte("{\"Texture\":3,\"Size\":1,\"ShipCount\":10,\"MaxShipCount\":15,\"Owner\":\"gophie\"}")
+    planet = Construct("planet.10_12", serialized_planet).(Planet)
+
+    if planet.Texture != 3 {
+        t.Error("Planet's texture is ", planet.Texture)
+    }
+
+    if planet.Size != 1 {
+        t.Error("Planet's tize is ", planet.Size)
+    }
+
+    if planet.ShipCount != 10 {
+        t.Error("Planet's ship count is ", planet.ShipCount)
+    }
+
+    if planet.MaxShipCount != 15 {
+        t.Error("Planet's max ship count is ", planet.MaxShipCount)
+    }
+
+    if planet.Owner != "gophie" {
+        t.Error("Planet's owner is ", planet.Owner)
+    }
+
+    if planet.coords[0] != 10  && planet.coords[1] != 12 {
+        t.Error("Planet's coords are ", planet.coords)
+    }
+}

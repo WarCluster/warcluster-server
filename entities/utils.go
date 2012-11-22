@@ -17,6 +17,12 @@ func Construct(key string, data []byte) Entity {
         json.Unmarshal(data, &player)
         player.username = strings.Split(key, "player.")[1]
         return player
+    case "planet":
+        var planet Planet
+        json.Unmarshal(data, &planet)
+        key_coords := strings.Split(key, ".")[1]
+        planet.coords[0], _ = strconv.Atoi(strings.Split(key_coords, "_")[0])
+        planet.coords[1], _ = strconv.Atoi(strings.Split(key_coords, "_")[1])
     }
     return nil
 }
