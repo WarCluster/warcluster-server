@@ -1,8 +1,9 @@
 package entities
 
 type Entity interface {
-    PrepareForDB() (string, []byte)
+    Serialize() (string, []byte)
     GetKey() string
+    String() string
 }
 
 var Types map[string]Entity

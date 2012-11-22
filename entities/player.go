@@ -15,7 +15,7 @@ type Player struct {
 
 }
 
-func (player *Player) String() string {
+func (player Player) String() string {
     return player.username
 }
 
@@ -33,7 +33,7 @@ func (player *Player) StartMission() error {
     return nil
 }
 
-func (player Player) PrepareForDB() (string, []byte) {
+func (player Player) Serialize() (string, []byte) {
     key := player.GetKey()
     result, err := json.Marshal(player)
     if err != nil {
