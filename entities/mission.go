@@ -16,14 +16,14 @@ type Mission struct {
 }
 
 // TODO Finish this!
-func (mission *Mission) PrepareForDB() (string, []byte) {
+func (self *Mission) PrepareForDB() (string, []byte) {
     key := fmt.Sprintf(
         "mission_%d_%d_%d",
-        mission.start_planet.coords[0],
-        mission.start_planet.coords[1],
+        self.start_planet.coords[0],
+        self.start_planet.coords[1],
     )
 
-    result, err := json.Marshal(mission)
+    result, err := json.Marshal(self)
     if err != nil {
         log.Fatal(err)
     }

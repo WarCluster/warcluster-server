@@ -15,27 +15,27 @@ type Player struct {
 
 }
 
-func (player Player) String() string {
-    return player.username
+func (self Player) String() string {
+    return self.username
 }
 
-func (player Player) GetKey() string {
-    return fmt.Sprintf("player.%s", player.username)
+func (self Player) GetKey() string {
+    return fmt.Sprintf("player.%s", self.username)
 }
 
-func (player *Player) GetMissions() []*Mission {
+func (self *Player) GetMissions() []*Mission {
     return []*Mission{}
 }
 
-func (player *Player) StartMission() error {
+func (self *Player) StartMission() error {
     // new_mission := CreateMission()
     //db.Do("RPUSH new_mission)
     return nil
 }
 
-func (player Player) Serialize() (string, []byte) {
-    key := player.GetKey()
-    result, err := json.Marshal(player)
+func (self Player) Serialize() (string, []byte) {
+    key := self.GetKey()
+    result, err := json.Marshal(self)
     if err != nil {
         log.Fatal(err)
     }

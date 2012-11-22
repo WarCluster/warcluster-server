@@ -16,17 +16,17 @@ type Planet struct {
     Owner string
 }
 
-func (planet Planet) String() string {
-    return planet.Owner
+func (self Planet) String() string {
+    return self.Owner
 }
 
-func (planet Planet) GetKey() string {
-    return fmt.Sprintf("planet.%d_%d", planet.coords[0], planet.coords[1])
+func (self Planet) GetKey() string {
+    return fmt.Sprintf("planet.%d_%d", self.coords[0], self.coords[1])
 }
 
-func (planet Planet) Serialize() (string, []byte) {
-    key := planet.GetKey()
-    result, err := json.Marshal(planet)
+func (self Planet) Serialize() (string, []byte) {
+    key := self.GetKey()
+    result, err := json.Marshal(self)
     if err != nil {
         log.Fatal(err)
     }
