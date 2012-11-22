@@ -40,7 +40,7 @@ func Finalize() {
 }
 
 func SetEntity(entity entities.Entity) bool {
-    key, prepared_entity := entity.PrepareForDB()
+    key, prepared_entity := entity.Serialize()
 
     send_err := connection.Send("SET", key, prepared_entity)
     if send_err != nil {
