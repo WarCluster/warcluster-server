@@ -64,3 +64,11 @@ func GetEntity(key string) entity.Entity {
 
     return Construct(key, result)
 }
+
+func GetPlayerMissions(username string) []*Mission {
+
+}
+
+func GetPlayerPlanets(username string) []*Planet {
+
+}
