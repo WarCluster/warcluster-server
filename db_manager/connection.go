@@ -4,7 +4,6 @@ import (
     "fmt"
     "log"
     "github.com/garyburd/redigo/redis"
-    "encoding/json"
     "../entities"
 )
 
@@ -55,20 +54,20 @@ func SetEntity(entity entities.Entity) bool {
     return true
 }
 
-func GetEntity(key string) entity.Entity {
+func GetEntity(key string) entities.Entity {
     result, err := redis.Bytes(connection.Do("GET", key))
     if err != nil {
         log.Print(err)
         return nil
     }
 
-    return Construct(key, result)
+    return entities.Construct(key, result)
 }
 
-func GetPlayerMissions(username string) []*Mission {
-
-}
-
-func GetPlayerPlanets(username string) []*Planet {
-
-}
+// func GetPlayerMissions(username string) []*entities.Mission {
+// 
+// }
+// 
+// func GetPlayerPlanets(username string) []*entities.Planet {
+// 
+// }
