@@ -23,4 +23,6 @@ func main() {
         log.Print(new_player)
     }
 
+    log.Println(db_manager.GetList("planets", "gophie"))
+
 }

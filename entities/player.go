@@ -23,13 +23,6 @@ func (self Player) GetKey() string {
     return fmt.Sprintf("player.%s", self.username)
 }
 
-func (self *Player) GetMissions() []*Mission {
-    return []*Mission{}
-}
-
-func (self *Player) GetPlanets() []*Planet {
-    return []*Planet{}
-}
 
 func (self *Player) StartMission() error {
     // new_mission := CreateMission()
