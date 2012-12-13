@@ -17,8 +17,7 @@ type Planet struct {
 }
 
 func (self Planet) String() string {
-    // TODO: Improve this
-    return self.Owner
+    return fmt.Sprintf("Planet[%s, %s]", self.coords[0], self.coords[1])
 }
 
 func (self Planet) GetKey() string {
