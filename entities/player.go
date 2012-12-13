@@ -24,7 +24,7 @@ func (self Player) GetKey() string {
 }
 
 
-func (self *Player) StartMission() error {
+func (self *Player) StartMission(start_planet, end_planet Planet, count int) error {
     // new_mission := CreateMission()
     //db.Do("RPUSH new_mission)
     return nil
