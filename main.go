@@ -15,14 +15,11 @@ func main() {
     _, home_planet := entities.GeneratePlanets(hash, sun_position)
     player := entities.CreatePlayer(username, hash, home_planet)
 
-    log.Println(player)
+    log.Println("Created player:", player)
     log.Println("------------------------------")
     db_manager.SetEntity(player)
     new_player := db_manager.GetEntity(player.GetKey())
     if new_player != nil {
-        log.Print(new_player)
+        log.Println("Fetched player from the db:", new_player)
     }
-
-    log.Println(db_manager.GetList("planets", "gophie"))
-
 }

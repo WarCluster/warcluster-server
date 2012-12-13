@@ -38,7 +38,7 @@ func GetEntity(key string) entities.Entity {
 func GetList(group_type string, username string) []entities.Entity {
     var entity_list []entities.Entity
     var coord string
-    
+
     result, err := redis.String(connection.Do("GET", fmt.Sprintf("%v.%v", group_type, username)))
     if err != nil {
         log.Print(err)
