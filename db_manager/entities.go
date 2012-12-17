@@ -1,10 +1,10 @@
 package db_manager
 
 import (
-    "fmt"
-    "log"
-    "github.com/garyburd/redigo/redis"
     "../entities"
+    "fmt"
+    "github.com/garyburd/redigo/redis"
+    "log"
     "strings"
 )
 

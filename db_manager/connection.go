@@ -2,18 +2,17 @@ package db_manager
 
 import (
     "fmt"
-    "log"
     "github.com/garyburd/redigo/redis"
+    "log"
 )
 
 var connection redis.Conn
 
 const (
     HOSTNAME = "localhost"
-    PORT = 6379
-    NETWORK = "tcp"
+    PORT     = 6379
+    NETWORK  = "tcp"
 )
-
 
 func init() {
     var err error

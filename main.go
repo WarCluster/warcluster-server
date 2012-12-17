@@ -1,9 +1,9 @@
 package main
 
 import (
-    "log"
-    "./entities"
     "./db_manager"
+    "./entities"
+    "log"
 )
 
 func main() {
