@@ -18,8 +18,7 @@ func main() {
     log.Println("Created player:", player)
     log.Println("------------------------------")
     db_manager.SetEntity(player)
-    new_player := db_manager.GetEntity(player.GetKey())
-    if new_player != nil {
+    if new_player := db_manager.GetEntity(player.GetKey()); new_player != nil {
         log.Println("Fetched player from the db:", new_player)
     }
 }

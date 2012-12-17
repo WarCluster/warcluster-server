@@ -18,8 +18,7 @@ const (
 func init() {
     var err error
     log.Print("Initializing database connection... ")
-    connection, err = connect()
-    if err != nil {
+    if connection, err = connect(); err != nil {
         log.Fatal(err)
     }
 }
@@ -30,8 +29,7 @@ func connect() (redis.Conn, error) {
 
 func Finalize() {
     log.Print("Closing database connection... ")
-    err := connection.Close()
-    if err != nil {
+    if err := connection.Close(); err != nil {
         log.Fatal(err)
     }
 }

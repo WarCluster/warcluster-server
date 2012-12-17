@@ -45,5 +45,6 @@ func actionParser(username, start_planet_key, end_planet_key string, count int) 
         count = start_planet.ShipCount
     }
 
-    return player.StartMission(start_planet, end_planet, count)
+    player.StartMission(start_planet, end_planet, count)
+    return nil
 }

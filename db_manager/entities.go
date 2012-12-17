@@ -11,14 +11,12 @@ import (
 func SetEntity(entity entities.Entity) bool {
     key, prepared_entity := entity.Serialize()
 
-    send_err := connection.Send("SET", key, prepared_entity)
-    if send_err != nil {
+    if send_err := connection.Send("SET", key, prepared_entity); send_err != nil {
         log.Print(send_err)
         return false
     }
 
-    flush_err := connection.Flush()
-    if flush_err != nil {
+    if flush_err := connection.Flush(); flush_err != nil {
         log.Print(flush_err)
         return false
     }

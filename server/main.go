@@ -18,7 +18,7 @@ func Run() {
     clients = make(map[string]*bufio.ReadWriter)
     server, err := net.Listen("tcp", HOST+":"+strconv.Itoa(PORT))
     if server == nil {
-        panic("couldn't start listening: " + err.Error())
+        log.Fatal("Couldn't start listening: " + err.Error())
     }
 
     log.Printf("I'm up and running!")
@@ -36,7 +36,7 @@ func clientConnections(listener net.Listener) chan net.Conn {
         for {
             client, err := listener.Accept()
             if client == nil {
-                log.Printf("couldn't accept: " + err.Error())
+                log.Printf("Couldn't accept: " + err.Error())
                 continue
             }
             i++
