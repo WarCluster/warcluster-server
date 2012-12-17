@@ -1,43 +1,46 @@
 package entities
 
 import (
-    "time"
-    "encoding/json"
-    "fmt"
-    "log"
+	"encoding/json"
+	"fmt"
+	"log"
+	"time"
 )
 
 type Mission struct {
-    start_planet string
-    start_time time.Time
-    Player string
-    ShipCount int
-    EndPlanet string
+	start_planet string
+	start_time   time.Time
+	Player       string
+	ShipCount    int
+	EndPlanet    string
 }
 
 func (self Mission) String() string {
-    return self.GetKey()
+	return self.GetKey()
 }
 
 func (self Mission) GetKey() string {
-    start_planet_coords := ExtractPlanetCoords(self.start_planet)
-    return fmt.Sprintf(
-        "mission.%d_%d_%d",
-        self.start_time.Unix(),
-        start_planet_coords[0],
-        start_planet_coords[1],
-    )
+	start_planet_coords := ExtractPlanetCoords(self.start_planet)
+	return fmt.Sprintf(
+		"mission.%d_%d_%d",
+		self.start_time.Unix(),
+		start_planet_coords[0],
+		start_planet_coords[1],
+	)
 }
 
 func (self Mission) Serialize() (string, []byte) {
-    result, err := json.Marshal(self)
-    if err != nil {
-        log.Fatal(err)
-    }
-    return self.GetKey(), result
+	result, err := json.Marshal(self)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return self.GetKey(), result
 }
 
-// func (mission *Mission) End() {
+// func (mission *Mission, ) End() {
+//     end_point
+//     start_point
+
 //     if mission.end_planet.ship_count >= mission.ship_count {
 //         mission.end_planet.ship_count -= mission.ship_count
 //     } else {
@@ -48,13 +51,3 @@ func (self Mission) Serialize() (string, []byte) {
 //         //Fuuuuuck
 //     }
 // }
-// 
-// func StartMission(player *Player, fleet int, start_planet, end_planet *Planet) *Mission {
-//     start_time = time.Now()
-//     ship_count = int(start_planet.ship_count / 10) * fleet
-//     start_planet.ship_count -= ship_count
-//     mission := Mission{player, ship_count, start_planet, end_planet, start_time}
-//     player.missions = append(player.missions, *mission)
-//     return *mission
-// }
-// 
