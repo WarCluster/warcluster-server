@@ -26,8 +26,9 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-# Sublime Workspace
+# Sublime
 *.sublime-workspace
+*.sublime-project
 
 # Redis db files
 *rdb
