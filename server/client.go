@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"../entities"
 )
 
 type Client struct {
 	conn     net.Conn
 	nickname string
 	channel  chan string
+	player   *entities.Player
 }
 
 func (self *Client) ReadLinesInto(ch chan<- string) {
