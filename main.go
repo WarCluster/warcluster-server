@@ -1,24 +1,28 @@
 package main
 
 import (
-    "./db_manager"
-    "./entities"
-    "log"
+	"./db_manager"
+	"./entities"
+	"./server"
+	"log"
 )
 
 func main() {
-    defer db_manager.Finalize()
-    username := "gophie"
-    sun_position := []int{500, 300}
+	defer db_manager.Finalize()
 
-    hash := entities.GenerateHash(username)
-    _, home_planet := entities.GeneratePlanets(hash, sun_position)
-    player := entities.CreatePlayer(username, hash, home_planet)
+	server := &server.Server{}
+	username := "gophie"
+	sun_position := []int{500, 300}
 
-    log.Println("Created player:", player)
-    log.Println("------------------------------")
-    db_manager.SetEntity(player)
-    if new_player := db_manager.GetEntity(player.GetKey()); new_player != nil {
-        log.Println("Fetched player from the db:", new_player)
-    }
+	hash := entities.GenerateHash(username)
+	_, home_planet := entities.GeneratePlanets(hash, sun_position)
+	player := entities.CreatePlayer(username, hash, home_planet)
+
+	log.Println("Created player:", player)
+	log.Println("------------------------------")
+	db_manager.SetEntity(player)
+	if new_player := db_manager.GetEntity(player.GetKey()); new_player != nil {
+		log.Println("Fetched player from the db:", new_player)
+	}
+	server.Start()
 }

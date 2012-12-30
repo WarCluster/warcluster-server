@@ -1,63 +1,77 @@
-package main
+package server
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"strings"
 )
 
 const HOST = "localhost"
 const PORT = 7000
 
-type Client struct {
-	conn     net.Conn
-	nickname string
-	channel  chan string
+type Server struct {
+	listener   net.Listener
+	clients    map[net.Conn]chan<- string
+	is_running bool
 }
 
-func main() {
-	msgchan := make(chan string)
-	addchan := make(chan Client)
-	rmchan := make(chan Client)
+func (self *Server) Start() error {
+	if self.is_running {
+		return errors.New("Server is already running!")
+	}
+	var err error
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("%v:%v", HOST, PORT))
-	if err != nil {
-		log.Fatal(err)
+	sigtermchan := make(chan os.Signal, 1)
+	msgchan := make(chan string)
+	addchan := make(chan *Client)
+	rmchan := make(chan *Client)
+
+	signal.Notify(sigtermchan, os.Interrupt)
+	self.listener, err = net.Listen("tcp", fmt.Sprintf("%v:%v", HOST, PORT))
+	if err == nil {
+		self.is_running = true
+		self.clients = make(map[net.Conn]chan<- string)
+	} else {
+		return err
 	}
 
 	log.Println("Server is up and running!")
-	go handleMessages(msgchan, addchan, rmchan)
+	go self.Stop(sigtermchan)
+	go self.handleMessages(msgchan, addchan, rmchan)
 
-	for {
-		conn, err := ln.Accept()
+	for self.is_running {
+		conn, err := self.listener.Accept()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		go handleConnection(conn, msgchan, addchan, rmchan)
+		go self.handleConnection(conn, msgchan, addchan, rmchan)
 	}
+	return nil
 }
 
-func (c Client) ReadLinesInto(ch chan<- string) {
-	bufc := bufio.NewReader(c.conn)
-	for {
-		line, err := bufc.ReadString('\n')
-		if err != nil {
-			break
-		}
-		ch <- fmt.Sprintf("%s: %s", c.nickname, line)
+func (self *Server) Stop(sigtermchan <-chan os.Signal) error {
+	if !self.is_running {
+		return errors.New("Server is already running!")
 	}
-}
 
-func (c Client) WriteLinesFrom(ch <-chan string) {
-	for msg := range ch {
-		if _, err := io.WriteString(c.conn, msg); err != nil {
-			return
+	select {
+	case <-sigtermchan:
+		log.Println("Server is shutting down...")
+		for client := range self.clients {
+			client.Close()
+			delete(self.clients, client)
 		}
+		self.listener.Close()
+		self.is_running = false
 	}
+	return nil
 }
 
 func authenticate(c net.Conn, bufc *bufio.Reader) string {
@@ -67,9 +81,9 @@ func authenticate(c net.Conn, bufc *bufio.Reader) string {
 	return string(nick)
 }
 
-func handleConnection(c net.Conn, msgchan chan<- string, addchan chan<- Client, rmchan chan<- Client) {
+func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan, rmchan chan<- *Client) {
 	bufc := bufio.NewReader(c)
-	client := Client{
+	client := &Client{
 		conn:     c,
 		nickname: authenticate(c, bufc),
 		channel:  make(chan string),
@@ -93,22 +107,20 @@ func handleConnection(c net.Conn, msgchan chan<- string, addchan chan<- Client, 
 	client.WriteLinesFrom(client.channel)
 }
 
-func handleMessages(msgchan <-chan string, addchan <-chan Client, rmchan <-chan Client) {
-	clients := make(map[net.Conn]chan<- string)
-
+func (self *Server) handleMessages(msgchan <-chan string, addchan, rmchan <-chan *Client) {
 	for {
 		select {
 		case msg := <-msgchan:
 			log.Printf("New message: %s", msg)
-			for _, ch := range clients {
-				go func(mch chan<- string) { mch <- fmt.Sprintf("%v\n%#v\n", msg, clients) }(ch)
+			for _, ch := range self.clients {
+				go func(mch chan<- string) { mch <- msg }(ch)
 			}
 		case client := <-addchan:
 			log.Printf("New client: %v\n", client.nickname)
-			clients[client.conn] = client.channel
+			self.clients[client.conn] = client.channel
 		case client := <-rmchan:
 			log.Printf("Client disconnects: %v\n", client.nickname)
-			delete(clients, client.conn)
+			delete(self.clients, client.conn)
 		}
 	}
 }
