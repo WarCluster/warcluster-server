@@ -12,16 +12,13 @@ import (
 	"strings"
 )
 
-const HOST = "localhost"
-const PORT = 7000
-
 type Server struct {
 	listener   net.Listener
 	clients    map[net.Conn]chan<- string
 	is_running bool
 }
 
-func (self *Server) Start() error {
+func (self *Server) Start(host string, port int) error {
 	if self.is_running {
 		return errors.New("Server is already running!")
 	}
@@ -33,7 +30,7 @@ func (self *Server) Start() error {
 	rmchan := make(chan *Client)
 
 	signal.Notify(sigtermchan, os.Interrupt)
-	self.listener, err = net.Listen("tcp", fmt.Sprintf("%v:%v", HOST, PORT))
+	self.listener, err = net.Listen("tcp", fmt.Sprintf("%v:%v", host, port))
 	if err == nil {
 		self.is_running = true
 		self.clients = make(map[net.Conn]chan<- string)

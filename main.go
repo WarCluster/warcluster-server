@@ -24,5 +24,5 @@ func main() {
 	if new_player := db_manager.GetEntity(player.GetKey()); new_player != nil {
 		log.Println("Fetched player from the db:", new_player)
 	}
-	server.Start()
+	server.Start("localhost", 7000)
 }
