@@ -97,7 +97,7 @@ func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
 		planets, home_planet := entities.GeneratePlanets(hash, sun_position)
 		player = entities.CreatePlayer(nickname, hash, home_planet)
 		db_manager.SetEntity(player)
-		for i:=0; i<=len(planets)-1; i++ {
+		for i := 0; i < len(planets); i++ {
 			db_manager.SetEntity(planets[i])
 		}
 	} else {

@@ -59,5 +59,5 @@ func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
 		result = append(result, planet_in_creation)
 	}
-	return result, &result[int(hashElement(37))-1]
+	return result, &result[int(hashElement(37))]
 }
