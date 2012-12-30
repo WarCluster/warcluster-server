@@ -7,68 +7,77 @@ import (
 	"io"
 	"log"
 	"net"
-	"os"
-	"os/signal"
 	"strings"
 )
 
 type Server struct {
+	host       string
+	port       int
 	listener   net.Listener
 	clients    map[net.Conn]chan<- string
 	is_running bool
 }
 
 func (self *Server) Start(host string, port int) error {
+	log.Print("Server is starting...")
 	if self.is_running {
-		return errors.New("Server is already running!")
+		return errors.New("Server is already started!")
 	}
 	var err error
 
-	sigtermchan := make(chan os.Signal, 1)
 	msgchan := make(chan string)
 	addchan := make(chan *Client)
 	rmchan := make(chan *Client)
 
-	signal.Notify(sigtermchan, os.Interrupt)
 	self.listener, err = net.Listen("tcp", fmt.Sprintf("%v:%v", host, port))
 	if err == nil {
+		self.host = host
+		self.port = port
 		self.is_running = true
 		self.clients = make(map[net.Conn]chan<- string)
+		log.Println("Server is up and running!")
 	} else {
+		log.Println(err)
 		return err
 	}
 
-	log.Println("Server is up and running!")
-	go self.Stop(sigtermchan)
 	go self.handleMessages(msgchan, addchan, rmchan)
 
 	for self.is_running {
 		conn, err := self.listener.Accept()
 		if err != nil {
-			log.Println(err)
-			continue
+			if self.is_running {
+				log.Println(err)
+				continue
+			} else {
+				break
+			}
 		}
 		go self.handleConnection(conn, msgchan, addchan, rmchan)
 	}
 	return nil
 }
 
-func (self *Server) Stop(sigtermchan <-chan os.Signal) error {
+func (self *Server) Stop() error {
+	log.Println("Server is shutting down...")
 	if !self.is_running {
-		return errors.New("Server is already running!")
+		err := errors.New("Server is already stopped!")
+		log.Println(err)
+		return err
 	}
 
-	select {
-	case <-sigtermchan:
-		log.Println("Server is shutting down...")
-		for client := range self.clients {
-			client.Close()
-			delete(self.clients, client)
-		}
-		self.listener.Close()
-		self.is_running = false
+	for client := range self.clients {
+		client.Close()
+		delete(self.clients, client)
 	}
+	self.listener.Close()
+	self.is_running = false
 	return nil
+}
+
+func (self *Server) Restart() {
+	self.Stop()
+	self.Start(self.host, self.port)
 }
 
 func authenticate(c net.Conn, bufc *bufio.Reader) string {
