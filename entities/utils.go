@@ -55,10 +55,6 @@ func ExtractMissionsKey(key string) (string, time.Time) {
 	return start_planet, start_time
 }
 
-func GetSunPosition() []int {
-	return []int{500, 300}
-}
-
 func usernameHash(username string) []byte {
 	hash := sha512.New()
 	io.WriteString(hash, username)
