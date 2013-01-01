@@ -9,7 +9,10 @@ import (
 )
 
 func SetEntity(entity entities.Entity) bool {
-	key, prepared_entity := entity.Serialize()
+	key, prepared_entity, err := entity.Serialize()
+	if err != nil {
+		return false
+	}
 
 	if send_err := connection.Send("SET", key, prepared_entity); send_err != nil {
 		log.Print(send_err)

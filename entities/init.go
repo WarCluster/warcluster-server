@@ -2,7 +2,7 @@ package entities
 
 type Entity interface {
 	GetKey() string
-	Serialize() (string, []byte)
+	Serialize() (string, []byte, error)
 	String() string
 }
 

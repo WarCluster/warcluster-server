@@ -3,7 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -29,12 +28,12 @@ func (self Mission) GetKey() string {
 	)
 }
 
-func (self Mission) Serialize() (string, []byte) {
+func (self Mission) Serialize() (string, []byte, error) {
 	result, err := json.Marshal(self)
 	if err != nil {
-		log.Fatal(err)
+		return self.GetKey(), nil, err
 	}
-	return self.GetKey(), result
+	return self.GetKey(), result, nil
 }
 
 // func (mission *Mission, ) End() {

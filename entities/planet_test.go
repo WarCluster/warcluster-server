@@ -45,9 +45,13 @@ func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
 	expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
 	expected_key := "planet.271_203"
 
-	key, json := planet.Serialize()
+	key, json, err := planet.Serialize()
 	if key != expected_key || string(json) != expected_json {
 		t.Error("Planet JSON formatting gone wrong!")
+	}
+
+	if err != nil {
+		t.Error("Error during serialization: ", err)
 	}
 }
 
@@ -56,10 +60,14 @@ func TestDatabasePreparationsWithAnOwner(t *testing.T) {
 	expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
 	expected_key := "planet.271_203"
 
-	key, json := planet.Serialize()
+	key, json, err := planet.Serialize()
 	if key != expected_key || string(json) != expected_json {
 		t.Error(json)
 		t.Error("Planet JSON formatting gone wrong!")
+	}
+
+	if err != nil {
+		t.Error("Error during serialization: ", err)
 	}
 }
 

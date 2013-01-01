@@ -14,8 +14,8 @@ func (self Sun) String() string {
 	return fmt.Sprintf("Sun[%d, %d]", self[0], self[1])
 }
 
-func (self Sun) Serialize() (string, []byte) {
-	return self.GetKey(), []byte{1}
+func (self Sun) Serialize() (string, []byte, error) {
+	return self.GetKey(), []byte{1}, nil
 }
 
 func GenerateSun() Sun {
