@@ -90,7 +90,7 @@ func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
 
 	// TODO: Twitter login goes here
 
-	entity := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
+	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
 	if entity == nil {
 		sun := entities.GenerateSun()
 		hash := entities.GenerateHash(nickname)
