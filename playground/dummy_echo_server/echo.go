@@ -1,11 +1,11 @@
 package main
 
 import (
-    "bufio"
-    "bytes"
-    "log"
-    "net"
-    "strconv"
+	"bufio"
+	"bytes"
+	"log"
+	"net"
+	"strconv"
 )
 
 const HOST = "localhost"
@@ -15,67 +15,67 @@ const NEW_LINE byte = 10
 var clients map[string]*bufio.ReadWriter
 
 func main() {
-    clients = make(map[string]*bufio.ReadWriter)
-    server, err := net.Listen("tcp", HOST+":"+strconv.Itoa(PORT))
-    if server == nil {
-        panic("couldn't start listening: " + err.Error())
-    }
+	clients = make(map[string]*bufio.ReadWriter)
+	server, err := net.Listen("tcp", HOST+":"+strconv.Itoa(PORT))
+	if server == nil {
+		panic("couldn't start listening: " + err.Error())
+	}
 
-    log.Printf("I'm up and running!")
-    connections := clientConnections(server)
+	log.Printf("I'm up and running!")
+	connections := clientConnections(server)
 
-    for {
-        go handleConnection(<-connections)
-    }
+	for {
+		go handleConnection(<-connections)
+	}
 }
 
 func clientConnections(listener net.Listener) chan net.Conn {
-    channel := make(chan net.Conn)
-    i := 0
-    go func() {
-        for {
-            client, err := listener.Accept()
-            if client == nil {
-                log.Printf("couldn't accept: " + err.Error())
-                continue
-            }
-            i++
-            log.Printf("%v <--> %v\n", client.LocalAddr(), client.RemoteAddr())
-            channel <- client
-        }
-    }()
-    return channel
+	channel := make(chan net.Conn)
+	i := 0
+	go func() {
+		for {
+			client, err := listener.Accept()
+			if client == nil {
+				log.Printf("couldn't accept: " + err.Error())
+				continue
+			}
+			i++
+			log.Printf("%v <--> %v\n", client.LocalAddr(), client.RemoteAddr())
+			channel <- client
+		}
+	}()
+	return channel
 }
 
 func handleConnection(client net.Conn) {
-    var message bytes.Buffer
-    buffer := bufio.NewReadWriter(bufio.NewReader(client), bufio.NewWriter(client))
-    clients[client.RemoteAddr().String()] = buffer
+	var message bytes.Buffer
+	buffer := bufio.NewReadWriter(bufio.NewReader(client), bufio.NewWriter(client))
+	clients[client.RemoteAddr().String()] = buffer
 
-    for {
-        line, err := buffer.ReadString(NEW_LINE)
-        if err != nil {
-            log.Printf("%v <- $ -> %v\n", client.LocalAddr(), client.RemoteAddr())
-            break
-        }
+	for {
+		line, err := buffer.ReadString(NEW_LINE)
+		if err != nil {
+			log.Printf("%v <- $ -> %v\n", client.LocalAddr(), client.RemoteAddr())
+			break
+		}
 
-        if len(line) > 4 && line[:5] == "/quit" {
-            buffer.WriteString("Bye\n")
-            buffer.Flush()
-            client.Close()
-        }
+		if len(line) > 4 && line[:5] == "/quit" {
+			buffer.WriteString("Bye\n")
+			buffer.Flush()
+			client.Close()
+		}
 
-        message.WriteString(client.RemoteAddr().String())
-        message.WriteString(" said: ")
-        message.WriteString(line)
-        go writeToEveryone(message.String())
-        message.Reset()
-    }
+		message.WriteString(client.RemoteAddr().String())
+		message.WriteString(" said: ")
+		message.WriteString(line)
+		go writeToEveryone(message.String())
+		message.Reset()
+	}
 }
 
 func writeToEveryone(message string) {
-    for key, _ := range clients {
-        clients[key].WriteString(message)
-        clients[key].Flush()
-    }
+	for key, _ := range clients {
+		clients[key].WriteString(message)
+		clients[key].Flush()
+	}
 }

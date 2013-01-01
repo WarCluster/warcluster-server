@@ -1,14 +1,14 @@
 package server
 
 import (
+	"../db_manager"
+	"../entities"
 	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
-	"../db_manager"
-	"../entities"
 )
 
 type Server struct {

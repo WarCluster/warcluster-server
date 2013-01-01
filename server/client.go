@@ -1,11 +1,11 @@
 package server
 
 import (
+	"../entities"
 	"bufio"
 	"fmt"
 	"io"
 	"net"
-	"../entities"
 	"strconv"
 	"strings"
 )

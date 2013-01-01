@@ -21,4 +21,3 @@ func (self Sun) Serialize() (string, []byte) {
 func GenerateSun() Sun {
 	return Sun{500, 300}
 }
-
