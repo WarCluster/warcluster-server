@@ -1,10 +1,10 @@
 package server
 
 import (
-    "../db_manager"
-    e "../entities"
-    "fmt"
-    "log"
+	"../db_manager"
+	e "../entities"
+	"errors"
+	"fmt"
 )
 
 const BEST_PING = 150
@@ -12,37 +12,55 @@ const WORST_PING = 1500
 const STEPS = 10
 
 func scopeOfView(position []int, resolution []int, lag int) ([]int, []int) {
-    step := int(WORST_PING - BEST_PING/STEPS)
-    multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
-    end_resolution := []int{
-        int(float32(resolution[0]) * multiply),
-        int(float32(resolution[1]) * multiply),
-    }
+	step := int(WORST_PING - BEST_PING/STEPS)
+	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
+	end_resolution := []int{
+		int(float32(resolution[0]) * multiply),
+		int(float32(resolution[1]) * multiply),
+	}
 
-    top_left := []int{
-        position[0] - int((end_resolution[0]-resolution[0])/2),
-        position[1] - int((end_resolution[1]-resolution[1])/2),
-    }
+	top_left := []int{
+		position[0] - int((end_resolution[0]-resolution[0])/2),
+		position[1] - int((end_resolution[1]-resolution[1])/2),
+	}
 
-    bottom_right := []int{
-        position[0] + resolution[0] + int((end_resolution[0]-resolution[0])/2),
-        position[1] + resolution[1] + int((end_resolution[1]-resolution[1])/2),
-    }
-    return top_left, bottom_right
+	bottom_right := []int{
+		position[0] + resolution[0] + int((end_resolution[0]-resolution[0])/2),
+		position[1] + resolution[1] + int((end_resolution[1]-resolution[1])/2),
+	}
+	return top_left, bottom_right
 }
 
 func actionParser(username, start_planet_key, end_planet_key string, fleet int) error {
-    var player e.Player
-    var start_planet, end_planet e.Planet
+	var err error = nil
 
-    player = db_manager.GetEntity(fmt.Sprint("player.", username)).(e.Player)
-    start_planet = db_manager.GetEntity(fmt.Sprint("planet.", start_planet_key)).(e.Planet)
-    end_planet = db_manager.GetEntity(fmt.Sprint("planet.", end_planet_key)).(e.Planet)
+	defer func() error {
+		if panicked := recover(); panicked != nil {
+			err = errors.New("Invalid action!")
+		}
+		return nil
+	}()
 
-    if start_planet.Owner != username {
-        log.Fatal("This is not your home!")
-    }
+	player_entity, err := db_manager.GetEntity(fmt.Sprint("player.", username))
+	if err != nil {
+		return errors.New("Player does not exist")
+	}
+	player := player_entity.(e.Player)
 
-    player.StartMission(start_planet, end_planet, fleet)
-    return nil
+	start_planet, err := db_manager.GetEntity(fmt.Sprint("planet.", start_planet_key))
+	if err != nil {
+		return errors.New("Start planet does not exist")
+	}
+
+	end_planet, err := db_manager.GetEntity(fmt.Sprint("planet.", end_planet_key))
+	if err != nil {
+		return errors.New("End planet does not exist")
+	}
+
+	if start_planet.(e.Planet).Owner != username {
+		err = errors.New("This is not your home!")
+	}
+
+	player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
+	return err
 }

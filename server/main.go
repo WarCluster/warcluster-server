@@ -1,13 +1,14 @@
 package server
 
 import (
+	"../db_manager"
+	"../entities"
 	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
-	"strings"
 )
 
 type Server struct {
@@ -80,18 +81,40 @@ func (self *Server) Restart() {
 	self.Start(self.host, self.port)
 }
 
-func authenticate(c net.Conn, bufc *bufio.Reader) string {
+func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
+	var player entities.Player
 	io.WriteString(c, "Authenticating...\n")
 	io.WriteString(c, "What is your nick?\n> ")
 	nick, _, _ := bufc.ReadLine()
-	return string(nick)
+	nickname := string(nick)
+
+	// TODO: Twitter login goes here
+
+	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
+	if entity == nil {
+		sun := entities.GenerateSun()
+		hash := entities.GenerateHash(nickname)
+		planets, home_planet := entities.GeneratePlanets(hash, sun)
+		player = entities.CreatePlayer(nickname, hash, home_planet)
+		db_manager.SetEntity(player)
+		db_manager.SetEntity(sun)
+		for i := 0; i < len(planets); i++ {
+			db_manager.SetEntity(planets[i])
+		}
+	} else {
+		player = entity.(entities.Player)
+	}
+	return nickname, &player
 }
 
 func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan, rmchan chan<- *Client) {
 	bufc := bufio.NewReader(c)
+	nickname, player := authenticate(c, bufc)
+
 	client := &Client{
 		conn:     c,
-		nickname: authenticate(c, bufc),
+		nickname: nickname,
+		player:   player,
 		channel:  make(chan string),
 	}
 
@@ -102,10 +125,6 @@ func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan,
 		rmchan <- client
 	}()
 
-	if strings.TrimSpace(client.nickname) == "" {
-		io.WriteString(c, "Invalid Username\n")
-		return
-	}
 	addchan <- client
 	io.WriteString(c, fmt.Sprintf("Welcome, %s!\n\n", client.nickname))
 	msgchan <- fmt.Sprintf("%s has joined.\n", client.nickname)

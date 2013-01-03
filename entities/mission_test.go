@@ -19,13 +19,18 @@ func TestMissionSerialize(t *testing.T) {
 	mission := Mission{"planet.32_64", start_time, "gophie", 5, "planet.2_2"}
 	expected_json := "{\"Player\":\"gophie\",\"ShipCount\":5,\"EndPlanet\":\"planet.2_2\"}"
 
-	key, json := mission.Serialize()
+	key, json, err := mission.Serialize()
+
 	if key != mission.GetKey() {
 		t.Error("You're not using the missions' GetKey()!")
 	}
 
 	if string(json) != expected_json {
 		t.Error("Serialized mission is ", json, "but iy should be ", expected_json)
+	}
+
+	if err != nil {
+		t.Error("Error during serialization: ", err)
 	}
 }
 
@@ -71,5 +76,4 @@ func TestEndMission(t *testing.T) {
 	if endPlanet.Owner != "gophie" {
 		t.Error("End Planet owner was expected  to be gophie but is:", endPlanet.Owner)
 	}
-
 }

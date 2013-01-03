@@ -3,7 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -37,12 +36,12 @@ func (self *Player) StartMission(start_planet, end_planet Planet, fleet int) Mis
 	return mission
 }
 
-func (self Player) Serialize() (string, []byte) {
+func (self Player) Serialize() (string, []byte, error) {
 	result, err := json.Marshal(self)
 	if err != nil {
-		log.Fatal(err)
+		return self.GetKey(), nil, err
 	}
-	return self.GetKey(), result
+	return self.GetKey(), result, nil
 }
 
 func CreatePlayer(username, Hash string, HomePlanet *Planet) Player {
