@@ -62,5 +62,8 @@ func actionParser(username, start_planet_key, end_planet_key string, fleet int) 
 	}
 
 	player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
+	// TODO: Write this mission in the DB
+	// Insert this mission in the sorted list with missions
+
 	return err
 }
