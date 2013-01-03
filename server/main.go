@@ -1,8 +1,6 @@
 package server
 
 import (
-	"../db_manager"
-	"../entities"
 	"bufio"
 	"errors"
 	"fmt"
@@ -79,32 +77,6 @@ func (self *Server) Stop() error {
 func (self *Server) Restart() {
 	self.Stop()
 	self.Start(self.host, self.port)
-}
-
-func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
-	var player entities.Player
-	io.WriteString(c, "Authenticating...\n")
-	io.WriteString(c, "What is your nick?\n> ")
-	nick, _, _ := bufc.ReadLine()
-	nickname := string(nick)
-
-	// TODO: Twitter login goes here
-
-	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
-	if entity == nil {
-		sun := entities.GenerateSun()
-		hash := entities.GenerateHash(nickname)
-		planets, home_planet := entities.GeneratePlanets(hash, sun)
-		player = entities.CreatePlayer(nickname, hash, home_planet)
-		db_manager.SetEntity(player)
-		db_manager.SetEntity(sun)
-		for i := 0; i < len(planets); i++ {
-			db_manager.SetEntity(planets[i])
-		}
-	} else {
-		player = entity.(entities.Player)
-	}
-	return nickname, &player
 }
 
 func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan, rmchan chan<- *Client) {
