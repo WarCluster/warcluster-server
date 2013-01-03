@@ -37,17 +37,16 @@ func (self Mission) Serialize() (string, []byte) {
 	return self.GetKey(), result
 }
 
-// func (mission *Mission, ) End() {
-//     end_point
-//     start_point
-
-//     if mission.end_planet.ship_count >= mission.ship_count {
-//         mission.end_planet.ship_count -= mission.ship_count
-//     } else {
-//         mission.ship_count -= mission.end_planet.ship_count
-//         mission.end_planet.ship_count = mission.ship_count
-//         mission.end_planet.max_ship_count = mission.ship_count
-//         mission.end_planet.owner = mission.player
-//         //Fuuuuuck
-//     }
-// }
+func EndMission(endPlanet Planet, missionInfo Mission) Planet {
+	if endPlanet.Owner == missionInfo.Player {
+		endPlanet.ShipCount += missionInfo.ShipCount
+	} else {
+		if missionInfo.ShipCount < endPlanet.ShipCount {
+			endPlanet.ShipCount -= missionInfo.ShipCount
+		} else {
+			endPlanet.ShipCount = missionInfo.ShipCount - endPlanet.ShipCount
+			endPlanet.Owner = missionInfo.Player
+		}
+	}
+	return endPlanet
+}
