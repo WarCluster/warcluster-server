@@ -6,7 +6,7 @@ import (
 
 func TestDatabasePreparations(t *testing.T) {
 	player := Player{"gophie", "asdf", "planet.0_0", []int{1, 1}, []int{2, 2}}
-	expected_json := "{\"Hash\":\"asdf\",\"HomePlanet\":\"planet.0_0\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}"
+	expected_json := "{\"TwitterID\":\"asdf\",\"HomePlanet\":\"planet.0_0\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}"
 	expected_key := "player.gophie"
 
 	key, json, err := player.Serialize()
@@ -22,15 +22,15 @@ func TestDatabasePreparations(t *testing.T) {
 
 func TestDeserializePlayer(t *testing.T) {
 	var player Player
-	serialized_player := []byte("{\"Hash\":\"asdf\",\"HomePlanet\":\"planet.3_4\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}")
+	serialized_player := []byte("{\"TwitterID\":\"asdf\",\"HomePlanet\":\"planet.3_4\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}")
 	player = Construct("player.gophie", serialized_player).(Player)
 
 	if player.username != "gophie" {
 		t.Error("Player's name is ", player.username)
 	}
 
-	if player.Hash != "asdf" {
-		t.Error("Player's hash is ", player.Hash)
+	if player.TwitterID != "asdf" {
+		t.Error("Player's twitter id is ", player.TwitterID)
 	}
 
 	if player.HomePlanet != "planet.3_4" {
