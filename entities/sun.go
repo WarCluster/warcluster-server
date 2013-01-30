@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var sunCounter = []int{0, 0}
+
 type Sun []int
 
 func (self Sun) GetKey() string {
@@ -19,5 +21,18 @@ func (self Sun) Serialize() (string, []byte, error) {
 }
 
 func GenerateSun() Sun {
-	return Sun{500, 300}
+
+	product := Sun{0, 0}
+
+	product[0] = 450 + 900*sunCounter[0]
+	product[1] = 450 + 900*sunCounter[1]
+
+	if sunCounter[0] <= 1000 {
+		sunCounter[0] += 1
+	} else {
+		sunCounter[0] = 0
+		sunCounter[1] += 1
+	}
+	return product
+	//Base player placement on worker movement from BotWars
 }
