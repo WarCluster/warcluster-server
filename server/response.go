@@ -61,9 +61,10 @@ func actionParser(username, start_planet_key, end_planet_key string, fleet int) 
 		err = errors.New("This is not your home!")
 	}
 
-	player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
-	// TODO: Write this mission in the DB
-	// Insert this mission in the sorted list with missions
+	// TODO: Append to player.missions
+	mission := player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
+	db_manager.SetEntity(mission)
+	// TODO: Call the missionary
 
 	return err
 }

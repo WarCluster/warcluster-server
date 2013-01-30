@@ -32,7 +32,6 @@ func (self *Player) StartMission(start_planet, end_planet Planet, fleet int) Mis
 	ship_count := int(start_planet.ShipCount/10) * fleet
 	start_planet.ShipCount -= ship_count
 	mission := Mission{start_planet.GetKey(), start_time, self.GetKey(), ship_count, end_planet.GetKey()}
-	// da se vpishe missiona v bazata i da se appendne link kum neq v player missions
 	return mission
 }
 
