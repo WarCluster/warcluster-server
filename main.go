@@ -28,7 +28,6 @@ func main() {
 	//
 	// TODO: Think for a name of this thing
 
-
 	server.Start("localhost", 7000)
 	return
 }
