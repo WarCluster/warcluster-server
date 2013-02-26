@@ -18,13 +18,14 @@ func TestGeneratePlanet(t *testing.T) {
 		Planet{[]int{918, 101}, 9, 6, 0, 0, "gophie"},
 		Planet{[]int{352, 798}, 5, 4, 0, 0, "gophie"},
 		Planet{[]int{686, 841}, 1, 1, 0, 0, "gophie"},
+		Planet{[]int{-75, 58}, 4, 6, 0, 0, "gophie"},
 	}
 	generated_planets, _ := GeneratePlanets(hash, sun_position)
 
-	if len(generated_planets) != 9 {
+	if len(generated_planets) != 10 {
 		t.Error("Wrong planets count")
 	}
-	for i := 0; i < 9; i++ {
+	for i := 0; i < 10; i++ {
 		if generated_planets[i].coords[0] != expected_planets[i].coords[0] {
 			t.Error("X coordinate missmatch on Planet[" + strconv.Itoa(i) + "]")
 		}
@@ -35,7 +36,7 @@ func TestGeneratePlanet(t *testing.T) {
 			t.Error("Ring offset missmatch on Planet[" + strconv.Itoa(i) + "]")
 		}
 		if generated_planets[i].Size != expected_planets[i].Size {
-			t.Error("Ring offset missmatch on Planet[" + strconv.Itoa(i) + "]")
+			t.Error("Size missmatch on Planet[" + strconv.Itoa(i) + "]")
 		}
 	}
 }

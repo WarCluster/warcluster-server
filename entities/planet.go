@@ -45,7 +45,7 @@ func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
 	ring_offset := float64(80)
 	planet_radius := float64(50)
 
-	for ix := 0; ix < 9; ix++ {
+	for ix := 0; ix < 10; ix++ {
 		planet_in_creation := Planet{[]int{0, 0}, 0, 0, 0, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)
 
@@ -58,5 +58,5 @@ func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
 		result = append(result, planet_in_creation)
 	}
-	return result, &result[int(hashElement(37))]
+	return result, &result[int(hashElement(41))]
 }
