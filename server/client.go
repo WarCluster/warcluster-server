@@ -11,7 +11,6 @@ import (
 	"strings"
 )
 
-
 type Client struct {
 	conn     net.Conn
 	nickname string

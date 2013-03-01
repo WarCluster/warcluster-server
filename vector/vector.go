@@ -66,6 +66,10 @@ func (self *Vector) GetDistance(other *Vector) float64 {
 	return math.Sqrt(math.Pow(self.X-other.X, 2) + math.Pow(self.Y-other.Y, 2))
 }
 
+func (self *Vector) IsEqual(other *Vector) bool {
+	return self.X == other.X && self.Y == other.Y
+}
+
 func (self *Vector) Add(other *Vector) *Vector {
 	return New(self.X+other.X, self.Y+other.Y)
 }
