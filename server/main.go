@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"net"
+	"../db_manager"
+	"../entities"
 )
 
 type Server struct {
@@ -98,8 +100,10 @@ func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan,
 	}()
 
 	addchan <- client
-	io.WriteString(c, fmt.Sprintf("Welcome, %s!\n\n", client.nickname))
-	msgchan <- fmt.Sprintf("%s has joined.\n", client.nickname)
+	home_planet_entity, _ := db_manager.GetEntity(client.player.HomePlanet)
+	home_planet := home_planet_entity.(entities.Planet)
+	io.WriteString(c, fmt.Sprintf("{username: '%s', position: [%d, %d] }",
+		client.nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1]))
 	go client.ReadLinesInto(msgchan)
 	client.WriteLinesFrom(client.channel)
 }
