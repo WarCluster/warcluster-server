@@ -66,7 +66,7 @@ func (self *Client) ReadLinesInto(ch chan<- string) {
 				ch <- fmt.Sprintf("%s: %s", self.nickname, line)
 			}
 		} else if strings.HasPrefix(line, "scope:") {
-			ch <- fmt.Sprintf("%s: %s", self.nickname, line)
+			io.WriteString(self.conn, db_manager.GetEntities("*"))
 		}
 	}
 }
