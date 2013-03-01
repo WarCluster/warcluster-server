@@ -65,7 +65,18 @@ func (self *Client) ReadLinesInto(ch chan<- string) {
 				ch <- fmt.Sprintf("%s: %s", self.nickname, line)
 			}
 		} else if strings.HasPrefix(line, "scope:") {
-			io.WriteString(self.conn, db_manager.GetEntities("*"))
+			entity_list := db_manager.GetEntities("*")
+			line := "{"
+			for _, entity := range entity_list {
+				switch t := entity.(type) {
+				case entities.Mission, entities.Planet, entities.Player, entities.Sun:
+					if key, json, err := t.Serialize(); err == nil {
+						line += fmt.Sprintf("%v: %s, ", key, json)
+					}
+				}
+			}
+			line += "}"
+			io.WriteString(self.conn, fmt.Sprintf("%v", line))
 		}
 	}
 }

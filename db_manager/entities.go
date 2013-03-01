@@ -52,20 +52,19 @@ func GetList(group_type string, username string) []entities.Entity {
 	return entity_list
 }
 
-func GetEntities(pattern string) string {
+func GetEntities(pattern string) []entities.Entity {
 	result, err := redis.Values(connection.Do("KEYS", pattern))
 	if err != nil {
 		log.Print(err)
-		return ""
+		return nil
 	}
 
 	results := fmt.Sprintf("%s", result)
-	entity_list := "{"
+	var entity_list []entities.Entity
 	for _, key := range strings.Split(results, " ") {
-		if entity, err := redis.String(connection.Do("GET", key)); err == nil {
-			entity_list += key + ": " + entity + ","
+		if entity, err := GetEntity(key); err == nil {
+			entity_list = append(entity_list, entity)
 		}
 	}
-	entity_list += "}"
 	return entity_list
 }
