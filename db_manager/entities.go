@@ -14,20 +14,26 @@ func SetEntity(entity entities.Entity) bool {
 		return false
 	}
 
-	if send_err := connection.Send("SET", key, prepared_entity); send_err != nil {
+	mutex.Lock()
+	send_err := connection.Send("SET", key, prepared_entity)
+	mutex.Unlock()
+	if send_err != nil {
 		log.Print(send_err)
-		return false
 	}
 
-	if flush_err := connection.Flush(); flush_err != nil {
+	mutex.Lock()
+	flush_err := connection.Flush()
+	mutex.Unlock()
+	if flush_err != nil {
 		log.Print(flush_err)
-		return false
 	}
 	return true
 }
 
 func GetEntity(key string) (entities.Entity, error) {
+	mutex.Lock()
 	result, err := redis.Bytes(connection.Do("GET", key))
+	mutex.Unlock()
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +44,9 @@ func GetList(group_type string, username string) []entities.Entity {
 	var entity_list []entities.Entity
 	var coord string
 
+	mutex.Lock()
 	result, err := redis.String(connection.Do("GET", fmt.Sprintf("%v.%v", group_type, username)))
+	mutex.Unlock()
 	if err != nil {
 		log.Print(err)
 		return nil
@@ -53,7 +61,9 @@ func GetList(group_type string, username string) []entities.Entity {
 }
 
 func GetEntities(pattern string) []entities.Entity {
+	mutex.Lock()
 	result, err := redis.Values(connection.Do("KEYS", pattern))
+	mutex.Unlock()
 	if err != nil {
 		log.Print(err)
 		return nil
@@ -67,4 +77,11 @@ func GetEntities(pattern string) []entities.Entity {
 		}
 	}
 	return entity_list
+}
+
+func DeleteEntity(key string) error {
+	mutex.Lock()
+	result, err := redis.Bytes(connection.Do("DEL", key))
+	mutex.Unlock()
+	return err
 }

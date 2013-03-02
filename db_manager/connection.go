@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
+	"sync"
 )
 
 var connection redis.Conn
+var mutex sync.Mutex
 
 const (
 	HOSTNAME = "localhost"
