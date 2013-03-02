@@ -32,9 +32,14 @@ func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
 
 	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
 	if entity == nil {
-		sun := entities.GenerateSun()
+		all_suns_entities := db_manager.GetEntities("sun.*")
+		all_suns := []entities.Sun{}
+		for _, entity := range all_suns_entities {
+			all_suns = append(all_suns, entity.(entities.Sun))
+		}
+		sun := entities.GenerateSun(all_suns, []entities.Sun{})
 		hash := entities.GenerateHash(nickname)
-		planets, home_planet := entities.GeneratePlanets(hash, sun)
+		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
 		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
 		db_manager.SetEntity(player)
 		db_manager.SetEntity(sun)

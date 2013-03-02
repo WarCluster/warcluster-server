@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"../vector"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -35,7 +36,7 @@ func (self Planet) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
+func GeneratePlanets(hash string, sun_position *vector.Vector) ([]Planet, *Planet) {
 
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48
@@ -49,9 +50,9 @@ func GeneratePlanets(hash string, sun_position []int) ([]Planet, *Planet) {
 		planet_in_creation := Planet{[]int{0, 0}, 0, 0, 0, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)
 
-		planet_in_creation.coords[0] = int(float64(sun_position[0]) + ring_offset*math.Cos(
+		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
 			hashElement(4*ix+1)*40))
-		planet_in_creation.coords[1] = int(float64(sun_position[1]) + ring_offset*math.Sin(
+		planet_in_creation.coords[1] = int(float64(sun_position.Y) + ring_offset*math.Sin(
 			hashElement(4*ix+1)*40))
 
 		planet_in_creation.Texture = int(hashElement(4*ix + 2))
