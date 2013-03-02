@@ -62,6 +62,7 @@ func actionParser(ch chan<- string, player *e.Player, start_planet_key, end_plan
 
 	mission := player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
+		go StartMissionary(ch, mission)
 		db_manager.SetEntity(mission)
 		return fmt.Sprintf("{%s: %s}", key, serialized_mission), err
 	}
