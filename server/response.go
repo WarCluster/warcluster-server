@@ -31,40 +31,39 @@ func scopeOfView(position []int, resolution []int, lag int) ([]int, []int) {
 	return top_left, bottom_right
 }
 
-func actionParser(username, start_planet_key, end_planet_key string, fleet int) error {
+func actionParser(ch chan<- string, player *e.Player, start_planet_key, end_planet_key string, fleet int) (string, error) {
 	var err error = nil
+	var result string = ""
 
-	defer func() error {
+	defer func() (string, error) {
 		if panicked := recover(); panicked != nil {
 			err = errors.New("Invalid action!")
 		}
-		return nil
+		return result, nil
 	}()
 
-	player_entity, err := db_manager.GetEntity(fmt.Sprint("player.", username))
 	if err != nil {
-		return errors.New("Player does not exist")
-	}
-	player := player_entity.(e.Player)
-
-	start_planet, err := db_manager.GetEntity(fmt.Sprint("planet.", start_planet_key))
-	if err != nil {
-		return errors.New("Start planet does not exist")
+		return result, errors.New("Player does not exist")
 	}
 
-	end_planet, err := db_manager.GetEntity(fmt.Sprint("planet.", end_planet_key))
+	start_planet, err := db_manager.GetEntity(start_planet_key)
 	if err != nil {
-		return errors.New("End planet does not exist")
+		return result, errors.New("Start planet does not exist")
 	}
 
-	if start_planet.(e.Planet).Owner != username {
+	end_planet, err := db_manager.GetEntity(end_planet_key)
+	if err != nil {
+		return result, errors.New("End planet does not exist")
+	}
+
+	if start_planet.(e.Planet).Owner != player.String() {
 		err = errors.New("This is not your home!")
 	}
 
-	// TODO: Append to player.missions
 	mission := player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
-	db_manager.SetEntity(mission)
-	// TODO: Call the missionary
-
-	return err
+	if key, serialized_mission, err := mission.Serialize(); err == nil {
+		db_manager.SetEntity(mission)
+		return fmt.Sprintf("{%s: %s}", key, serialized_mission), err
+	}
+	return "", err
 }

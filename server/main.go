@@ -94,7 +94,6 @@ func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan,
 
 	defer func() {
 		c.Close()
-		msgchan <- fmt.Sprintf("User %s left the chat room.\n", client.nickname)
 		log.Printf("Connection from %v closed.\n", c.RemoteAddr())
 		rmchan <- client
 	}()

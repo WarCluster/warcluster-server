@@ -37,7 +37,7 @@ func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
 		for _, entity := range all_suns_entities {
 			all_suns = append(all_suns, entity.(entities.Sun))
 		}
-		sun := entities.GenerateSun(all_suns, []entities.Sun{})
+		sun := entities.GenerateSun(nickname, all_suns, []entities.Sun{})
 		hash := entities.GenerateHash(nickname)
 		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
 		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
@@ -66,8 +66,10 @@ func (self *Client) ReadLinesInto(ch chan<- string) {
 				continue
 			}
 			fleet, _ := strconv.Atoi(params[3])
-			if err := actionParser(self.nickname, params[1], params[2], fleet); err == nil {
-				ch <- fmt.Sprintf("%s: %s", self.nickname, line)
+			if result, err := actionParser(ch, self.player, params[1], params[2], fleet); err == nil {
+				ch <- fmt.Sprintf(result)
+			} else {
+				fmt.Println(err.Error())
 			}
 		} else if strings.HasPrefix(line, "scope:") {
 			entity_list := db_manager.GetEntities("*")

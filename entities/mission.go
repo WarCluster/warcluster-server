@@ -28,12 +28,24 @@ func (self Mission) GetKey() string {
 	)
 }
 
+func (self *Mission) GetSpeed() int {
+	return 5
+}
+
 func (self Mission) Serialize() (string, []byte, error) {
 	result, err := json.Marshal(self)
 	if err != nil {
 		return self.GetKey(), nil, err
 	}
 	return self.GetKey(), result, nil
+}
+
+func (self Mission) GetStartPlanet() string {
+	return self.start_planet
+}
+
+func (self Mission) GetStartTime() time.Time {
+	return self.start_time
 }
 
 func EndMission(endPlanet Planet, missionInfo Mission) Planet {

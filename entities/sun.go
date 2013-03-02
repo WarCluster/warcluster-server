@@ -57,9 +57,9 @@ func (self Sun) MoveSun(position *vector.Vector) {
 	self.target = position
 }
 
-func GenerateSun(friends, others []Sun) Sun {
-	var newSun Sun
-	var targetposition vector.Vector
+func GenerateSun(username string, friends, others []Sun) Sun {
+	newSun := Sun{username, 5, vector.New(0, 0), vector.New(0, 0)}
+	targetposition := vector.New(0, 0)
 
 	for _, friend := range friends {
 		targetposition.X += friend.position.X
