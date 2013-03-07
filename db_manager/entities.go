@@ -81,7 +81,7 @@ func GetEntities(pattern string) []entities.Entity {
 
 func DeleteEntity(key string) error {
 	mutex.Lock()
-	result, err := redis.Bytes(connection.Do("DEL", key))
+	_, err := redis.Bytes(connection.Do("DEL", key))
 	mutex.Unlock()
 	return err
 }
