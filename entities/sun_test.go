@@ -24,7 +24,7 @@ func TestBasePreparations(t *testing.T) {
 func TestDeserializeSun(t *testing.T) {
 	var sun Sun
 	serialized_Sun := []byte("{\"Username\":\"gophie\"}")
-	sun = Construct("sun.20_20", serialized_sun).(Sun)
+	sun = Construct("sun.20_20", serialized_Sun).(Sun)
 
 	if sun.Username != "gophie" {
 		t.Error("Player's name is ", sun.Username)
@@ -39,7 +39,7 @@ func TestUpdateSun(t *testing.T) {
 	sun := Sun{"gophie", 4, vector.New(100, 100), vector.New(20, 20)}
 	sun.Update()
 
-	if sun.position.X != 10.7715875253809 {
+	if sun.position.X != 29.22842712474619 {
 		t.Error("Suns's position is wrong: ", sun.position.X)
 	}
 }

@@ -61,11 +61,11 @@ func ExtractMissionsKey(key string) (string, time.Time) {
 	return start_planet, start_time
 }
 
-func ExtractSunKey(key string) vector.Vector {
+func ExtractSunKey(key string) *vector.Vector {
 	params_raw := strings.Split(key, ".")[1]
 	params := strings.Split(params_raw, "_")
-	sun_coords_0, _ := strconv.Atoi(params[0])
-	sun_coords_1, _ := strconv.Atoi(params[1])
+	sun_coords_0, _ := strconv.ParseFloat(params[0], 64)
+	sun_coords_1, _ := strconv.ParseFloat(params[1], 64)
 	coords := vector.New(sun_coords_0, sun_coords_1)
 	return coords
 }

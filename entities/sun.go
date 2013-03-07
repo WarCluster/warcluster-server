@@ -16,11 +16,11 @@ type Sun struct {
 }
 
 func (self Sun) GetKey() string {
-	return fmt.Sprintf("sun.%d_%d", self.position.X, self.position.Y)
+	return fmt.Sprintf("sun.%v_%v", self.position.X, self.position.Y)
 }
 
 func (self Sun) String() string {
-	return fmt.Sprintf("Sun[%d, %d]", self.position.X, self.position.Y)
+	return fmt.Sprintf("Sun[%v, %v]", self.position.X, self.position.Y)
 }
 
 func (self Sun) Serialize() (string, []byte, error) {
@@ -35,7 +35,7 @@ func (self Sun) GetPosition() *vector.Vector {
 	return self.position
 }
 
-func (self Sun) Update() {
+func (self *Sun) Update() {
 	direction := self.target.Substitute(self.position)
 	if int(direction.Length()) >= self.speed {
 		direction.SetLength(float64(self.speed) * ((direction.Length() / 50) + 1))
@@ -43,7 +43,7 @@ func (self Sun) Update() {
 	}
 }
 
-func (self Sun) Collider(staticSun *Sun) {
+func (self *Sun) Collider(staticSun *Sun) {
 	distance := self.position.GetDistance(staticSun.position)
 	if distance < 42 { //TODO:42 da se zamesti s goleminata v pixeli na slunchevata sistema
 		overlap := 42 - distance
@@ -53,7 +53,7 @@ func (self Sun) Collider(staticSun *Sun) {
 	}
 }
 
-func (self Sun) MoveSun(position *vector.Vector) {
+func (self *Sun) MoveSun(position *vector.Vector) {
 	self.target = position
 }
 
