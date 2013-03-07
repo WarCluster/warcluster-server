@@ -3,11 +3,12 @@ package entities
 import (
 	"strconv"
 	"testing"
+	"../vector"
 )
 
-func TestGeneratePlanet(t *testing.T) {
+func TestGeneratePlanets(t *testing.T) {
 	hash := "5762908447300427353060676895795336101745023746116233389596883"
-	sun_position := []int{500, 300}
+	sun_position := vector.New(500, 300)
 	expected_planets := []Planet{
 		Planet{[]int{375, 247}, 6, 3, 0, 0, "gophie"},
 		Planet{[]int{694, 300}, 8, 5, 0, 0, "gophie"},
