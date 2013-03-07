@@ -27,8 +27,8 @@ func StartMissionary(ch chan<- string, mission entities.Mission) {
 	result := entities.EndMission(end_planet, mission)
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
-		db_manager.setEntry(result)
+		db_manager.SetEntity(result)
 		ch <- fmt.Sprintf(fmt.Sprintf("{%s: %s}", key, serialized_planet))
 	}
-	entities.DeleteEntity(mission.GetKey())
+	db_manager.DeleteEntity(mission.GetKey())
 }
