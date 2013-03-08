@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"strconv"
-	"strings"
 )
 
 type Client struct {
@@ -60,30 +58,12 @@ func (self *Client) ReadLinesInto(ch chan<- string) {
 			break
 		}
 
-		if strings.HasPrefix(line, "sm;") {
-			params := strings.Split(line, ";")
-			if len(params) != 4 {
-				continue
-			}
-			fleet, _ := strconv.Atoi(params[3])
-			if result, err := actionParser(ch, self.player, params[1], params[2], fleet); err == nil {
-				ch <- fmt.Sprintf(result)
+		if request, err := UnmarshalRequest(line); err == nil {
+			if action, err := ParseRequest(request); err == nil {
+				action(ch, self.conn, self.player, request)
 			} else {
 				fmt.Println(err.Error())
 			}
-		} else if strings.HasPrefix(line, "scope:") {
-			entity_list := db_manager.GetEntities("*")
-			line := "{"
-			for _, entity := range entity_list {
-				switch t := entity.(type) {
-				case entities.Mission, entities.Planet, entities.Player, entities.Sun:
-					if key, json, err := t.Serialize(); err == nil {
-						line += fmt.Sprintf("%v: %s, ", key, json)
-					}
-				}
-			}
-			line += "}"
-			io.WriteString(self.conn, fmt.Sprintf("%v", line))
 		}
 	}
 }

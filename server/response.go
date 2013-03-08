@@ -2,16 +2,18 @@ package server
 
 import (
 	"../db_manager"
-	e "../entities"
+	"../entities"
 	"errors"
 	"fmt"
+	"io"
+	"net"
 )
 
 const BEST_PING = 150
 const WORST_PING = 1500
 const STEPS = 10
 
-func scopeOfView(position []int, resolution []int, lag int) ([]int, []int) {
+func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
 	step := int(WORST_PING - BEST_PING/STEPS)
 	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
 	end_resolution := []int{
@@ -31,40 +33,56 @@ func scopeOfView(position []int, resolution []int, lag int) ([]int, []int) {
 	return top_left, bottom_right
 }
 
-func actionParser(ch chan<- string, player *e.Player, start_planet_key, end_planet_key string, fleet int) (string, error) {
-	var err error = nil
-	var result string = ""
+func scopeOfView(ch chan<- string, conn net.Conn, player *entities.Player, request *Request) error {
+	entity_list := db_manager.GetEntities("*")
+	line := "{"
+	for _, entity := range entity_list {
+		switch t := entity.(type) {
+		case entities.Mission, entities.Planet, entities.Player, entities.Sun:
+			if key, json, err := t.Serialize(); err == nil {
+				line += fmt.Sprintf("%v: %s, ", key, json)
+			}
+		}
+	}
+	line += "}"
+	io.WriteString(conn, fmt.Sprintf("%v", line))
+	return nil
+}
 
-	defer func() (string, error) {
+func actionParser(ch chan<- string, conn net.Conn, player *entities.Player, request *Request) error {
+	var err error = nil
+
+	defer func() error {
 		if panicked := recover(); panicked != nil {
 			err = errors.New("Invalid action!")
 		}
-		return result, nil
+		return nil
 	}()
 
 	if err != nil {
-		return result, errors.New("Player does not exist")
+		return errors.New("Player does not exist")
 	}
 
-	start_planet, err := db_manager.GetEntity(start_planet_key)
+	start_planet, err := db_manager.GetEntity(request.StartPlanet)
 	if err != nil {
-		return result, errors.New("Start planet does not exist")
+		return errors.New("Start planet does not exist")
 	}
 
-	end_planet, err := db_manager.GetEntity(end_planet_key)
+	end_planet, err := db_manager.GetEntity(request.EndPlanet)
 	if err != nil {
-		return result, errors.New("End planet does not exist")
+		return errors.New("End planet does not exist")
 	}
 
-	if start_planet.(e.Planet).Owner != player.String() {
+	if start_planet.(entities.Planet).Owner != player.String() {
 		err = errors.New("This is not your home!")
 	}
 
-	mission := player.StartMission(start_planet.(e.Planet), end_planet.(e.Planet), fleet)
+	mission := player.StartMission(start_planet.(entities.Planet), end_planet.(entities.Planet), request.Fleet)
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(ch, mission)
 		db_manager.SetEntity(mission)
-		return fmt.Sprintf("{%s: %s}", key, serialized_mission), err
+		ch <- fmt.Sprintf("{%s: %s}", key, serialized_mission)
+		return nil
 	}
-	return "", err
+	return err
 }
