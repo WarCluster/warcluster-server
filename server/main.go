@@ -1,92 +1,78 @@
 package server
 
 import (
+	"../db_manager"
+	"../entities"
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/fzzy/sockjs-go/sockjs"
 	"io"
 	"log"
 	"net"
-	"../db_manager"
-	"../entities"
+	"net/http"
+	"strings"
 )
 
-type Server struct {
-	host       string
-	port       int
-	listener   net.Listener
-	clients    map[net.Conn]chan<- string
-	is_running bool
-}
+var host       string
+var port       int
+var is_running bool
 
-func (self *Server) Start(host string, port int) error {
+var users *sockjs.SessionPool = sockjs.NewSessionPool()
+
+func Start(host string, port int) error {
 	log.Print("Server is starting...")
-	if self.is_running {
+	if is_running {
 		return errors.New("Server is already started!")
 	}
-	var err error
+	mux := sockjs.NewServeMux(http.DefaultServeMux)
+	conf := sockjs.NewConfig()
+	http.HandleFunc("/", indexHandler)
+	http.Handle("/static", http.FileServer(http.Dir("./static")))
+	mux.Handle("/chat", handler, conf)
 
-	msgchan := make(chan string)
-	addchan := make(chan *Client)
-	rmchan := make(chan *Client)
-
-	self.listener, err = net.Listen("tcp", fmt.Sprintf("%v:%v", host, port))
+	err := http.ListenAndServe(":8081", mux)
+	fmt.Println("wazaaa")
 	if err == nil {
-		self.host = host
-		self.port = port
-		self.is_running = true
-		self.clients = make(map[net.Conn]chan<- string)
+		host = host
+		port = port
+		is_running = true
+		users = sockjs.NewSessionPool()
 		log.Println("Server is up and running!")
 	} else {
 		log.Println(err)
 		return err
 	}
-
-	go self.handleMessages(msgchan, addchan, rmchan)
-
-	for self.is_running {
-		conn, err := self.listener.Accept()
-		if err != nil {
-			if self.is_running {
-				log.Println(err)
-				continue
-			} else {
-				break
-			}
-		}
-		go self.handleConnection(conn, msgchan, addchan, rmchan)
-	}
-	return nil
+	return err
 }
 
-func (self *Server) Stop() error {
+func Stop() error {
 	log.Println("Server is shutting down...")
-	if !self.is_running {
+	if !is_running {
 		err := errors.New("Server is already stopped!")
 		log.Println(err)
 		return err
 	}
 
-	for client := range self.clients {
-		client.Close()
-		delete(self.clients, client)
-	}
-	self.listener.Close()
-	self.is_running = false
+	is_running = false
 	return nil
 }
 
-func (self *Server) Restart() {
-	self.Stop()
-	self.Start(self.host, self.port)
+func Restart() {
+	Stop()
+	Start(host, port)
 }
 
-func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan, rmchan chan<- *Client) {
-	bufc := bufio.NewReader(c)
-	nickname, player := authenticate(c, bufc)
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/index.html")
+}
+
+func login(session sockjs.Session, message []byte) {
+	nickname, player := authenticate(session, message)
+	// TODO: Assume the login attempt could be wrong
 
 	client := &Client{
-		conn:     c,
+		session:  session,
 		nickname: nickname,
 		player:   player,
 		channel:  make(chan string),
@@ -107,20 +93,43 @@ func (self *Server) handleConnection(c net.Conn, msgchan chan<- string, addchan,
 	client.WriteLinesFrom(client.channel)
 }
 
-func (self *Server) handleMessages(msgchan <-chan string, addchan, rmchan <-chan *Client) {
-	for {
-		select {
-		case msg := <-msgchan:
-			log.Printf("New message: %s", msg)
-			for _, ch := range self.clients {
-				go func(mch chan<- string) { mch <- msg }(ch)
+func handler(session sockjs.Session) {
+	users.Add(session)
+	defer users.Remove(session)
+	loginInfo := session.Receive()
+	if login_info == nil {
+		break
+	}
+	isLoginAttemptSuccessful = login(session, message)
+
+	if(isLoginAttemptSuccessful) {
+		for {
+			message := session.Receive()
+			if message == nil {
+				break
 			}
-		case client := <-addchan:
-			log.Printf("New client: %v\n", client.nickname)
-			self.clients[client.conn] = client.channel
-		case client := <-rmchan:
-			log.Printf("Client disconnects: %v\n", client.nickname)
-			delete(self.clients, client.conn)
+			fullAddr := session.Info().RemoteAddr
+			addr := fullAddr[:strings.LastIndex(fullAddr, ":")]
+			message = []byte(fmt.Sprintf("%s: %s", addr, message))
+			users.Broadcast(message)
 		}
+	} else {
+		session.End(3000, "Login failed")
 	}
 }
+// 	for {
+// 		select {
+// 		case msg := <-msgchan:
+// 			log.Printf("New message: %s", msg)
+// 			for _, ch := range self.users {
+// 				go func(mch chan<- string) { mch <- msg }(ch)
+// 			}
+// 		case client := <-addchan:
+// 			log.Printf("New client: %v\n", client.nickname)
+// 			self.users[client.conn] = client.channel
+// 		case client := <-rmchan:
+// 			log.Printf("Client disconnects: %v\n", client.nickname)
+// 			delete(self.users, client.conn)
+// 		}
+// 	}
+// }

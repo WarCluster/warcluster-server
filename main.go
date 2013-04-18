@@ -2,12 +2,10 @@ package main
 
 import (
 	"./db_manager"
-	net "./server"
+	"./server"
 	"os"
 	"os/signal"
 )
-
-var server *net.Server = &net.Server{}
 
 func main() {
 	go final()
