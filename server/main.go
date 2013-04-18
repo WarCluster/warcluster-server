@@ -3,13 +3,10 @@ package server
 import (
 	"../db_manager"
 	"../entities"
-	"bufio"
 	"errors"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
-	"io"
 	"log"
-	"net"
 	"net/http"
 	"strings"
 )
@@ -67,8 +64,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
-func login(session sockjs.Session, message []byte) {
-	nickname, player := authenticate(session, message)
+func login(session sockjs.Session) bool {
+	nickname, player := authenticate(session)
 	// TODO: Assume the login attempt could be wrong
 
 	client := &Client{
@@ -78,30 +75,18 @@ func login(session sockjs.Session, message []byte) {
 		channel:  make(chan string),
 	}
 
-	defer func() {
-		c.Close()
-		log.Printf("Connection from %v closed.\n", c.RemoteAddr())
-		rmchan <- client
-	}()
-
-	addchan <- client
 	home_planet_entity, _ := db_manager.GetEntity(client.player.HomePlanet)
 	home_planet := home_planet_entity.(entities.Planet)
-	io.WriteString(c, fmt.Sprintf("{username: '%s', position: [%d, %d] }",
-		client.nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1]))
-	go client.ReadLinesInto(msgchan)
-	client.WriteLinesFrom(client.channel)
+	session.Send([]byte(fmt.Sprintf("{username: '%s', position: [%d, %d] }",
+		client.nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1])))
+	return true
 }
 
 func handler(session sockjs.Session) {
 	users.Add(session)
 	defer users.Remove(session)
-	loginInfo := session.Receive()
-	if login_info == nil {
-		break
-	}
-	isLoginAttemptSuccessful = login(session, message)
 
+	isLoginAttemptSuccessful := login(session)
 	if(isLoginAttemptSuccessful) {
 		for {
 			message := session.Receive()
@@ -114,7 +99,7 @@ func handler(session sockjs.Session) {
 			users.Broadcast(message)
 		}
 	} else {
-		session.End(3000, "Login failed")
+		session.End()
 	}
 }
 // 	for {

@@ -3,29 +3,27 @@ package server
 import (
 	"../db_manager"
 	"../entities"
-	"bufio"
 	"fmt"
-	"io"
-	"net"
+	"github.com/fzzy/sockjs-go/sockjs"
 )
 
 type Client struct {
-	conn     net.Conn
+	session  sockjs.Session
 	nickname string
 	channel  chan string
 	player   *entities.Player
 }
 
-func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
+func authenticate(session sockjs.Session) (string, *entities.Player) {
 	var player entities.Player
 
-	io.WriteString(c, "Twitter Authenticating:\n")
-	io.WriteString(c, "Username: ")
-	nick, _, _ := bufc.ReadLine()
+	session.Send([]byte("Twitter Authenticating:\n"))
+	session.Send([]byte("Username: "))
+	nick := session.Receive()
 	nickname := string(nick)
 
-	io.WriteString(c, "TwitterID: ")
-	twitter, _, _ := bufc.ReadLine()
+	session.Send([]byte("TwitterID: "))
+	twitter := session.Receive()
 	twitter_id := string(twitter)
 
 	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
@@ -50,17 +48,12 @@ func authenticate(c net.Conn, bufc *bufio.Reader) (string, *entities.Player) {
 	return nickname, &player
 }
 
-func (self *Client) ReadLinesInto(ch chan<- string) {
-	bufc := bufio.NewReader(self.conn)
+func (self *Client) ReadLinesInto(session sockjs.Session, message []byte) {
 	for {
-		line, err := bufc.ReadString('\n')
-		if err != nil {
-			break
-		}
-
-		if request, err := UnmarshalRequest(line); err == nil {
+		if request, err := UnmarshalRequest(string(message)); err == nil {
 			if action, err := ParseRequest(request); err == nil {
-				action(ch, self.conn, self.player, request)
+				fmt.Println(action)
+				// action(ch, self.conn, self.player, request)
 			} else {
 				fmt.Println(err.Error())
 			}
@@ -68,10 +61,10 @@ func (self *Client) ReadLinesInto(ch chan<- string) {
 	}
 }
 
-func (self *Client) WriteLinesFrom(ch <-chan string) {
-	for msg := range ch {
-		if _, err := io.WriteString(self.conn, msg); err != nil {
-			return
-		}
-	}
+func (self *Client) WriteLinesFrom(session sockjs.Session, message []byte) {
+	// for msg := range ch {
+	// 	if _, err := io.WriteString(self.conn, msg); err != nil {
+	// 		return
+	// 	}
+	// }
 }
