@@ -73,7 +73,7 @@ func parseAction(request *Request) error {
 
 	mission := request.Client.Player.StartMission(start_planet.(entities.Planet), end_planet.(entities.Planet), request.Fleet)
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
-		// TODO: go StartMissionary(ch, mission)
+		go StartMissionary(mission)
 		db_manager.SetEntity(mission)
 		sessions.Broadcast([]byte(fmt.Sprintf("{%s: %s}", key, serialized_mission)))
 		return nil

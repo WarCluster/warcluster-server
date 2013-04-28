@@ -15,7 +15,7 @@ func CalculateArrivalTime(start_point, end_point []int, speed int) time.Duration
 	return time.Duration(time.Duration(distance.Length() / float64(speed)) * time.Second)
 }
 
-func StartMissionary(ch chan<- string, mission entities.Mission) {
+func StartMissionary(mission entities.Mission) {
 	start_entity, err := db_manager.GetEntity(mission.GetStartPlanet())
 	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
 	start_planet := start_entity.(entities.Planet)
@@ -28,7 +28,7 @@ func StartMissionary(ch chan<- string, mission entities.Mission) {
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
 		db_manager.SetEntity(result)
-		ch <- fmt.Sprintf(fmt.Sprintf("{%s: %s}", key, serialized_planet))
+		sessions.Broadcast([]byte(fmt.Sprintf("{%s: %s}", key, serialized_planet)))
 	}
 	db_manager.DeleteEntity(mission.GetKey())
 }
