@@ -59,6 +59,7 @@ func Stop() error {
 	}
 
 	IS_RUNNING = false
+	log.Println("Server has stopped.")
 	return nil
 }
 

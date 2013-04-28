@@ -22,6 +22,7 @@ func final() {
 	signal.Notify(sigtermchan, os.Interrupt)
 	<-sigtermchan
 
-	server.Stop()
 	db_manager.Finalize()
+	server.Stop()
+	os.Exit(0)
 }
