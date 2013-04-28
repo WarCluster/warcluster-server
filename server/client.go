@@ -8,10 +8,9 @@ import (
 )
 
 type Client struct {
-	session  sockjs.Session
-	nickname string
-	channel  chan string
-	player   *entities.Player
+	Session  sockjs.Session
+	Nickname string
+	Player   *entities.Player
 }
 
 func authenticate(session sockjs.Session) (string, *entities.Player) {
@@ -49,16 +48,18 @@ func authenticate(session sockjs.Session) (string, *entities.Player) {
 }
 
 func (self *Client) ReadLinesInto(session sockjs.Session, message []byte) {
-	for {
-		if request, err := UnmarshalRequest(string(message)); err == nil {
-			if action, err := ParseRequest(request); err == nil {
-				fmt.Println(action)
-				// action(ch, self.conn, self.player, request)
-			} else {
-				fmt.Println(err.Error())
-			}
-		}
-	}
+	// for {
+	// 	if request, err := UnmarshalRequest(string(message)); err == nil {
+	// 		if action, err := ParseRequest(request); err == nil {
+	// 			fmt.Println(action)
+	// 			// action(ch, self.conn, self.player, request)
+	// 		} else {
+	// 			fmt.Println(err.Error())
+	// 		}
+	// 	} else {
+	// 		fmt.Println(err.Error())
+	// 	}
+	// }
 }
 
 func (self *Client) WriteLinesFrom(session sockjs.Session, message []byte) {

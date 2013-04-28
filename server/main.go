@@ -8,14 +8,13 @@ import (
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
 	"net/http"
-	"strings"
 )
 
 var host       string
 var port       int
 var is_running bool
 
-var users *sockjs.SessionPool = sockjs.NewSessionPool()
+var sessions *sockjs.SessionPool = sockjs.NewSessionPool()
 
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
@@ -29,12 +28,11 @@ func Start(host string, port int) error {
 	mux.Handle("/chat", handler, conf)
 
 	err := http.ListenAndServe(":8081", mux)
-	fmt.Println("wazaaa")
 	if err == nil {
 		host = host
 		port = port
 		is_running = true
-		users = sockjs.NewSessionPool()
+		sessions = sockjs.NewSessionPool()
 		log.Println("Server is up and running!")
 	} else {
 		log.Println(err)
@@ -64,39 +62,45 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
-func login(session sockjs.Session) bool {
+func login(session sockjs.Session) (*Client, error) {
 	nickname, player := authenticate(session)
 	// TODO: Assume the login attempt could be wrong
 
 	client := &Client{
-		session:  session,
-		nickname: nickname,
-		player:   player,
-		channel:  make(chan string),
+		Session:  session,
+		Nickname: nickname,
+		Player:   player,
 	}
 
-	home_planet_entity, _ := db_manager.GetEntity(client.player.HomePlanet)
+	home_planet_entity, _ := db_manager.GetEntity(client.Player.HomePlanet)
 	home_planet := home_planet_entity.(entities.Planet)
 	session.Send([]byte(fmt.Sprintf("{username: '%s', position: [%d, %d] }",
-		client.nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1])))
-	return true
+		client.Nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1])))
+	return client, nil
 }
 
 func handler(session sockjs.Session) {
-	users.Add(session)
-	defer users.Remove(session)
+	sessions.Add(session)
+	defer sessions.Remove(session)
 
-	isLoginAttemptSuccessful := login(session)
-	if(isLoginAttemptSuccessful) {
+	if client, err := login(session); err == nil {
 		for {
 			message := session.Receive()
 			if message == nil {
 				break
 			}
-			fullAddr := session.Info().RemoteAddr
-			addr := fullAddr[:strings.LastIndex(fullAddr, ":")]
-			message = []byte(fmt.Sprintf("%s: %s", addr, message))
-			users.Broadcast(message)
+
+			if request, err := UnmarshalRequest(message, client); err == nil {
+				if action, err := ParseRequest(request); err == nil {
+					if err := action(request); err != nil {
+						log.Println(err)
+					}
+				} else {
+					log.Println("Error in server.main.handler:", err.Error())
+				}
+			} else {
+				log.Println("Error in server.main.handler:", err.Error())
+			}
 		}
 	} else {
 		session.End()
