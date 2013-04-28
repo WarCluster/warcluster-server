@@ -10,8 +10,8 @@ import (
 	"net/http"
 )
 
-var host       string
-var port       int
+var host string
+var port int
 var is_running bool
 
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool()
@@ -106,19 +106,3 @@ func handler(session sockjs.Session) {
 		session.End()
 	}
 }
-// 	for {
-// 		select {
-// 		case msg := <-msgchan:
-// 			log.Printf("New message: %s", msg)
-// 			for _, ch := range self.users {
-// 				go func(mch chan<- string) { mch <- msg }(ch)
-// 			}
-// 		case client := <-addchan:
-// 			log.Printf("New client: %v\n", client.nickname)
-// 			self.users[client.conn] = client.channel
-// 		case client := <-rmchan:
-// 			log.Printf("Client disconnects: %v\n", client.nickname)
-// 			delete(self.users, client.conn)
-// 		}
-// 	}
-// }

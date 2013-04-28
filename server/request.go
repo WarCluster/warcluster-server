@@ -7,13 +7,13 @@ import (
 )
 
 type Request struct {
-	Client		  *Client
-	Command       string
-	Position      []int
-	Resolution    []int
-	StartPlanet   string
-	EndPlanet     string
-	Fleet         int
+	Client      *Client
+	Command     string
+	Position    []int
+	Resolution  []int
+	StartPlanet string
+	EndPlanet   string
+	Fleet       int
 }
 
 func UnmarshalRequest(message []byte, client *Client) (*Request, error) {
@@ -28,7 +28,7 @@ func UnmarshalRequest(message []byte, client *Client) (*Request, error) {
 	return &request, nil
 }
 
-func ParseRequest(request *Request) (func (*Request) error, error) {
+func ParseRequest(request *Request) (func(*Request) error, error) {
 	switch request.Command {
 	case "start_mission":
 		if len(request.StartPlanet) > 0 && len(request.EndPlanet) > 0 {

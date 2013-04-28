@@ -1,9 +1,9 @@
 package entities
 
 import (
+	"../vector"
 	"strconv"
 	"testing"
-	"../vector"
 )
 
 func TestGeneratePlanets(t *testing.T) {
