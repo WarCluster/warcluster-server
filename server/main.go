@@ -48,7 +48,6 @@ func Start(host string, port int) error {
 	return Stop()
 }
 
-
 //Die biatch and get the fuck out.
 func Stop() error {
 	log.Println("Server is shutting down...")
@@ -62,7 +61,6 @@ func Stop() error {
 	log.Println("Server has stopped.")
 	return nil
 }
-
 
 //Stop + Start = Restart
 func Restart() {
