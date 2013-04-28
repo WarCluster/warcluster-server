@@ -1,5 +1,5 @@
 /*
-	This is the serve package.
+	This is the server package.
 	The purpouse of this package is to map a connection to each player(who is online) so we have a comunication chanel.
 
 */
@@ -15,9 +15,9 @@ import (
 	"net/http"
 )
 
-var host string  	//Server scope constant that keeps the server host address.
-var port int		//Server scope constant that keeps the server port number.
-var is_running bool	//Server scope variable that represents the is active flag.
+var HOST string     //Server scope constant that keeps the server host address.
+var PORT int        //Server scope constant that keeps the server port number.
+var IS_RUNNING bool //Server scope variable that represents the is active flag.
 
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions). 
 
@@ -26,40 +26,39 @@ var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs 
 //	Starts the listening foe messages loop.
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
-	if is_running {
+	if IS_RUNNING {
 		return errors.New("Server is already started!")
+	} else {
+		HOST = host
+		PORT = port
+		IS_RUNNING = true
 	}
+	log.Println("Server is up and running!")
 	mux := sockjs.NewServeMux(http.DefaultServeMux)
 	conf := sockjs.NewConfig()
-	http.HandleFunc("/", indexHandler)
-	http.Handle("/static", http.FileServer(http.Dir("./static")))
-	mux.Handle("/chat", handler, conf)
 
-	err := http.ListenAndServe(":8081", mux)
-	if err == nil {
-		host = host
-		port = port
-		is_running = true
-		sessions = sockjs.NewSessionPool()
-		log.Println("Server is up and running!")
-	} else {
+	http.HandleFunc("/console", staticHandler)
+	http.Handle("/static", http.FileServer(http.Dir("./static")))
+	mux.Handle("/universe", handler, conf)
+
+	if err := http.ListenAndServe(fmt.Sprintf("%v:%v", HOST, PORT), mux); err != nil {
 		log.Println(err)
 		return err
 	}
-	return err
+	return Stop()
 }
 
 
 //Die biatch and get the fuck out.
 func Stop() error {
 	log.Println("Server is shutting down...")
-	if !is_running {
+	if !IS_RUNNING {
 		err := errors.New("Server is already stopped!")
 		log.Println(err)
 		return err
 	}
 
-	is_running = false
+	IS_RUNNING = false
 	return nil
 }
 
@@ -67,11 +66,11 @@ func Stop() error {
 //Stop + Start = Restart
 func Restart() {
 	Stop()
-	Start(host, port)
+	Start(HOST, PORT)
 }
 
 //Returns the HTML page needed to display the debug page (server "chat" window). 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func staticHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
