@@ -1,3 +1,8 @@
+/*
+	This is the serve package.
+	The purpouse of this package is to map a connection to each player(who is online) so we have a comunication chanel.
+
+*/
 package server
 
 import (
@@ -10,12 +15,15 @@ import (
 	"net/http"
 )
 
-var host string
-var port int
-var is_running bool
+var host string  	//Server scope constant that keeps the server host address.
+var port int		//Server scope constant that keeps the server port number.
+var is_running bool	//Server scope variable that represents the is active flag.
 
-var sessions *sockjs.SessionPool = sockjs.NewSessionPool()
+var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions). 
 
+//This function goes trough all the procedurs needed for the werver to be initialized.
+//	Create an empty connections pool
+//	Starts the listening foe messages loop.
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
 	if is_running {
@@ -41,6 +49,8 @@ func Start(host string, port int) error {
 	return err
 }
 
+
+//Die biatch and get the fuck out.
 func Stop() error {
 	log.Println("Server is shutting down...")
 	if !is_running {
@@ -53,18 +63,23 @@ func Stop() error {
 	return nil
 }
 
+
+//Stop + Start = Restart
 func Restart() {
 	Stop()
 	Start(host, port)
 }
 
+//Returns the HTML page needed to display the debug page (server "chat" window). 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
+//This function is called from the message handler to parse the first message for every new connection.
+//It check for existing user in the DB and logs him if the password is correct.
+//If the user is new he is initiated and a new home planet nad solar system are generated.
 func login(session sockjs.Session) (*Client, error) {
 	nickname, player := authenticate(session)
-	// TODO: Assume the login attempt could be wrong
 
 	client := &Client{
 		Session:  session,
@@ -79,6 +94,11 @@ func login(session sockjs.Session) (*Client, error) {
 	return client, nil
 }
 
+//On the first rescived message from each connection the server will call the handler.
+//So it can complete the following actions:
+//	Adding a new session to the session pool.
+//	Call the login func to validate the connection
+//	If the connection is valid enters "while true" state and uses ParseRequest to parse the requests. Shocking right?!?!
 func handler(session sockjs.Session) {
 	sessions.Add(session)
 	defer sessions.Remove(session)
