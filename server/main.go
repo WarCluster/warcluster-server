@@ -21,9 +21,9 @@ var is_running bool	//Server scope variable that represents the is active flag.
 
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions). 
 
-//This function goes trough all the procedurs needed for the werver to be initialized.
-//	Create an empty connections pool
-//	Starts the listening foe messages loop.
+/*This function goes trough all the procedurs needed for the werver to be initialized.
+1.Create an empty connections pool
+2.Starts the listening foe messages loop.*/
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
 	if is_running {
@@ -75,9 +75,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
 
-//This function is called from the message handler to parse the first message for every new connection.
-//It check for existing user in the DB and logs him if the password is correct.
-//If the user is new he is initiated and a new home planet nad solar system are generated.
+/*This function is called from the message handler to parse the first message for every new connection.
+It check for existing user in the DB and logs him if the password is correct.
+If the user is new he is initiated and a new home planet nad solar system are generated.*/
 func login(session sockjs.Session) (*Client, error) {
 	nickname, player := authenticate(session)
 
@@ -94,11 +94,11 @@ func login(session sockjs.Session) (*Client, error) {
 	return client, nil
 }
 
-//On the first rescived message from each connection the server will call the handler.
-//So it can complete the following actions:
-//	Adding a new session to the session pool.
-//	Call the login func to validate the connection
-//	If the connection is valid enters "while true" state and uses ParseRequest to parse the requests. Shocking right?!?!
+/*On the first rescived message from each connection the server will call the handler.
+So it can complete the following actions:
+1.Adding a new session to the session pool.
+2.Call the login func to validate the connection
+3.If the connection is valid enters "while true" state and uses ParseRequest to parse the requests. Shocking right?!?!*/
 func handler(session sockjs.Session) {
 	sessions.Add(session)
 	defer sessions.Remove(session)
