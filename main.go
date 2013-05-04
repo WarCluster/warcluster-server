@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./db_manager"
-	"./server"
+	"warcluster/db_manager"
+	"warcluster/server"
 	"os"
 	"os/signal"
 )

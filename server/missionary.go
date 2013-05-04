@@ -1,9 +1,9 @@
 package server
 
 import (
-	"../db_manager"
-	"../entities"
-	"../vector"
+	"warcluster/db_manager"
+	"warcluster/entities"
+	"warcluster/vector"
 	"fmt"
 	"time"
 )

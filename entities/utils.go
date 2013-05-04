@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"../vector"
+	"warcluster/vector"
 	"crypto/sha512"
 	"encoding/json"
 	"fmt"

@@ -1,7 +1,7 @@
 package db_manager
 
 import (
-	"../entities"
+	"warcluster/entities"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"../db_manager"
-	"../entities"
+	"warcluster/db_manager"
+	"warcluster/entities"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 )
