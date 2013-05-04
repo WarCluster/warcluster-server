@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"warcluster/vector"
+	"github.com/Vladimiroff/vec2d"
 	"encoding/json"
 	"fmt"
 )
@@ -11,8 +11,8 @@ var sunCounter = []int{0, 0}
 type Sun struct {
 	Username string
 	speed    int
-	target   *vector.Vector
-	position *vector.Vector
+	target   *vec2d.Vector
+	position *vec2d.Vector
 }
 
 func (self Sun) GetKey() string {
@@ -31,7 +31,7 @@ func (self Sun) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func (self Sun) GetPosition() *vector.Vector {
+func (self Sun) GetPosition() *vec2d.Vector {
 	return self.position
 }
 
@@ -39,7 +39,7 @@ func (self *Sun) Update() {
 	direction := self.target.Substitute(self.position)
 	if int(direction.Length()) >= self.speed {
 		direction.SetLength(float64(self.speed) * ((direction.Length() / 50) + 1))
-		self.position = vector.New(float64(self.position.X+direction.X), float64(self.position.Y+direction.Y))
+		self.position = vec2d.New(float64(self.position.X+direction.X), float64(self.position.Y+direction.Y))
 	}
 }
 
@@ -53,13 +53,13 @@ func (self *Sun) Collider(staticSun *Sun) {
 	}
 }
 
-func (self *Sun) MoveSun(position *vector.Vector) {
+func (self *Sun) MoveSun(position *vec2d.Vector) {
 	self.target = position
 }
 
 func GenerateSun(username string, friends, others []Sun) Sun {
-	newSun := Sun{username, 5, vector.New(0, 0), vector.New(0, 0)}
-	targetposition := vector.New(0, 0)
+	newSun := Sun{username, 5, vec2d.New(0, 0), vec2d.New(0, 0)}
+	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {
 		targetposition.X += friend.position.X

@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"warcluster/vector"
+	"github.com/Vladimiroff/vec2d"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -36,7 +36,7 @@ func (self Planet) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func GeneratePlanets(hash string, sun_position *vector.Vector) ([]Planet, *Planet) {
+func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]Planet, *Planet) {
 
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48
