@@ -1,13 +1,17 @@
 package db_manager
 
 import (
-	"warcluster/entities"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"strings"
+	"warcluster/entities"
 )
 
+/*
+SetEntity takes an Entity (struct used as template for all data containers to ease the managing of the DB)
+and generates an unique key in order to add the record to the DB.
+*/
 func SetEntity(entity entities.Entity) bool {
 	key, prepared_entity, err := entity.Serialize()
 	if err != nil {
@@ -30,6 +34,10 @@ func SetEntity(entity entities.Entity) bool {
 	return true
 }
 
+/*
+GetEntity is used to pull information from the DB in order to be used by the server.
+GetEntity operates as read only function and does not modify the data in the DB.
+*/
 func GetEntity(key string) (entities.Entity, error) {
 	mutex.Lock()
 	result, err := redis.Bytes(connection.Do("GET", key))
@@ -40,6 +48,11 @@ func GetEntity(key string) (entities.Entity, error) {
 	return entities.Construct(key, result), nil
 }
 
+/*
+GetList is a special function needed to parse a list of keys stored in the DB for quick acsess.
+For instance provide a userna in order to acsess the list of planets owned by this player.
+The list will be iterated upon in order to call GetEntity for every key.
+*/
 func GetList(group_type string, username string) []entities.Entity {
 	var entity_list []entities.Entity
 	var coord string
@@ -60,6 +73,10 @@ func GetList(group_type string, username string) []entities.Entity {
 	return entity_list
 }
 
+/*
+GetEntities operates as GetEntity but instead of an unique key it takes a patern in order to return
+a lyst of Entitys that reflect the entered patern.
+*/
 func GetEntities(pattern string) []entities.Entity {
 	mutex.Lock()
 	result, err := redis.Values(connection.Do("KEYS", pattern))
@@ -79,6 +96,9 @@ func GetEntities(pattern string) []entities.Entity {
 	return entity_list
 }
 
+/*
+I think DeleteEntity speaks for itself but still. This function is used to remove entrys from the DB.
+*/
 func DeleteEntity(key string) error {
 	mutex.Lock()
 	_, err := redis.Bytes(connection.Do("DEL", key))
