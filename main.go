@@ -1,10 +1,10 @@
 package main
 
 import (
-	"warcluster/db_manager"
-	"warcluster/server"
 	"os"
 	"os/signal"
+	"warcluster/db_manager"
+	"warcluster/server"
 )
 
 func main() {

@@ -1,10 +1,10 @@
 package entities
 
 import (
-	"github.com/Vladimiroff/vec2d"
 	"crypto/sha512"
 	"encoding/json"
 	"fmt"
+	"github.com/Vladimiroff/vec2d"
 	"io"
 	"strconv"
 	"strings"

@@ -1,9 +1,9 @@
 package entities
 
 import (
-	"github.com/Vladimiroff/vec2d"
 	"encoding/json"
 	"fmt"
+	"github.com/Vladimiroff/vec2d"
 	"math"
 )
 

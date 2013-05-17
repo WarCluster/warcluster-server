@@ -6,20 +6,20 @@
 package server
 
 import (
-	"warcluster/db_manager"
-	"warcluster/entities"
 	"errors"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
 	"net/http"
+	"warcluster/db_manager"
+	"warcluster/entities"
 )
 
 var HOST string     //Server scope constant that keeps the server host address.
 var PORT int        //Server scope constant that keeps the server port number.
 var IS_RUNNING bool //Server scope variable that represents the is active flag.
 
-var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions). 
+var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions).
 
 /*This function goes trough all the procedurs needed for the werver to be initialized.
 1.Create an empty connections pool
@@ -68,7 +68,7 @@ func Restart() {
 	Start(HOST, PORT)
 }
 
-//Returns the HTML page needed to display the debug page (server "chat" window). 
+//Returns the HTML page needed to display the debug page (server "chat" window).
 func staticHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/index.html")
 }
