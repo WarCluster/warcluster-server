@@ -1,8 +1,6 @@
 package main
 
 import (
-	"code.google.com/p/gcfg"
-	"log"
 	"os"
 	"os/signal"
 	"warcluster/config"
@@ -18,10 +16,7 @@ func main() {
 		final()
 	}()
 
-	if err := gcfg.ReadFileInto(&cfg, "config/config.gcfg"); err != nil {
-		log.Fatal("Error loading cfg:", err)
-	}
-
+	cfg.Load("config/config.gcfg")
 	db_manager.Connect(cfg.Database.Network, cfg.Database.Host, cfg.Database.Port)
 	server.Start(cfg.Server.Host, cfg.Server.Port)
 	return
