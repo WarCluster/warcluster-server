@@ -16,7 +16,10 @@ to be your go workspace directory, set __$GOPATH__ to it and create `src/` direc
 
     $ mkdir -p go/src
     $ export GOPATH=$HOME/go
+    $ export PATH=$PATH:$GOPATH/bin
 
+It's a good idea to place these two _export_ commands in your .bashrc file, though. Otherwise you would
+have to execute them on each re-login in your system.
 Great. Now it's time to fetch the warcluster and install its requirements.
 
     $ git clone git@github.com:altras/WarCluster.git go/src/warcluster
@@ -27,4 +30,10 @@ Just to be sure, everything is set up propery run the tests:
 
     $ go test ./...
 
-If you see no errors, then __Hurray!__
+If you see no errors, then __Hurray!__ Let's actually compile server:
+
+    $ go install
+
+If this command runs without errors you should have a `bin/` directory in your `$GOPATH` and now you can run it:
+
+    $ warcluster
