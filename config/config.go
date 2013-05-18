@@ -4,6 +4,8 @@ package config
 import (
 	"code.google.com/p/gcfg"
 	"log"
+	"path"
+	"runtime"
 )
 
 type Config struct {
@@ -18,8 +20,10 @@ type Config struct {
 	}
 }
 
-func (self *Config) Load(path string) {
-	if err := gcfg.ReadFileInto(self, path); err != nil {
+func (self *Config) Load(name string) {
+	_, filename, _, _ := runtime.Caller(1)
+	configPath := path.Join(path.Dir(filename), name)
+	if err := gcfg.ReadFileInto(self, configPath); err != nil {
 		log.Fatal("Error loading cfg:", err)
 	}
 }
