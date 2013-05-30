@@ -49,7 +49,7 @@ func scopeOfView(request *Request) error {
 		switch t := entity.(type) {
 		case entities.Mission, entities.Planet, entities.Player, entities.Sun:
 			if key, json, err := t.Serialize(); err == nil {
-				line += fmt.Sprintf("%v: %s, ", key, json)
+				line += fmt.Sprintf("\"%v\": %s, ", key, json)
 			}
 		}
 	}
@@ -89,7 +89,7 @@ func parseAction(request *Request) error {
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(mission)
 		db_manager.SetEntity(mission)
-		sessions.Broadcast([]byte(fmt.Sprintf("{%s: %s}", key, serialized_mission)))
+		sessions.Broadcast([]byte(fmt.Sprintf("{\"%s\": %s}", key, serialized_mission)))
 		return nil
 	}
 
