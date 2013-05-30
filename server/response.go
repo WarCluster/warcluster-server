@@ -53,7 +53,7 @@ func scopeOfView(request *Request) error {
 			}
 		}
 	}
-	line += "}"
+	line = line[:len(line)-1] + "}"
 	request.Client.Session.Send([]byte(fmt.Sprintf("%v", line)))
 	return nil
 }
