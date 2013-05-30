@@ -87,7 +87,7 @@ func login(session sockjs.Session) (*Client, error) {
 
 	home_planet_entity, _ := db_manager.GetEntity(client.Player.HomePlanet)
 	home_planet := home_planet_entity.(entities.Planet)
-	session.Send([]byte(fmt.Sprintf("{\"Username\": '%s', \"Position\": [%d, %d] }",
+	session.Send([]byte(fmt.Sprintf("{\"Username\": \"%s\", \"Position\": [%d, %d] }",
 		client.Nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1])))
 	return client, nil
 }
