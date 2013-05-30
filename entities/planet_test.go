@@ -4,22 +4,24 @@ import (
 	"github.com/Vladimiroff/vec2d"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func TestGeneratePlanets(t *testing.T) {
+	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
 	hash := "5762908447300427353060676895795336101745023746116233389596883"
 	sun_position := vec2d.New(500, 300)
 	expected_planets := []Planet{
-		Planet{[]int{375, 247}, 6, 3, 0, 0, "gophie"},
-		Planet{[]int{694, 300}, 8, 5, 0, 0, "gophie"},
-		Planet{[]int{271, 203}, 3, 1, 0, 0, "gophie"},
-		Planet{[]int{209, 365}, 2, 8, 0, 0, "gophie"},
-		Planet{[]int{671, -6}, 3, 1, 0, 0, "gophie"},
-		Planet{[]int{907, 300}, 6, 8, 0, 0, "gophie"},
-		Planet{[]int{918, 101}, 9, 6, 0, 0, "gophie"},
-		Planet{[]int{352, 798}, 5, 4, 0, 0, "gophie"},
-		Planet{[]int{686, 841}, 1, 1, 0, 0, "gophie"},
-		Planet{[]int{-75, 58}, 4, 6, 0, 0, "gophie"},
+		Planet{[]int{375, 247}, 6, 3, start_time.Unix(), 0, 0, "gophie"},
+		Planet{[]int{694, 300}, 8, 5, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{209, 365}, 2, 8, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{671, -6}, 3, 1, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{907, 300}, 6, 8, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{918, 101}, 9, 6, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{352, 798}, 5, 4, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{686, 841}, 1, 1, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{-75, 58}, 4, 6, start_time.Unix(), 00, 0, "gophie"},
 	}
 	generated_planets, _ := GeneratePlanets(hash, sun_position)
 
@@ -43,8 +45,9 @@ func TestGeneratePlanets(t *testing.T) {
 }
 
 func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
-	planet := Planet{[]int{271, 203}, 3, 1, 0, 0, ""}
-	expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
+	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	planet := Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 0, 0, ""}
+	expected_json := "{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":1352588400,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
 	expected_key := "planet.271_203"
 
 	key, json, err := planet.Serialize()
@@ -58,8 +61,9 @@ func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
 }
 
 func TestDatabasePreparationsWithAnOwner(t *testing.T) {
-	planet := Planet{[]int{271, 203}, 3, 1, 0, 0, "gophie"}
-	expected_json := "{\"Texture\":3,\"Size\":1,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
+	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	planet := Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 0, 0, "gophie"}
+	expected_json := "{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":1352588400,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
 	expected_key := "planet.271_203"
 
 	key, json, err := planet.Serialize()
@@ -75,7 +79,7 @@ func TestDatabasePreparationsWithAnOwner(t *testing.T) {
 
 func TestDeserializePlanet(t *testing.T) {
 	var planet Planet
-	serialized_planet := []byte("{\"Texture\":3,\"Size\":1,\"ShipCount\":10,\"MaxShipCount\":15,\"Owner\":\"gophie\"}")
+	serialized_planet := []byte("{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":1352588400,\"ShipCount\":10,\"MaxShipCount\":15,\"Owner\":\"gophie\"}")
 	planet = Construct("planet.10_12", serialized_planet).(Planet)
 
 	if planet.Texture != 3 {

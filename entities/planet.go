@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
 	"math"
+	"time"
 )
 
 type Planet struct {
-	coords       []int
-	Texture      int
-	Size         int
-	ShipCount    int
-	MaxShipCount int
-	Owner        string
+	coords       		[]int
+	Texture      		int
+	Size         		int
+	LastShipCountUpdate int64
+	ShipCount    		int
+	MaxShipCount 		int
+	Owner        		string
 }
 
 func (self Planet) String() string {
@@ -36,6 +38,18 @@ func (self Planet) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
+func (self Planet) GetShipCount() int { 
+	passedTime := time.Now().Unix() - self.LastShipCountUpdate
+	timeModifier := int64(self.Size/3)
+	//if getobject(Owner.getkey).gethomeplanet == self.getkey
+	self.ShipCount += int(passedTime/timeModifier)
+	self.LastShipCountUpdate=time.Now().Unix()
+	return self.ShipCount
+}
+
+/*
+TODO: We need to add ship count on new planet creation
+*/
 func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]Planet, *Planet) {
 
 	hashElement := func(index int) float64 {
@@ -47,7 +61,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]Planet, *Planet
 	planet_radius := float64(50)
 
 	for ix := 0; ix < 10; ix++ {
-		planet_in_creation := Planet{[]int{0, 0}, 0, 0, 0, 0, ""}
+		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 0, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
@@ -57,6 +71,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]Planet, *Planet
 
 		planet_in_creation.Texture = int(hashElement(4*ix + 2))
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
+		//self.LastShipCountUpdate = time.Now()
 		result = append(result, planet_in_creation)
 	}
 	return result, &result[int(hashElement(41))]

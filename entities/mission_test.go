@@ -55,7 +55,7 @@ func TestEndMission(t *testing.T) {
 	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
 	mission := Mission{"planet.32_64", start_time, "gophie", 15, "planet.2_2"}
 	seccondMission := Mission{"planet.32_64", start_time, "chochko", 10, "planet.2_2"}
-	endPlanet := Planet{[]int{2, 2}, 6, 3, 2, 0, "chochko"}
+	endPlanet := Planet{[]int{2, 2}, 6, 3, start_time.Unix(), 2, 0, "chochko"}
 
 	endPlanet = EndMission(endPlanet, seccondMission)
 

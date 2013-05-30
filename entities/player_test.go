@@ -2,6 +2,7 @@ package entities
 
 import (
 	"testing"
+	"time"
 )
 
 func TestDatabasePreparations(t *testing.T) {
@@ -47,8 +48,9 @@ func TestDeserializePlayer(t *testing.T) {
 }
 
 func TestCreateMission(t *testing.T) {
-	planet_start := Planet{[]int{271, 203}, 3, 1, 100, 1000, "gophie"}
-	planet_end := Planet{[]int{471, 403}, 3, 1, 50, 1000, "gophie"}
+	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	planet_start := Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 100, 1000, "gophie"}
+	planet_end := Planet{[]int{471, 403}, 3, 1, start_time.Unix(), 50, 1000, "gophie"}
 	player := Player{"gophie", "asdf", "planet.271_203", []int{1, 1}, []int{2, 2}}
 
 	valid_mission := player.StartMission(planet_start, planet_end, 8)
