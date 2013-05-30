@@ -100,6 +100,11 @@ So it can complete the following actions:
 func handler(session sockjs.Session) {
 	sessions.Add(session)
 	defer sessions.Remove(session)
+	defer func() {
+		if panicked := recover(); panicked != nil {
+			return
+		}
+	}()
 
 	if client, err := login(session); err == nil {
 		for {
