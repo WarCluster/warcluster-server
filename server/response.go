@@ -43,8 +43,8 @@ scopeOfView is not finished yet but the purpose of the function is to call calcu
  and give the player the information contained in the given borders.
 */
 func scopeOfView(request *Request) error {
+	var line string
 	entity_list := db_manager.GetEntities("*")
-	line := "{"
 	for _, entity := range entity_list {
 		switch t := entity.(type) {
 		case entities.Mission, entities.Planet, entities.Player, entities.Sun:
@@ -53,7 +53,7 @@ func scopeOfView(request *Request) error {
 			}
 		}
 	}
-	line = line[:len(line)-1] + "}"
+	line = fmt.Sprintf("{\"Command\": \"scope_of_view_result\", \"Planets\": {%v}}", line[:len(line)-2])
 	request.Client.Session.Send([]byte(fmt.Sprintf("%v", line)))
 	return nil
 }
