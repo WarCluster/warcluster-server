@@ -38,7 +38,7 @@ func StartMissionary(mission entities.Mission) {
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
 		db_manager.SetEntity(result)
-		sessions.Broadcast([]byte(fmt.Sprintf("{%s: %s}", key, serialized_planet)))
+		sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Planets\": {\"%s\": \"%s\"}}", key, serialized_planet)))
 	}
 	db_manager.DeleteEntity(mission.GetKey())
 }
