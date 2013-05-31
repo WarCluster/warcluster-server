@@ -39,12 +39,21 @@ func (self Planet) Serialize() (string, []byte, error) {
 }
 
 func (self Planet) GetShipCount() int { 
+	self.UpdateShipCount()
+	return self.ShipCount
+}
+
+func (self Planet) SetShipCount(count int) { 
+	self.ShipCount = count
+	self.LastShipCountUpdate=time.Now().Unix()
+}
+
+func (self Planet) UpdateShipCount() { 
 	passedTime := time.Now().Unix() - self.LastShipCountUpdate
 	timeModifier := int64(self.Size/3)
 	//if getobject(Owner.getkey).gethomeplanet == self.getkey
 	self.ShipCount += int(passedTime/timeModifier)
 	self.LastShipCountUpdate=time.Now().Unix()
-	return self.ShipCount
 }
 
 /*

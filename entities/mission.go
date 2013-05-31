@@ -50,12 +50,12 @@ func (self Mission) GetStartTime() time.Time {
 
 func EndMission(endPlanet Planet, missionInfo Mission) Planet {
 	if endPlanet.Owner == missionInfo.Player {
-		endPlanet.ShipCount += missionInfo.ShipCount
+		endPlanet.SetShipCount(endPlanet.GetShipCount() + missionInfo.ShipCount)
 	} else {
-		if missionInfo.ShipCount < endPlanet.ShipCount {
-			endPlanet.ShipCount -= missionInfo.ShipCount
+		if missionInfo.ShipCount < endPlanet.GetShipCount() {
+			endPlanet.SetShipCount(endPlanet.GetShipCount() - missionInfo.ShipCount)
 		} else {
-			endPlanet.ShipCount = missionInfo.ShipCount - endPlanet.ShipCount
+			endPlanet.SetShipCount(missionInfo.ShipCount - endPlanet.GetShipCount())
 			endPlanet.Owner = missionInfo.Player
 		}
 	}
