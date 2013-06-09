@@ -12,14 +12,11 @@ var cfg config.Config
 
 func main() {
 	go final()
-	defer func() {
-		final()
-	}()
+	defer final()
 
 	cfg.Load("config/config.gcfg")
 	db_manager.Connect(cfg.Database.Network, cfg.Database.Host, cfg.Database.Port)
 	server.Start(cfg.Server.Host, cfg.Server.Port)
-	return
 }
 
 func final() {
