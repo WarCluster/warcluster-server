@@ -6,18 +6,18 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
+	"net"
 	"net/http"
 	"warcluster/db_manager"
 	"warcluster/entities"
 )
 
+var listener net.Listener
 var HOST string     //Server scope constant that keeps the server host address.
 var PORT int        //Server scope constant that keeps the server port number.
-var IS_RUNNING bool //Server scope variable that represents the is active flag.
 
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions).
 
@@ -26,13 +26,6 @@ var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs 
 2.Starts the listening foe messages loop.*/
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
-	if IS_RUNNING {
-		return errors.New("Server is already started!")
-	} else {
-		HOST = host
-		PORT = port
-		IS_RUNNING = true
-	}
 	log.Println("Server is up and running!")
 	mux := sockjs.NewServeMux(http.DefaultServeMux)
 	conf := sockjs.NewConfig()
@@ -41,31 +34,39 @@ func Start(host string, port int) error {
 	http.Handle("/static", http.FileServer(http.Dir("./static")))
 	mux.Handle("/universe", handler, conf)
 
-	if err := http.ListenAndServe(fmt.Sprintf("%v:%v", HOST, PORT), mux); err != nil {
+	if err := ListenAndServe(fmt.Sprintf("%v:%v", HOST, PORT), mux); err != nil {
 		log.Println(err)
 		return err
 	}
+
 	return Stop()
+}
+
+// ListenAndServe listens on the TCP network address srv.Addr and then
+// calls Serve to handle requests on incoming connections.  If
+// srv.Addr is blank, ":http" is used.
+func ListenAndServe(address string, mux *sockjs.ServeMux) error {
+	var err error
+
+	server := &http.Server{Addr: address, Handler: mux}
+	addr := server.Addr
+	if addr == "" {
+		addr = ":http"
+	}
+	listener, err = net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+
+	return server.Serve(listener)
 }
 
 //Die biatch and get the fuck out.
 func Stop() error {
 	log.Println("Server is shutting down...")
-	if !IS_RUNNING {
-		err := errors.New("Server is already stopped!")
-		log.Println(err)
-		return err
-	}
-
-	IS_RUNNING = false
+	listener.Close()
 	log.Println("Server has stopped.")
 	return nil
-}
-
-//Stop + Start = Restart
-func Restart() {
-	Stop()
-	Start(HOST, PORT)
 }
 
 //Returns the HTML page needed to display the debug page (server "chat" window).
