@@ -16,8 +16,6 @@ import (
 )
 
 var listener net.Listener
-var HOST string     //Server scope constant that keeps the server host address.
-var PORT int        //Server scope constant that keeps the server port number.
 
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions).
 
@@ -34,7 +32,7 @@ func Start(host string, port int) error {
 	http.Handle("/static", http.FileServer(http.Dir("./static")))
 	mux.Handle("/universe", handler, conf)
 
-	if err := ListenAndServe(fmt.Sprintf("%v:%v", HOST, PORT), mux); err != nil {
+	if err := ListenAndServe(fmt.Sprintf("%v:%v", host, port), mux); err != nil {
 		log.Println(err)
 		return err
 	}
