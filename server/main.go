@@ -20,8 +20,7 @@ var listener net.Listener
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions).
 
 /*This function goes trough all the procedurs needed for the werver to be initialized.
-1.Create an empty connections pool
-2.Starts the listening foe messages loop.*/
+Create an empty connections pool and start the listening foe messages loop.*/
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
 	log.Println("Server is up and running!")
@@ -91,11 +90,11 @@ func login(session sockjs.Session) (*Client, error) {
 	return client, nil
 }
 
-/*On the first rescived message from each connection the server will call the handler.
-So it can complete the following actions:
-1.Adding a new session to the session pool.
-2.Call the login func to validate the connection
-3.If the connection is valid enters "while true" state and uses ParseRequest to parse the requests. Shocking right?!?!*/
+/*On the first received message from each connection the server will call the handler.
+Add new session to the session pool, call the login func to validate the connection and
+if the connection is valid enters "while true" state and uses ParseRequest to parse the requests.
+
+Shocking right?!?!*/
 func handler(session sockjs.Session) {
 	sessions.Add(session)
 	defer sessions.Remove(session)
