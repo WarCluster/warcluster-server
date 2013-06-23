@@ -9,13 +9,13 @@ import (
 )
 
 type Planet struct {
-	coords       		[]int
-	Texture      		int
-	Size         		int
+	coords              []int
+	Texture             int
+	Size                int
 	LastShipCountUpdate int64
-	ShipCount    		int
-	MaxShipCount 		int
-	Owner        		string
+	ShipCount           int
+	MaxShipCount        int
+	Owner               string
 }
 
 func (self Planet) String() string {
@@ -38,22 +38,22 @@ func (self Planet) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func (self Planet) GetShipCount() int { 
+func (self Planet) GetShipCount() int {
 	self.UpdateShipCount()
 	return self.ShipCount
 }
 
-func (self Planet) SetShipCount(count int) { 
+func (self Planet) SetShipCount(count int) {
 	self.ShipCount = count
-	self.LastShipCountUpdate=time.Now().Unix()
+	self.LastShipCountUpdate = time.Now().Unix()
 }
 
-func (self Planet) UpdateShipCount() { 
+func (self Planet) UpdateShipCount() {
 	passedTime := time.Now().Unix() - self.LastShipCountUpdate
-	timeModifier := int64(self.Size/3)
+	timeModifier := int64(self.Size / 3)
 	//if getobject(Owner.getkey).gethomeplanet == self.getkey
-	self.ShipCount += int(passedTime/timeModifier)
-	self.LastShipCountUpdate=time.Now().Unix()
+	self.ShipCount += int(passedTime / timeModifier)
+	self.LastShipCountUpdate = time.Now().Unix()
 }
 
 /*

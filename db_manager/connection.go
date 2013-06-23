@@ -20,7 +20,7 @@ var mutex sync.Mutex
 This function is called in order to insure propper db acsess.
 It creates the DB connection and stores it in the connection variable.
 */
-func Connect(network, host string, port int)  {
+func Connect(network, host string, port int) {
 	var err error
 	log.Print("Initializing database connection... ")
 	if connection, err = redis.Dial(network, fmt.Sprintf("%v:%v", host, port)); err != nil {
