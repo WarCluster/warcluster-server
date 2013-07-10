@@ -58,7 +58,7 @@ func (self *Sun) MoveSun(position *vec2d.Vector) {
 }
 
 func GenerateSun(username string, friends, others []Sun) Sun {
-	newSun := Sun{username, 5, vec2d.New(0, 0), vec2d.New(70000, 70000)}
+	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(50000)}
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {

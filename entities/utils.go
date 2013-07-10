@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"math/rand"
 	"io"
 	"strconv"
 	"strings"
@@ -13,7 +14,6 @@ import (
 
 func Construct(key string, data []byte) Entity {
 	entity_type := strings.Split(key, ".")[0]
-	fmt.Print()
 
 	switch entity_type {
 	case "player":
@@ -83,4 +83,12 @@ func simplifyHash(hash []byte) string {
 		result += strconv.Itoa(int(last_digit))
 	}
 	return result
+}
+
+func getRandomStartPosition(scope int) *vec2d.Vector {
+	x_seed := time.Now().UTC().UnixNano()
+	y_seed := time.Now().UTC().UnixNano()
+	x_generator := rand.New(rand.NewSource(x_seed))
+	y_generator := rand.New(rand.NewSource(y_seed))
+	return vec2d.New(float64(x_generator.Intn(scope) - scope/2), float64(y_generator.Intn(scope) - scope/2))
 }
