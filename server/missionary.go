@@ -14,7 +14,7 @@ The CalculateArrivalTime is used by the mission starter (StartMissionary) to cal
 func CalculateArrivalTime(start_point, end_point []int, speed int) time.Duration {
 	start_vector := vec2d.New(float64(start_point[0]), float64(start_point[1]))
 	end_vector := vec2d.New(float64(end_point[0]), float64(end_point[1]))
-	distance := end_vector.Substitute(start_vector)
+	distance := vec2d.Sub(end_vector, start_vector)
 	return time.Duration(time.Duration(distance.Length()/float64(speed)) * time.Second)
 }
 

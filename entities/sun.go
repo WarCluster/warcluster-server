@@ -36,7 +36,7 @@ func (self Sun) GetPosition() *vec2d.Vector {
 }
 
 func (self *Sun) Update() {
-	direction := self.target.Substitute(self.position)
+	direction := vec2d.Sub(self.target, self.position)
 	if int(direction.Length()) >= self.speed {
 		direction.SetLength(float64(self.speed) * ((direction.Length() / 50) + 1))
 		self.position = vec2d.New(float64(self.position.X+direction.X), float64(self.position.Y+direction.Y))
@@ -44,12 +44,12 @@ func (self *Sun) Update() {
 }
 
 func (self *Sun) Collider(staticSun *Sun) {
-	distance := self.position.GetDistance(staticSun.position)
+	distance := vec2d.GetDistance(self.position, staticSun.position)
 	if distance < 42 { //TODO:42 da se zamesti s goleminata v pixeli na slunchevata sistema
 		overlap := 42 - distance
-		ndir := staticSun.position.Substitute(self.position)
+		ndir := vec2d.Sub(staticSun.position, self.position)
 		ndir.SetLength(overlap)
-		self.position = self.position.Substitute(ndir)
+		self.position.Sub(ndir)
 	}
 }
 
