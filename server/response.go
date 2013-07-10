@@ -41,6 +41,8 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 /*
 scopeOfView is not finished yet but the purpose of the function is to call calculateCanvasSize
  and give the player the information contained in the given borders.
+
+ TODO: Make some proper JSON Unmarshaling out here
 */
 func scopeOfView(request *Request) error {
 	var line string

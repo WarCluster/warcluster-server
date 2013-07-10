@@ -58,20 +58,21 @@ func (self Planet) UpdateShipCount() {
 
 /*
 TODO: We need to add ship count on new planet creation
+TODO: Put all funny numbers in a constans in our config file
+NOTE: 5 in ring_offset is the distance between planets
 */
 func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]Planet, *Planet) {
-
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48
 	}
 
 	result := []Planet{}
-	ring_offset := float64(80)
-	planet_radius := float64(50)
+	ring_offset := float64(600)
+	planet_radius := float64(160)
 
 	for ix := 0; ix < 10; ix++ {
 		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 0, 0, ""}
-		ring_offset += planet_radius + hashElement(4*ix)
+		ring_offset += planet_radius + hashElement(4*ix) * 5
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
 			hashElement(4*ix+1)*40))

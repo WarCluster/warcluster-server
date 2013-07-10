@@ -16,11 +16,11 @@ type Sun struct {
 }
 
 func (self Sun) GetKey() string {
-	return fmt.Sprintf("sun.%v_%v", self.position.X, self.position.Y)
+	return fmt.Sprintf("sun.%v_%v", int64(self.position.X), int64(self.position.Y))
 }
 
 func (self Sun) String() string {
-	return fmt.Sprintf("Sun[%v, %v]", self.position.X, self.position.Y)
+	return fmt.Sprintf("Sun[%v, %v]", int64(self.position.X), int64(self.position.Y))
 }
 
 func (self Sun) Serialize() (string, []byte, error) {
@@ -45,8 +45,8 @@ func (self *Sun) Update() {
 
 func (self *Sun) Collider(staticSun *Sun) {
 	distance := vec2d.GetDistance(self.position, staticSun.position)
-	if distance < 42 { //TODO:42 da se zamesti s goleminata v pixeli na slunchevata sistema
-		overlap := 42 - distance
+	if distance < 4576 { //TODO: da se zamesti s goleminata v pixeli na slunchevata sistema
+		overlap := 4576 - distance
 		ndir := vec2d.Sub(staticSun.position, self.position)
 		ndir.SetLength(overlap)
 		self.position.Sub(ndir)
@@ -58,7 +58,7 @@ func (self *Sun) MoveSun(position *vec2d.Vector) {
 }
 
 func GenerateSun(username string, friends, others []Sun) Sun {
-	newSun := Sun{username, 5, vec2d.New(0, 0), vec2d.New(0, 0)}
+	newSun := Sun{username, 5, vec2d.New(0, 0), vec2d.New(70000, 70000)}
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {
@@ -70,13 +70,15 @@ func GenerateSun(username string, friends, others []Sun) Sun {
 
 	noChange := false
 
+	var oldPos *vec2d.Vector
 	for noChange != true {
-		var oldPos = newSun.position
+		oldPos = newSun.position
 		newSun.Update()
 		for _, sunEntity := range append(friends, others...) {
 			newSun.Collider(&sunEntity)
 		}
-		if newSun.position.IsEqual(oldPos) {
+
+		if int64(newSun.position.X) == int64(oldPos.X) && int64(newSun.position.Y) == int64(oldPos.Y){
 			noChange = true
 		}
 	}

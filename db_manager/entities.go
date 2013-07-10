@@ -61,7 +61,6 @@ func GetList(group_type string, username string) []entities.Entity {
 	result, err := redis.String(connection.Do("GET", fmt.Sprintf("%v.%v", group_type, username)))
 	mutex.Unlock()
 	if err != nil {
-		log.Print(err)
 		return nil
 	}
 
@@ -82,13 +81,12 @@ func GetEntities(pattern string) []entities.Entity {
 	result, err := redis.Values(connection.Do("KEYS", pattern))
 	mutex.Unlock()
 	if err != nil {
-		log.Print(err)
 		return nil
 	}
 
 	results := fmt.Sprintf("%s", result)
 	var entity_list []entities.Entity
-	for _, key := range strings.Split(results, " ") {
+	for _, key := range strings.Split(results[1:len(results)-1], " ") {
 		if entity, err := GetEntity(key); err == nil {
 			entity_list = append(entity_list, entity)
 		}
