@@ -11,6 +11,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"path"
+	"runtime"
 	"warcluster/db_manager"
 	"warcluster/entities"
 )
@@ -24,11 +26,12 @@ Create an empty connections pool and start the listening foe messages loop.*/
 func Start(host string, port int) error {
 	log.Print("Server is starting...")
 	log.Println("Server is up and running!")
+
 	mux := sockjs.NewServeMux(http.DefaultServeMux)
 	conf := sockjs.NewConfig()
 
 	http.HandleFunc("/console", staticHandler)
-	http.Handle("/static", http.FileServer(http.Dir("./static")))
+	http.Handle("/static", http.FileServer(http.Dir(getStaticDir())))
 	mux.Handle("/universe", handler, conf)
 
 	if err := ListenAndServe(fmt.Sprintf("%v:%v", host, port), mux); err != nil {
@@ -68,7 +71,7 @@ func Stop() error {
 
 //Returns the HTML page needed to display the debug page (server "chat" window).
 func staticHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./static/index.html")
+	http.ServeFile(w, r, path.Join(getStaticDir(), "/index.html"))
 }
 
 /*This function is called from the message handler to parse the first message for every new connection.
@@ -126,4 +129,9 @@ func handler(session sockjs.Session) {
 	} else {
 		session.End()
 	}
+}
+
+func getStaticDir() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return path.Join(path.Dir(filename), "../static")
 }
