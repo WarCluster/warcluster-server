@@ -22,9 +22,9 @@ func TestDatabasePreparations(t *testing.T) {
 }
 
 func TestDeserializePlayer(t *testing.T) {
-	var player Player
+	var player *Player
 	serialized_player := []byte("{\"TwitterID\":\"asdf\",\"HomePlanet\":\"planet.3_4\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}")
-	player = Construct("player.gophie", serialized_player).(Player)
+	player = Construct("player.gophie", serialized_player).(*Player)
 
 	if player.username != "gophie" {
 		t.Error("Player's name is ", player.username)
@@ -48,14 +48,15 @@ func TestDeserializePlayer(t *testing.T) {
 }
 
 func TestCreateMission(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	start_time := time.Now()
 	planet_start := Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 100, 1000, "gophie"}
 	planet_end := Planet{[]int{471, 403}, 3, 1, start_time.Unix(), 50, 1000, "gophie"}
 	player := Player{"gophie", "asdf", "planet.271_203", []int{1, 1}, []int{2, 2}}
 
-	valid_mission := player.StartMission(planet_start, planet_end, 8)
+	valid_mission := player.StartMission(&planet_start, &planet_end, 8)
 
-	invalid_mission := player.StartMission(planet_start, planet_end, 12)
+	planet_start.ShipCount = 100
+	invalid_mission := player.StartMission(&planet_start, &planet_end, 12)
 
 	if valid_mission.start_planet != "planet.271_203" {
 		t.Error(valid_mission.start_planet)
@@ -74,6 +75,6 @@ func TestCreateMission(t *testing.T) {
 
 	if invalid_mission.ShipCount != 100 {
 		t.Error(invalid_mission.ShipCount)
-		t.Error("Mission ShipCount was expected to be 80!")
+		t.Error("Mission ShipCount was expected to be 100!")
 	}
 }

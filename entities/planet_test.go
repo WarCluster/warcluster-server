@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"fmt"
 	"github.com/Vladimiroff/vec2d"
 	"strconv"
 	"testing"
@@ -45,13 +46,15 @@ func TestGeneratePlanets(t *testing.T) {
 }
 
 func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	start_time := time.Now()
 	planet := Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 0, 0, ""}
-	expected_json := "{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":1352588400,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
+	json_base := "{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":%v,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
+	expected_json := fmt.Sprintf(json_base, start_time.Unix())
 	expected_key := "planet.271_203"
 
 	key, json, err := planet.Serialize()
 	if key != expected_key || string(json) != expected_json {
+		t.Error(string(json))
 		t.Error("Planet JSON formatting gone wrong!")
 	}
 
@@ -61,14 +64,16 @@ func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
 }
 
 func TestDatabasePreparationsWithAnOwner(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	start_time := time.Now()
 	planet := Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 0, 0, "gophie"}
-	expected_json := "{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":1352588400,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
+	json_base := "{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":%v,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
+	expected_json := fmt.Sprintf(json_base, start_time.Unix())
 	expected_key := "planet.271_203"
 
 	key, json, err := planet.Serialize()
 	if key != expected_key || string(json) != expected_json {
-		t.Error(json)
+		t.Error(string(json))
+		t.Error(string(expected_json))
 		t.Error("Planet JSON formatting gone wrong!")
 	}
 
@@ -78,9 +83,9 @@ func TestDatabasePreparationsWithAnOwner(t *testing.T) {
 }
 
 func TestDeserializePlanet(t *testing.T) {
-	var planet Planet
+	var planet *Planet
 	serialized_planet := []byte("{\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":1352588400,\"ShipCount\":10,\"MaxShipCount\":15,\"Owner\":\"gophie\"}")
-	planet = Construct("planet.10_12", serialized_planet).(Planet)
+	planet = Construct("planet.10_12", serialized_planet).(*Planet)
 
 	if planet.Texture != 3 {
 		t.Error("Planet's texture is ", planet.Texture)
