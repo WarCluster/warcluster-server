@@ -8,9 +8,7 @@ import (
 	"warcluster/entities"
 )
 
-/*
-The CalculateArrivalTime is used by the mission starter (StartMissionary) to calculate the mission duration.
-*/
+// The CalculateArrivalTime is used by the mission starter (StartMissionary) to calculate the mission duration.
 func CalculateArrivalTime(start_point, end_point []int, speed int) time.Duration {
 	start_vector := vec2d.New(float64(start_point[0]), float64(start_point[1]))
 	end_vector := vec2d.New(float64(end_point[0]), float64(end_point[1]))
@@ -18,13 +16,11 @@ func CalculateArrivalTime(start_point, end_point []int, speed int) time.Duration
 	return time.Duration(time.Duration(distance.Length()/float64(speed)) * time.Second)
 }
 
-/*
-StartMissionary is used when a call to initiate a new mission is rescived.
-1. The function gets the mission planet information from the DB and makes basic data checks.
-2. Calls CalculateArrivalTime and sleeps the thread for the returned ammount of time.
-3. When the delay ends the thread ends the mission calling EndMission
-4. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
-*/
+// StartMissionary is used when a call to initiate a new mission is rescived.
+// 1. The function gets the mission planet information from the DB and makes basic data checks.
+// 2. Calls CalculateArrivalTime and sleeps the thread for the returned ammount of time.
+// 3. When the delay ends the thread ends the mission calling EndMission
+// 4. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
 	start_entity, err := db_manager.GetEntity(mission.GetStartPlanet())
 	end_entity, err := db_manager.GetEntity(mission.EndPlanet)

@@ -1,8 +1,5 @@
-/*
-	This is the server package.
-	The purpouse of this package is to map a connection to each player(who is online) so we have a comunication chanel.
-
-*/
+// This is the server package.
+// The purpouse of this package is to map a connection to each player(who is online) so we have a comunication chanel.
 package server
 
 import (
@@ -23,8 +20,8 @@ var listener net.Listener
 
 var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions).
 
-/*This function goes trough all the procedurs needed for the werver to be initialized.
-Create an empty connections pool and start the listening foe messages loop.*/
+// This function goes trough all the procedurs needed for the werver to be initialized.
+// Create an empty connections pool and start the listening foe messages loop.
 func Start(host string, port int) error {
 	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", host, port))
 	log.Print("Quit the server with Ctrl-C.")
@@ -63,7 +60,7 @@ func ListenAndServe(address string, mux *sockjs.ServeMux) error {
 	return server.Serve(listener)
 }
 
-//Die biatch and get the fuck out.
+// Die biatch and get the fuck out.
 func Stop() error {
 	log.Println("Server is shutting down...")
 	listener.Close()
@@ -71,14 +68,14 @@ func Stop() error {
 	return nil
 }
 
-//Returns the HTML page needed to display the debug page (server "chat" window).
+// Returns the HTML page needed to display the debug page (server "chat" window).
 func staticHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path.Join(getStaticDir(), "/index.html"))
 }
 
-/*This function is called from the message handler to parse the first message for every new connection.
-It check for existing user in the DB and logs him if the password is correct.
-If the user is new he is initiated and a new home planet nad solar system are generated.*/
+// This function is called from the message handler to parse the first message for every new connection.
+// It check for existing user in the DB and logs him if the password is correct.
+// If the user is new he is initiated and a new home planet nad solar system are generated.
 func login(session sockjs.Session) (*Client, error) {
 	nickname, player, err := authenticate(session)
 	if err != nil {
@@ -98,11 +95,11 @@ func login(session sockjs.Session) (*Client, error) {
 	return client, nil
 }
 
-/*On the first received message from each connection the server will call the handler.
-Add new session to the session pool, call the login func to validate the connection and
-if the connection is valid enters "while true" state and uses ParseRequest to parse the requests.
-
-Shocking right?!?!*/
+// On the first received message from each connection the server will call the handler.
+// Add new session to the session pool, call the login func to validate the connection and
+// if the connection is valid enters "while true" state and uses ParseRequest to parse the requests.
+//
+// Shocking right?!?!
 func handler(session sockjs.Session) {
 	sessions.Add(session)
 	defer sessions.Remove(session)
@@ -137,6 +134,7 @@ func handler(session sockjs.Session) {
 	}
 }
 
+// getStaticDir return an absolute path to the static files
 func getStaticDir() string {
 	_, filename, _, _ := runtime.Caller(1)
 	return path.Join(path.Dir(filename), "../static")

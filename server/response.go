@@ -7,17 +7,13 @@ import (
 	"warcluster/entities"
 )
 
-/*
-The three constants bellow are used by calculateCanvasSize to determine the size of the area for wich information will be sent to the user.
-*/
+// The three constants bellow are used by calculateCanvasSize to determine the size of the area for wich information will be sent to the user.
 const BEST_PING = 150
 const WORST_PING = 1500
 const STEPS = 10
 
-/*
-calculateCanvasSize is used to determine how big of an area(information about an area)
- do we need to send to the user to eleminate traces of lag.
-*/
+// calculateCanvasSize is used to determine how big of an area(information about an area)
+// do we need to send to the user to eleminate traces of lag.
 func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
 	step := int(WORST_PING - BEST_PING/STEPS)
 	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
@@ -38,12 +34,10 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 	return top_left, bottom_right
 }
 
-/*
-scopeOfView is not finished yet but the purpose of the function is to call calculateCanvasSize
- and give the player the information contained in the given borders.
-
- TODO: Make some proper JSON Unmarshaling out here
-*/
+// scopeOfView is not finished yet but the purpose of the function is to call calculateCanvasSize
+// and give the player the information contained in the given borders.
+//
+//  TODO: Make some proper JSON Unmarshaling out here
 func scopeOfView(request *Request) error {
 	var line string
 	entity_list := db_manager.GetEntities("*")
@@ -60,9 +54,7 @@ func scopeOfView(request *Request) error {
 	return nil
 }
 
-/*
-This function makes all the checks needed for creation of a new mission.
-*/
+// This function makes all the checks needed for creation of a new mission.
 func parseAction(request *Request) error {
 	var err error = nil
 
