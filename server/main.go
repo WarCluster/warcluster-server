@@ -6,6 +6,7 @@
 package server
 
 import (
+	"runtime/debug"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
@@ -87,7 +88,7 @@ func login(session sockjs.Session) (*Client, error) {
 	}
 
 	home_planet_entity, _ := db_manager.GetEntity(client.Player.HomePlanet)
-	home_planet := home_planet_entity.(entities.Planet)
+	home_planet := home_planet_entity.(*entities.Planet)
 	session.Send([]byte(fmt.Sprintf("{\"Command\": \"login_success\", \"Username\": \"%s\", \"Position\": [%d, %d] }",
 		client.Nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1])))
 	return client, nil
@@ -103,6 +104,7 @@ func handler(session sockjs.Session) {
 	defer sessions.Remove(session)
 	defer func() {
 		if panicked := recover(); panicked != nil {
+			log.Println(string(debug.Stack()))
 			return
 		}
 	}()

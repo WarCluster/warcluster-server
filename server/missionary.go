@@ -25,11 +25,11 @@ StartMissionary is used when a call to initiate a new mission is rescived.
 3. When the delay ends the thread ends the mission calling EndMission
 4. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 */
-func StartMissionary(mission entities.Mission) {
+func StartMissionary(mission *entities.Mission) {
 	start_entity, err := db_manager.GetEntity(mission.GetStartPlanet())
 	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
-	start_planet := start_entity.(entities.Planet)
-	end_planet := end_entity.(entities.Planet)
+	start_planet := start_entity.(*entities.Planet)
+	end_planet := end_entity.(*entities.Planet)
 
 	speed := mission.GetSpeed()
 	time.Sleep(CalculateArrivalTime(start_planet.GetCoords(), end_planet.GetCoords(), speed))

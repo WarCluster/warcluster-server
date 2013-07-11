@@ -17,23 +17,23 @@ func Construct(key string, data []byte) Entity {
 
 	switch entity_type {
 	case "player":
-		var player Player
-		json.Unmarshal(data, &player)
+		player := new(Player)
+		json.Unmarshal(data, player)
 		player.username = strings.Split(key, "player.")[1]
 		return player
 	case "planet":
-		var planet Planet
-		json.Unmarshal(data, &planet)
+		planet := new(Planet)
+		json.Unmarshal(data, planet)
 		planet.coords = ExtractPlanetCoords(key)
 		return planet
 	case "mission":
-		var mission Mission
-		json.Unmarshal(data, &mission)
+		mission := new(Mission)
+		json.Unmarshal(data, mission)
 		mission.start_planet, mission.start_time = ExtractMissionsKey(key)
 		return mission
 	case "sun":
-		var sun Sun
-		json.Unmarshal(data, &sun)
+		sun := new(Sun)
+		json.Unmarshal(data, sun)
 		sun.position = ExtractSunKey(key)
 		return sun
 	}

@@ -49,7 +49,7 @@ func scopeOfView(request *Request) error {
 	entity_list := db_manager.GetEntities("*")
 	for _, entity := range entity_list {
 		switch t := entity.(type) {
-		case entities.Mission, entities.Planet, entities.Player, entities.Sun:
+		case *entities.Mission, *entities.Planet, *entities.Player, *entities.Sun:
 			if key, json, err := t.Serialize(); err == nil {
 				line += fmt.Sprintf("\"%v\": %s, ", key, json)
 			}
@@ -83,11 +83,11 @@ func parseAction(request *Request) error {
 		return errors.New("End planet does not exist")
 	}
 
-	if start_planet.(entities.Planet).Owner != request.Client.Player.String() {
+	if start_planet.(*entities.Planet).Owner != request.Client.Player.String() {
 		err = errors.New("This is not your home!")
 	}
 
-	mission := request.Client.Player.StartMission(start_planet.(entities.Planet), end_planet.(entities.Planet), request.Fleet)
+	mission := request.Client.Player.StartMission(start_planet.(*entities.Planet), end_planet.(*entities.Planet), request.Fleet)
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(mission)
 		db_manager.SetEntity(mission)
