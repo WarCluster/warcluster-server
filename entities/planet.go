@@ -40,7 +40,9 @@ func (self *Planet) Serialize() (string, []byte, error) {
 }
 
 func (self *Planet) GetShipCount() int {
-	self.UpdateShipCount()
+	if len(self.Owner) > 0 {
+		self.UpdateShipCount()
+	}
 	return self.ShipCount
 }
 
@@ -75,7 +77,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 	planet_radius := float64(cfg.Planets.PlanetRadius)
 
 	for ix := 0; ix < cfg.Planets.PlanetCount; ix++ {
-		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 0, 0, ""}
+		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
