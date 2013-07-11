@@ -1,9 +1,9 @@
 [planets]
-	ring_offset = 600
-	planet_radius = 160
-	planet_count = 10
-	planet_hash_args = 4
+	ringOffset = 600
+	planetRadius = 160
+	planetCount = 10
+	planetHashArgs = 4
 
 [suns]
-	random_spawn_zone_radius = 50000
-	solar_system_radius = 4000
+	randomSpawnZoneRadius = 50000
+	solarSystemRadius = 4000

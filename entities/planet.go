@@ -6,10 +6,7 @@ import (
 	"github.com/Vladimiroff/vec2d"
 	"math"
 	"time"
-	"warcluster/config"
 )
-
-var cfg config.Config
 
 type Planet struct {
 	coords              []int
@@ -71,13 +68,13 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		return float64(hash[index]) - 48// The offset of simbol "1" in the ascii table
 	}
 
-	cfg.Load("config/entities.gcfg")
+	cfg.Load("../config/entities.gcfg")
 
 	result := []*Planet{}
-	ring_offset := float64(cfg.Planets.Ring_offset)
-	planet_radius := float64(cfg.Planets.Planet_radius)
+	ring_offset := float64(cfg.Planets.RingOffset)
+	planet_radius := float64(cfg.Planets.PlanetRadius)
 
-	for ix := 0; ix < cfg.Planets.Planet_count; ix++ {
+	for ix := 0; ix < cfg.Planets.PlanetCount; ix++ {
 		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 0, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
@@ -92,5 +89,5 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	return result, result[int(hashElement(cfg.Planets.Planet_count * cfg.Planets.Planet_hash_args + 1))]
+	return result, result[int(hashElement(cfg.Planets.PlanetCount * cfg.Planets.PlanetHashArgs + 1))]
 }
