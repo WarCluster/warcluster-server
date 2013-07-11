@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
@@ -30,23 +31,25 @@ It manages several important tasks at the start of the session.
 3.2.Choose home planet from the newly created solar sysitem.
 3.3.Create a reccord of the new player and start comunication.
 */
-func authenticate(session sockjs.Session) (string, *entities.Player) {
+func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 	var player *entities.Player
 	var nickname string
 	var twitter_id string
 	request := new(Request)
 
 	for {
-		message := session.Receive()
-
-		if err := json.Unmarshal(message, request); err == nil {
-			if len(request.Username) > 0 && len(request.TwitterID) > 0 {
-				nickname = request.Username
-				twitter_id = request.TwitterID
-				break
-			}
+		if message := session.Receive(); message == nil {
+			return "", nil, errors.New("No credentials provided")
 		} else {
-			log.Println("Error in server.request.UnmarshalRequest:", err.Error())
+			if err := json.Unmarshal(message, request); err == nil {
+				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
+					nickname = request.Username
+					twitter_id = request.TwitterID
+					break
+				}
+			} else {
+				log.Print("Error in server.client.authenticate: ", err.Error())
+			}
 		}
 	}
 
@@ -69,5 +72,5 @@ func authenticate(session sockjs.Session) (string, *entities.Player) {
 	} else {
 		player = entity.(*entities.Player)
 	}
-	return nickname, player
+	return nickname, player, nil
 }

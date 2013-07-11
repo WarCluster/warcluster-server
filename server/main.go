@@ -6,6 +6,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
@@ -25,8 +26,8 @@ var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs 
 /*This function goes trough all the procedurs needed for the werver to be initialized.
 Create an empty connections pool and start the listening foe messages loop.*/
 func Start(host string, port int) error {
-	log.Print("Server is starting...")
-	log.Println("Server is up and running!")
+	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", host, port))
+	log.Print("Quit the server with Ctrl-C.")
 
 	mux := sockjs.NewServeMux(http.DefaultServeMux)
 	conf := sockjs.NewConfig()
@@ -79,7 +80,10 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 It check for existing user in the DB and logs him if the password is correct.
 If the user is new he is initiated and a new home planet nad solar system are generated.*/
 func login(session sockjs.Session) (*Client, error) {
-	nickname, player := authenticate(session)
+	nickname, player, err := authenticate(session)
+	if err != nil {
+		return nil, errors.New("Login failed")
+	}
 
 	client := &Client{
 		Session:  session,
