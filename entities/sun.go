@@ -44,10 +44,9 @@ func (self *Sun) Update() {
 }
 
 func (self *Sun) Collider(staticSun *Sun) {
-	cfg.Load("../config/entities.gcfg")
 	distance := vec2d.GetDistance(self.position, staticSun.position)
-	if distance < cfg.Suns.SolarSystemRadius{ //TODO: da se zamesti s goleminata v pixeli na slunchevata sistema
-		overlap := cfg.Suns.SolarSystemRadius - distance
+	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
+		overlap := SUNS_SOLAR_SYSTEM_RADIUS - distance
 		ndir := vec2d.Sub(staticSun.position, self.position)
 		ndir.SetLength(overlap)
 		self.position.Sub(ndir)
@@ -59,7 +58,7 @@ func (self *Sun) MoveSun(position *vec2d.Vector) {
 }
 
 func GenerateSun(username string, friends, others []Sun) *Sun {
-	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(cfg.Suns.RandomSpawnZoneRadius)}
+	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS)}
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {
