@@ -71,17 +71,11 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		return float64(hash[index]) - 48// The offset of simbol "1" in the ascii table
 	}
 
-<<<<<<< HEAD
 	cfg.Load("config/entities.gcfg")
 
-	result := []Planet{}
+	result := []*Planet{}
 	ring_offset := float64(cfg.Planets.Ring_offset)
 	planet_radius := float64(cfg.Planets.Planet_radius)
-=======
-	result := []*Planet{}
-	ring_offset := float64(600)
-	planet_radius := float64(160)
->>>>>>> Huge fucking refactoring with all the pointers and shit
 
 	for ix := 0; ix < cfg.Planets.Planet_count; ix++ {
 		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 0, 0, ""}
@@ -97,10 +91,6 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		//self.LastShipCountUpdate = time.Now()
 		result = append(result, &planet_in_creation)
 	}
-<<<<<<< HEAD
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	return result, &result[int(hashElement(cfg.Planets.Planet_count * cfg.Planets.Planet_hash_args + 1))]
-=======
-	return result, result[int(hashElement(41))]
->>>>>>> Huge fucking refactoring with all the pointers and shit
+	return result, result[int(hashElement(cfg.Planets.Planet_count * cfg.Planets.Planet_hash_args + 1))]
 }
