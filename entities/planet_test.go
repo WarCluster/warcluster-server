@@ -12,16 +12,16 @@ func TestGeneratePlanets(t *testing.T) {
 	hash := "5762908447300427353060676895795336101745023746116233389596883"
 	sun_position := vec2d.New(500, 300)
 	expected_planets := []Planet{
-		Planet{[]int{375, 247}, 6, 3, start_time.Unix(), 0, 0, "gophie"},
-		Planet{[]int{694, 300}, 8, 5, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{271, 203}, 3, 1, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{209, 365}, 2, 8, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{671, -6}, 3, 1, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{907, 300}, 6, 8, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{918, 101}, 9, 6, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{352, 798}, 5, 4, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{686, 841}, 1, 1, start_time.Unix(), 00, 0, "gophie"},
-		Planet{[]int{-75, 58}, 4, 6, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{-223, -4}, 6, 3, start_time.Unix(), 0, 0, "gophie"},
+		Planet{[]int{1490, 300}, 8, 5, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{-578, -153}, 3, 1, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{-797, 591}, 2, 8, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{1233, -1014}, 3, 1, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{2195, 300}, 6, 8, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{2203, -507}, 9, 6, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{-90 , 2294}, 5, 4, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{1234, 2431}, 1, 1, start_time.Unix(), 00, 0, "gophie"},
+		Planet{[]int{-1730, -638}, 4, 6, start_time.Unix(), 00, 0, "gophie"},
 	}
 	generated_planets, _ := GeneratePlanets(hash, sun_position)
 
