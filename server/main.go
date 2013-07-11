@@ -122,10 +122,10 @@ func handler(session sockjs.Session) {
 						log.Println(err)
 					}
 				} else {
-					log.Println("Error in server.main.handler:", err.Error())
+					log.Println("Error in server.main.handler.ParseRequest:", err.Error())
 				}
 			} else {
-				log.Println("Error in server.main.handler:", err.Error())
+				log.Println("Error in server.main.handler.UnmarshalRequest:", err.Error())
 			}
 		}
 	} else {
