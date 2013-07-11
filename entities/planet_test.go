@@ -20,7 +20,7 @@ func TestGeneratePlanets(t *testing.T) {
 		Planet{[]int{1233, -1014}, 3, 1, start_time.Unix(), 10, 0, "gophie"},
 		Planet{[]int{2195, 300}, 6, 8, start_time.Unix(), 10, 0, "gophie"},
 		Planet{[]int{2203, -507}, 9, 6, start_time.Unix(), 10, 0, "gophie"},
-		Planet{[]int{-90 , 2294}, 5, 4, start_time.Unix(), 10, 0, "gophie"},
+		Planet{[]int{-90, 2294}, 5, 4, start_time.Unix(), 10, 0, "gophie"},
 		Planet{[]int{1234, 2431}, 1, 1, start_time.Unix(), 10, 0, "gophie"},
 		Planet{[]int{-1730, -638}, 4, 6, start_time.Unix(), 10, 0, "gophie"},
 	}

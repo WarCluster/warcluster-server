@@ -24,8 +24,8 @@ type Request struct {
 	StartPlanet string
 	EndPlanet   string
 	Fleet       int
-	Username	string
-	TwitterID	string
+	Username    string
+	TwitterID   string
 }
 
 /*

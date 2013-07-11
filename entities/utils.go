@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
-	"math/rand"
 	"io"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -90,5 +90,5 @@ func getRandomStartPosition(scope int) *vec2d.Vector {
 	y_seed := time.Now().UTC().UnixNano()
 	x_generator := rand.New(rand.NewSource(x_seed))
 	y_generator := rand.New(rand.NewSource(y_seed))
-	return vec2d.New(float64(x_generator.Intn(scope) - scope/2), float64(y_generator.Intn(scope) - scope/2))
+	return vec2d.New(float64(x_generator.Intn(scope)-scope/2), float64(y_generator.Intn(scope)-scope/2))
 }

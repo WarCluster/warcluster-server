@@ -53,7 +53,7 @@ func (self *Planet) SetShipCount(count int) {
 
 func (self *Planet) UpdateShipCount() {
 	passedTime := time.Now().Unix() - self.LastShipCountUpdate
-	timeModifier := int64(self.Size / 3) + 1
+	timeModifier := int64(self.Size/3) + 1
 	//TODO: To be completed for all planet size types
 	//if getobject(Owner.getkey).gethomeplanet == self.getkey
 	self.ShipCount += int(passedTime / timeModifier)
@@ -67,7 +67,7 @@ NOTE: 5 in ring_offset is the distance between planets
 */
 func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Planet) {
 	hashElement := func(index int) float64 {
-		return float64(hash[index]) - 48// The offset of simbol "1" in the ascii table
+		return float64(hash[index]) - 48 // The offset of simbol "1" in the ascii table
 	}
 
 	result := []*Planet{}
@@ -83,11 +83,11 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		planet_in_creation.coords[1] = int(float64(sun_position.Y) + ring_offset*math.Sin(
 			hashElement(4*ix+1)*40))
 
-		planet_in_creation.Texture = int(hashElement(4*ix+2))
+		planet_in_creation.Texture = int(hashElement(4*ix + 2))
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
 		//self.LastShipCountUpdate = time.Now()
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	return result, result[int(hashElement(PLANETS_PLANET_COUNT * PLANETS_PLANET_HASH_ARGS + 1))]
+	return result, result[int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS+1))]
 }

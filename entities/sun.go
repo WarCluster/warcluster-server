@@ -78,7 +78,7 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 			newSun.Collider(&sunEntity)
 		}
 
-		if int64(newSun.position.X) == int64(oldPos.X) && int64(newSun.position.Y) == int64(oldPos.Y){
+		if int64(newSun.position.X) == int64(oldPos.X) && int64(newSun.position.Y) == int64(oldPos.Y) {
 			noChange = true
 		}
 	}
