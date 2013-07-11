@@ -24,6 +24,8 @@ type Request struct {
 	StartPlanet string
 	EndPlanet   string
 	Fleet       int
+	Username	string
+	TwitterID	string
 }
 
 /*
@@ -64,5 +66,5 @@ func ParseRequest(request *Request) (func(*Request) error, error) {
 			return nil, errors.New("Not enough arguments")
 		}
 	}
-	return nil, nil
+	return nil, errors.New("Unknown command")
 }

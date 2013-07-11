@@ -18,15 +18,15 @@ type Sun struct {
 	position *vec2d.Vector
 }
 
-func (self Sun) GetKey() string {
+func (self *Sun) GetKey() string {
 	return fmt.Sprintf("sun.%v_%v", int64(self.position.X), int64(self.position.Y))
 }
 
-func (self Sun) String() string {
+func (self *Sun) String() string {
 	return fmt.Sprintf("Sun[%v, %v]", int64(self.position.X), int64(self.position.Y))
 }
 
-func (self Sun) Serialize() (string, []byte, error) {
+func (self *Sun) Serialize() (string, []byte, error) {
 	result, err := json.Marshal(self)
 	if err != nil {
 		return self.GetKey(), nil, err
@@ -34,7 +34,7 @@ func (self Sun) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func (self Sun) GetPosition() *vec2d.Vector {
+func (self *Sun) GetPosition() *vec2d.Vector {
 	return self.position
 }
 
@@ -61,8 +61,8 @@ func (self *Sun) MoveSun(position *vec2d.Vector) {
 	self.target = position
 }
 
-func GenerateSun(username string, friends, others []Sun) Sun {
-	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(fg.Suns.Random_spawn_zone_radius)}
+func GenerateSun(username string, friends, others []Sun) *Sun {
+	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(cfg.Suns.Random_spawn_zone_radius)}
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {
@@ -86,6 +86,6 @@ func GenerateSun(username string, friends, others []Sun) Sun {
 			noChange = true
 		}
 	}
-	return newSun
+	return &newSun
 	//Base player placement on worker movement from BotWars
 }

@@ -1,7 +1,9 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"warcluster/db_manager"
 	"warcluster/entities"
@@ -29,23 +31,31 @@ It manages several important tasks at the start of the session.
 3.3.Create a reccord of the new player and start comunication.
 */
 func authenticate(session sockjs.Session) (string, *entities.Player) {
-	var player entities.Player
+	var player *entities.Player
+	var nickname string
+	var twitter_id string
+	request := new(Request)
 
-	session.Send([]byte("Twitter Authenticating:\n"))
-	session.Send([]byte("Username: "))
-	nick := session.Receive()
-	nickname := string(nick)
+	for {
+		message := session.Receive()
 
-	session.Send([]byte("TwitterID: "))
-	twitter := session.Receive()
-	twitter_id := string(twitter)
+		if err := json.Unmarshal(message, request); err == nil {
+			if len(request.Username) > 0 && len(request.TwitterID) > 0 {
+				nickname = request.Username
+				twitter_id = request.TwitterID
+				break
+			}
+		} else {
+			log.Println("Error in server.request.UnmarshalRequest:", err.Error())
+		}
+	}
 
-	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", nick))
+	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", []byte(nickname)))
 	if entity == nil {
 		all_suns_entities := db_manager.GetEntities("sun.*")
 		all_suns := []entities.Sun{}
 		for _, entity := range all_suns_entities {
-			all_suns = append(all_suns, entity.(entities.Sun))
+			all_suns = append(all_suns, *entity.(*entities.Sun))
 		}
 		sun := entities.GenerateSun(nickname, all_suns, []entities.Sun{})
 		hash := entities.GenerateHash(nickname)
@@ -57,7 +67,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player) {
 			db_manager.SetEntity(planets[i])
 		}
 	} else {
-		player = entity.(entities.Player)
+		player = entity.(*entities.Player)
 	}
-	return nickname, &player
+	return nickname, player
 }

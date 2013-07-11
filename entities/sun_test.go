@@ -22,9 +22,9 @@ func TestBasePreparations(t *testing.T) {
 }
 
 func TestDeserializeSun(t *testing.T) {
-	var sun Sun
+	var sun *Sun
 	serialized_Sun := []byte("{\"Username\":\"gophie\"}")
-	sun = Construct("sun.20_20", serialized_Sun).(Sun)
+	sun = Construct("sun.20_20", serialized_Sun).(*Sun)
 
 	if sun.Username != "gophie" {
 		t.Error("Player's name is ", sun.Username)
