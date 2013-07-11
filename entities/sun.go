@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"warcluster/config"
 )
+
+var cfg config.Config
 
 var sunCounter = []int{0, 0}
 
@@ -44,9 +47,10 @@ func (self *Sun) Update() {
 }
 
 func (self *Sun) Collider(staticSun *Sun) {
+	cfg.Load("config/entities.gcfg")
 	distance := vec2d.GetDistance(self.position, staticSun.position)
-	if distance < 4576 { //TODO: da se zamesti s goleminata v pixeli na slunchevata sistema
-		overlap := 4576 - distance
+	if distance < cfg.Suns.Solar_system_radius{ //TODO: da se zamesti s goleminata v pixeli na slunchevata sistema
+		overlap := cfg.Suns.Solar_system_radius - distance
 		ndir := vec2d.Sub(staticSun.position, self.position)
 		ndir.SetLength(overlap)
 		self.position.Sub(ndir)
@@ -58,7 +62,7 @@ func (self *Sun) MoveSun(position *vec2d.Vector) {
 }
 
 func GenerateSun(username string, friends, others []Sun) Sun {
-	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(50000)}
+	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(fg.Suns.Random_spawn_zone_radius)}
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {

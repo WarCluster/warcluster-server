@@ -12,4 +12,4 @@
 *.pyo
 
 # Config file
-config/*.gcfg
+config/config.gcfg
