@@ -44,8 +44,8 @@ func (self *Player) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func CreatePlayer(username, TwitterID string, HomePlanet *Planet, avatarURL string) *Player {
-	player := Player{username, TwitterID, HomePlanet.GetKey(), avatarURL, []int{0, 0}, []int{0, 0}}
+func CreatePlayer(username, TwitterID string, HomePlanet *Planet, AvatarURL string) *Player {
+	player := Player{username, TwitterID, HomePlanet.GetKey(), AvatarURL, []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	return &player
 }

@@ -24,7 +24,7 @@ type Request struct {
 	Fleet       int
 	Username    string
 	TwitterID   string
-	avatarURL	string
+	AvatarURL	string
 }
 
 // This function transfers the information of a new request from byte list to the special Request struct.
