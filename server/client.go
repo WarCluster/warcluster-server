@@ -33,6 +33,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 	var player *entities.Player
 	var nickname string
 	var twitter_id string
+	var AvatarURL string
 	request := new(Request)
 
 	for {
@@ -43,6 +44,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
 					nickname = request.Username
 					twitter_id = request.TwitterID
+					AvatarURL = request.avatarURL
 					break
 				}
 			} else {
@@ -61,7 +63,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		sun := entities.GenerateSun(nickname, all_suns, []entities.Sun{})
 		hash := entities.GenerateHash(nickname)
 		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
-		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
+		player = entities.CreatePlayer(nickname, twitter_id, home_planet, AvatarURL)
 		db_manager.SetEntity(player)
 		db_manager.SetEntity(sun)
 		for i := 0; i < len(planets); i++ {
