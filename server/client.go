@@ -64,6 +64,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		hash := entities.GenerateHash(nickname)
 		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
 		player = entities.CreatePlayer(nickname, twitter_id, home_planet, avatarURL)
+		log.Print("Player", player)
 		db_manager.SetEntity(player)
 		db_manager.SetEntity(sun)
 		for i := 0; i < len(planets); i++ {
@@ -71,6 +72,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		}
 	} else {
 		player = entity.(*entities.Player)
+		log.Print("Player.AvatarURL: ", player.AvatarURL)
 	}
 	return nickname, player, nil
 }
