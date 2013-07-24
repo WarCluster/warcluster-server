@@ -35,7 +35,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 	var twitter_id string
 	var avatarURL string
 	request := new(Request)
-	
+
 	for {
 		if message := session.Receive(); message == nil {
 			return "", nil, errors.New("No credentials provided")
@@ -44,7 +44,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
 					nickname = request.Username
 					twitter_id = request.TwitterID
-					// avatarURL = request.AvatarURL
+					avatarURL = request.AvatarURL
 					break
 				}
 			} else {
