@@ -107,6 +107,9 @@ func TestDeserializePlanet(t *testing.T) {
 		t.Error("Planet's owner is ", planet.Owner)
 	}
 
+	if planet.OwnerAvatarURL != "pngURL" {
+		t.Error("Planet's owner avatar url is ", planet.OwnerAvatarURL)
+	}
 	if planet.coords[0] != 10 && planet.coords[1] != 12 {
 		t.Error("Planet's coords are ", planet.coords)
 	}
