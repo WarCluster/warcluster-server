@@ -16,7 +16,6 @@ type Planet struct {
 	ShipCount           int
 	MaxShipCount        int
 	Owner               string
-	OwnerAvatarURL      string
 }
 
 func (self *Planet) String() string {
@@ -61,15 +60,6 @@ func (self *Planet) UpdateShipCount() {
 	self.LastShipCountUpdate = time.Now().Unix()
 }
 
-// func (self *Planet) GetAvatarURL() string {
-// 	if len(self.Owner) > 0 {
-// 		return self.AvatarURL
-// 	}
-// 	return nil
-// }
-// func (self *Planet) SetAvatarURL(url string) {
-// 	self.AvatarURL = url
-// }
 /*
 TODO: We need to add ship count on new planet creation
 TODO: Put all funny numbers in a constans in our config file
@@ -85,7 +75,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 	planet_radius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, "", ""}
+		planet_in_creation := Planet{[]int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(

@@ -58,7 +58,7 @@ func TestEndMission(t *testing.T) {
 	start_time := time.Now()
 	*mission = Mission{"planet.32_64", start_time, "gophie", 15, "planet.2_2"}
 	*secondMission = Mission{"planet.32_64", start_time, "chochko", 10, "planet.2_2"}
-	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time.Unix(), 2, 0, "chochko", "avatarURL"}
+	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time.Unix(), 2, 0, "chochko"}
 
 	endPlanet = EndMission(endPlanet, secondMission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
