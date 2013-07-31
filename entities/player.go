@@ -10,7 +10,7 @@ type Player struct {
 	username       string
 	TwitterID      string
 	HomePlanet     string
-    AvatarURL      string
+	AvatarURL      string
 	ScreenSize     []int
 	ScreenPosition []int
 }

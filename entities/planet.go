@@ -16,7 +16,7 @@ type Planet struct {
 	ShipCount           int
 	MaxShipCount        int
 	Owner               string
-	OwnerAvatarURL		string
+	OwnerAvatarURL      string
 }
 
 func (self *Planet) String() string {
@@ -46,7 +46,6 @@ func (self *Planet) GetShipCount() int {
 	}
 	return self.ShipCount
 }
-
 
 func (self *Planet) SetShipCount(count int) {
 	self.ShipCount = count
