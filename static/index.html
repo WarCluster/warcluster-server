@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-		<script src="http://cdn.sockjs.org/sockjs-0.3.4.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script src="//cdn.sockjs.org/sockjs-0.3.4.min.js"></script>
 		<script>
 			$(function() {
 				var conn = null;
@@ -62,7 +62,7 @@
 								$('#message').val('').focus();
 			});
 		</script>
-		<title>Sockjs-go chat</title>
+		<title>War Cluster Development shell</title>
 	</head>
 	<body>
 		<h1>Sockjs-go chat</h1>
@@ -73,9 +73,9 @@
 		<div id="log" style="width: 80em; height: 30em; overflow:auto; border: 1px solid black">
 		</div>
 		<form id="chatform">
-			<label for="message">Message:</label>
-			<input id="message" type="text" />
-			<input type="submit" value="Send" />
+			<label for="message">Command:</label>
+			<input id="message" type="text" style="width: 80em">
+			<input type="submit" value="Send">
 		</form>
 	</body>
 </html>
