@@ -29,10 +29,10 @@ func (self *Player) StartMission(start_planet, end_planet *Planet, fleet int) *M
 	} else if fleet <= 0 {
 		fleet = 1
 	}
-	start_time := time.Now()
+	current_time := time.Now()
 	ship_count := int(start_planet.ShipCount/10) * fleet
 	start_planet.ShipCount -= ship_count
-	mission := Mission{start_planet.GetKey(), start_time, self.GetKey(), ship_count, end_planet.GetKey()}
+	mission := Mission{start_planet.GetCoords(), end_planet.GetCoords(), current_time, current_time, current_time, self.username, ship_count}
 	return &mission
 }
 

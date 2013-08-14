@@ -40,11 +40,11 @@ func TestDeserializePlayer(t *testing.T) {
 		t.Error("Player's avatarURL is ", player.AvatarURL)
 	}
 
-	if player.ScreenSize[0] != 1 && player.ScreenSize[1] != 1 {
+	if player.ScreenSize[0] != 1 || player.ScreenSize[1] != 1 {
 		t.Error("Player's ScreenSize is ", player.ScreenSize)
 	}
 
-	if player.ScreenPosition[0] != 2 && player.ScreenPosition[1] != 2 {
+	if player.ScreenPosition[0] != 2 || player.ScreenPosition[1] != 2 {
 		t.Error("Player's ScreenPosition is ", player.ScreenPosition)
 	}
 }
@@ -60,13 +60,13 @@ func TestCreateMission(t *testing.T) {
 	planet_start.ShipCount = 100
 	invalid_mission := player.StartMission(&planet_start, &planet_end, 12)
 
-	if valid_mission.start_planet != "planet.271_203" {
-		t.Error(valid_mission.start_planet)
+	if valid_mission.Source[0] != 271 || valid_mission.Source[1] != 203 {
+		t.Error(valid_mission.Source)
 		t.Error("Planet planet.271_203 was expected as start planet!")
 	}
 
-	if valid_mission.EndPlanet != "planet.471_403" {
-		t.Error(valid_mission.EndPlanet)
+	if valid_mission.Target[0] != 471 || valid_mission.Target[1] != 403 {
+		t.Error(valid_mission.Target)
 		t.Error("Planet planet.471_403 was expected as end planet!")
 	}
 
