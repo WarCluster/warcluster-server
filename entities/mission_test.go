@@ -1,13 +1,16 @@
 package entities
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
 
 func TestMissionGetKey(t *testing.T) {
 	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
-	mission := Mission{"planet.32_64", start_time, "gophie", 5, "planet.2_2"}
+	mission := new(Mission)
+	mission.Source = []int{32, 64}
+	mission.StartTime = start_time
 
 	if mission.GetKey() != "mission.13525884000_32_64" {
 		t.Error("Mission's time is ", mission.GetKey())
@@ -15,9 +18,15 @@ func TestMissionGetKey(t *testing.T) {
 }
 
 func TestMissionSerialize(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
-	mission := Mission{"planet.32_64", start_time, "gophie", 5, "planet.2_2"}
-	expected_json := "{\"Player\":\"gophie\",\"ShipCount\":5,\"EndPlanet\":\"planet.2_2\"}"
+	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC)
+	mission := Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 5}
+	expected_json := strings.Join([]string{"{\"Source\":[32,64],",
+		"\"Target\":[2,2],",
+		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
+		"\"StartTime\":\"2013-08-14T22:12:06Z\",",
+		"\"ArrivalTime\":\"2013-08-14T22:12:06Z\",",
+		"\"Player\":\"gophie\",",
+		"\"ShipCount\":5}"}, "")
 
 	key, json, err := mission.Serialize()
 
@@ -26,7 +35,7 @@ func TestMissionSerialize(t *testing.T) {
 	}
 
 	if string(json) != expected_json {
-		t.Error("Serialized mission is ", json, "but iy should be ", expected_json)
+		t.Error("Serialized mission is ", string(json), "but it should be ", expected_json)
 	}
 
 	if err != nil {
@@ -35,8 +44,14 @@ func TestMissionSerialize(t *testing.T) {
 }
 
 func TestMissionDeserialize(t *testing.T) {
-	serialized_mission := []byte("{\"Player\":\"gophie\",\"ShipCount\":5,\"EndPlanet\":\"planet.2_2\"}")
-	mission := Construct("mission.1352588400_32_64", serialized_mission).(*Mission)
+	serialized_mission := []byte(strings.Join([]string{"{\"Source\":[32,64],",
+		"\"Target\":[2,2],",
+		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
+		"\"StartTime\":\"2013-08-14T22:12:06.06Z\",",
+		"\"ArrivalTime\":\"2013-08-14T22:12:06Z\",",
+		"\"Player\":\"gophie\",",
+		"\"ShipCount\":5}"}, ""))
+	mission := Construct("mission.137650752666_32_64", serialized_mission).(*Mission)
 
 	if mission.Player != "gophie" {
 		t.Error("Mission's player is ", mission.Player)
@@ -46,8 +61,12 @@ func TestMissionDeserialize(t *testing.T) {
 		t.Error("Mission's ShipCount is ", mission.ShipCount)
 	}
 
-	if mission.EndPlanet != "planet.2_2" {
-		t.Error("Mission's EndPlanet is ", mission.EndPlanet)
+	if mission.Source[0] != 32 || mission.Source[1] != 64 {
+		t.Error("Mission's Source is ", mission.Source)
+	}
+
+	if mission.Target[0] != 2 || mission.Target[1] != 2 {
+		t.Error("Mission's Target is ", mission.Target)
 	}
 }
 
@@ -56,8 +75,8 @@ func TestEndMission(t *testing.T) {
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
 	start_time := time.Now()
-	*mission = Mission{"planet.32_64", start_time, "gophie", 15, "planet.2_2"}
-	*secondMission = Mission{"planet.32_64", start_time, "chochko", 10, "planet.2_2"}
+	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
+	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "chochko", 10}
 	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time.Unix(), 2, 0, "chochko"}
 
 	endPlanet = EndMission(endPlanet, secondMission)

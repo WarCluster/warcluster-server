@@ -22,19 +22,20 @@ func CalculateArrivalTime(start_point, end_point []int, speed int) time.Duration
 // 3. When the delay ends the thread ends the mission calling EndMission
 // 4. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
-	start_entity, err := db_manager.GetEntity(mission.GetStartPlanet())
-	start_planet := start_entity.(*entities.Planet)
-	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
-	end_planet := end_entity.(*entities.Planet)
+	source_entity, err := db_manager.GetEntity(fmt.Sprintf("planet.%d_%d", mission.Source[0], mission.Source[1]))
+	source := source_entity.(*entities.Planet)
+	target_key := fmt.Sprintf("planet.%d_%d", mission.Target[0], mission.Target[1])
+	target_entity, err := db_manager.GetEntity(target_key)
+	target := target_entity.(*entities.Planet)
 
 	speed := mission.GetSpeed()
-	time.Sleep(CalculateArrivalTime(start_planet.GetCoords(), end_planet.GetCoords(), speed))
+	time.Sleep(CalculateArrivalTime(source.GetCoords(), target.GetCoords(), speed))
 
 	// Fetch the end_planet again in order to know what has changed
-	end_entity, err = db_manager.GetEntity(mission.EndPlanet)
-	end_planet = end_entity.(*entities.Planet)
+	target_entity, err = db_manager.GetEntity(target_key)
+	target = target_entity.(*entities.Planet)
 
-	result := entities.EndMission(end_planet, mission)
+	result := entities.EndMission(target, mission)
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
 		db_manager.SetEntity(result)

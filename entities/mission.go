@@ -7,11 +7,13 @@ import (
 )
 
 type Mission struct {
-	start_planet string
-	start_time   time.Time
-	Player       string
-	ShipCount    int
-	EndPlanet    string
+	Source      []int
+	Target      []int
+	CurrentTime time.Time
+	StartTime   time.Time
+	ArrivalTime time.Time
+	Player      string
+	ShipCount   int
 }
 
 func (self *Mission) String() string {
@@ -19,13 +21,12 @@ func (self *Mission) String() string {
 }
 
 func (self *Mission) GetKey() string {
-	start_planet_coords := ExtractPlanetCoords(self.start_planet)
 	return fmt.Sprintf(
 		"mission.%d%d_%d_%d",
-		self.start_time.Unix(),
-		self.start_time.Nanosecond() / 1e6,
-		start_planet_coords[0],
-		start_planet_coords[1],
+		self.StartTime.Unix(),
+		self.StartTime.Nanosecond()/1e6,
+		self.Source[0],
+		self.Source[1],
 	)
 }
 
@@ -41,12 +42,8 @@ func (self *Mission) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func (self *Mission) GetStartPlanet() string {
-	return self.start_planet
-}
-
 func (self *Mission) GetStartTime() time.Time {
-	return self.start_time
+	return self.StartTime
 }
 
 func EndMission(endPlanet *Planet, missionInfo *Mission) *Planet {
