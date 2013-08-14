@@ -83,7 +83,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		planet_in_creation.coords[1] = int(float64(sun_position.Y) + ring_offset*math.Sin(
 			hashElement(4*ix+1)*40))
 
-		planet_in_creation.Texture = int(hashElement(4*ix + 2))
+		planet_in_creation.Texture = int(hashElement(4*ix+2))
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
 		//self.LastShipCountUpdate = time.Now()
 		result = append(result, &planet_in_creation)
