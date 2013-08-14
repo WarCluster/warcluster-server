@@ -21,7 +21,7 @@ func (self *Mission) String() string {
 func (self *Mission) GetKey() string {
 	start_planet_coords := ExtractPlanetCoords(self.start_planet)
 	return fmt.Sprintf(
-		"mission.%d.%d_%d_%d",
+		"mission.%d%d_%d_%d",
 		self.start_time.Unix(),
 		self.start_time.Nanosecond() / 1e6,
 		start_planet_coords[0],

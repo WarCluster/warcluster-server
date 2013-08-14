@@ -9,7 +9,7 @@ func TestMissionGetKey(t *testing.T) {
 	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
 	mission := Mission{"planet.32_64", start_time, "gophie", 5, "planet.2_2"}
 
-	if mission.GetKey() != "mission.1352588400.0_32_64" {
+	if mission.GetKey() != "mission.13525884000_32_64" {
 		t.Error("Mission's time is ", mission.GetKey())
 	}
 }
