@@ -31,16 +31,16 @@ func TestGeneratePlanets(t *testing.T) {
 	}
 	for i := 0; i < 10; i++ {
 		if generated_planets[i].coords[0] != expected_planets[i].coords[0] {
-			t.Error("X coordinate missmatch on Planet[" , strconv.Itoa(i) , "] Expected" , expected_planets[i].coords[0] , "Actual " , generated_planets[i].coords[0])
+			t.Error("X coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].coords[0], "Actual ", generated_planets[i].coords[0])
 		}
 		if generated_planets[i].coords[1] != expected_planets[i].coords[1] {
-			t.Error("Y coordinate missmatch on Planet[" , strconv.Itoa(i) , "] Expected" , expected_planets[i].coords[1] , "Actual " , generated_planets[i].coords[1])
+			t.Error("Y coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].coords[1], "Actual ", generated_planets[i].coords[1])
 		}
 		if generated_planets[i].Texture != expected_planets[i].Texture {
-			t.Error("Ring offset missmatch on Planet[" , strconv.Itoa(i) , "] Expected" , expected_planets[i].Texture , "Actual " , generated_planets[i].Texture)
+			t.Error("Ring offset missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].Texture, "Actual ", generated_planets[i].Texture)
 		}
 		if generated_planets[i].Size != expected_planets[i].Size {
-			t.Error("Size missmatch on Planet[" , strconv.Itoa(i) , "] Expected" , expected_planets[i].Size , "Actual " , generated_planets[i].Size)
+			t.Error("Size missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].Size, "Actual ", generated_planets[i].Size)
 		}
 	}
 }
