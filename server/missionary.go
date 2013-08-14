@@ -31,8 +31,8 @@ func StartMissionary(mission *entities.Mission) {
 	time.Sleep(CalculateArrivalTime(start_planet.GetCoords(), end_planet.GetCoords(), speed))
 
 	// Fetch the end_planet again in order to know what has changed
-	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
-	end_planet := end_entity.(*entities.Planet)
+	end_entity, err = db_manager.GetEntity(mission.EndPlanet)
+	end_planet = end_entity.(*entities.Planet)
 
 	result := entities.EndMission(end_planet, mission)
 	key, serialized_planet, err := result.Serialize()
