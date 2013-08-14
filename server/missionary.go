@@ -23,12 +23,16 @@ func CalculateArrivalTime(start_point, end_point []int, speed int) time.Duration
 // 4. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
 	start_entity, err := db_manager.GetEntity(mission.GetStartPlanet())
-	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
 	start_planet := start_entity.(*entities.Planet)
+	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
 	end_planet := end_entity.(*entities.Planet)
 
 	speed := mission.GetSpeed()
 	time.Sleep(CalculateArrivalTime(start_planet.GetCoords(), end_planet.GetCoords(), speed))
+
+	// Fetch the end_planet again in order to know what has changed
+	end_entity, err := db_manager.GetEntity(mission.EndPlanet)
+	end_planet := end_entity.(*entities.Planet)
 
 	result := entities.EndMission(end_planet, mission)
 	key, serialized_planet, err := result.Serialize()
