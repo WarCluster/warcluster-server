@@ -107,7 +107,7 @@ func TestTravelTime(t *testing.T) {
 		ShipCount: 50,
 	}
 	mission.CalculateTravelTime()
-	var expectedTravel int64 = 14035
+	var expectedTravel int64 = 7017
 
 	if mission.TravelTime != expectedTravel {
 		t.Error("Wrong arrival time:", mission.TravelTime, "instead of:", expectedTravel)

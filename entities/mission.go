@@ -31,7 +31,7 @@ func (m *Mission) GetKey() string {
 }
 
 func (m *Mission) GetSpeed() int {
-	return 5
+	return 10
 }
 
 func (m *Mission) Serialize() (string, []byte, error) {
