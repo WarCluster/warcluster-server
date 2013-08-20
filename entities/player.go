@@ -10,7 +10,6 @@ type Player struct {
 	username       string
 	TwitterID      string
 	HomePlanet     string
-	AvatarURL      string
 	ScreenSize     []int
 	ScreenPosition []int
 }
@@ -44,8 +43,8 @@ func (self *Player) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func CreatePlayer(username, TwitterID string, HomePlanet *Planet, AvatarURL string) *Player {
-	player := Player{username, TwitterID, HomePlanet.GetKey(), AvatarURL, []int{0, 0}, []int{0, 0}}
+func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
+	player := Player{username, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	return &player
 }
