@@ -21,7 +21,7 @@ func TestMissionSerialize(t *testing.T) {
 	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() / 1e6
 	mission := Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 5}
 	expected_json_prefix := "{\"Source\":[32,64],\"Target\":[2,2],\"CurrentTime\""
-	expected_json_suffix := "\"StartTime\":1376518326000,\"ArrivalTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
+	expected_json_suffix := "\"StartTime\":1376518326000,\"TravelTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
 
 	key, json, err := mission.Serialize()
 
@@ -43,7 +43,7 @@ func TestMissionDeserialize(t *testing.T) {
 		"\"Target\":[2,2],",
 		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
 		"\"StartTime\":\"2013-08-14T22:12:06.06Z\",",
-		"\"ArrivalTime\":\"2013-08-14T22:12:06Z\",",
+		"\"TravelTime\":\"2013-08-14T22:12:06Z\",",
 		"\"Player\":\"gophie\",",
 		"\"ShipCount\":5}"}, ""))
 	mission := Construct("mission.137650752666_32_64", serialized_mission).(*Mission)
@@ -95,21 +95,21 @@ func TestEndMission(t *testing.T) {
 	}
 }
 
-func TestArrivalTime(t *testing.T) {
+func TestTravelTime(t *testing.T) {
 	mission := new(Mission)
 	*mission = Mission{
 		Source: []int{100, 200},
 		Target: []int{800, 150},
 		CurrentTime: time.Now().UnixNano() / 1e6,
 		StartTime: time.Now().UnixNano() / 1e6,
-		ArrivalTime: time.Now().UnixNano() / 1e6,
+		TravelTime: time.Now().UnixNano() / 1e6,
 		Player: "gophie",
 		ShipCount: 50,
 	}
-	mission.CalculateArrivalTime()
-	expectedArrival := 14035 + mission.StartTime 
+	mission.CalculateTravelTime()
+	var expectedTravel int64 = 14035
 
-	if mission.ArrivalTime != expectedArrival {
-		t.Error("Wrong arrival time:", mission.ArrivalTime, "instead of:", expectedArrival)
+	if mission.TravelTime != expectedTravel {
+		t.Error("Wrong arrival time:", mission.TravelTime, "instead of:", expectedTravel)
 	}
 }

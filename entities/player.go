@@ -36,11 +36,11 @@ func (p *Player) StartMission(source, target *Planet, fleet int) *Mission {
 		Target: target.GetCoords(),
 		CurrentTime: current_time,
 		StartTime: current_time,
-		ArrivalTime: current_time,
+		TravelTime: current_time,
 		Player: p.username,
 		ShipCount: ship_count,
 	}
-	mission.CalculateArrivalTime()
+	mission.CalculateTravelTime()
 	return &mission
 }
 
