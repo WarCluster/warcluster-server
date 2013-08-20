@@ -3,15 +3,15 @@ package entities
 import (
 	"encoding/json"
 	"fmt"
-	"time"
+	"github.com/Vladimiroff/vec2d"
 )
 
 type Mission struct {
 	Source      []int
 	Target      []int
-	CurrentTime time.Time
-	StartTime   time.Time
-	ArrivalTime time.Time
+	CurrentTime int64
+	StartTime   int64
+	ArrivalTime int64
 	Player      string
 	ShipCount   int
 }
@@ -22,9 +22,8 @@ func (self *Mission) String() string {
 
 func (self *Mission) GetKey() string {
 	return fmt.Sprintf(
-		"mission.%d%d_%d_%d",
-		self.StartTime.Unix(),
-		self.StartTime.Nanosecond()/1e6,
+		"mission.%d_%d_%d",
+		self.StartTime,
 		self.Source[0],
 		self.Source[1],
 	)
@@ -43,8 +42,12 @@ func (self *Mission) Serialize() (string, []byte, error) {
 	return self.GetKey(), result, nil
 }
 
-func (self *Mission) GetStartTime() time.Time {
-	return self.StartTime
+// The CalculateArrivalTime is used to calculate the mission duration.
+func (self *Mission) CalculateArrivalTime() {
+	start_vector := vec2d.New(float64(self.Source[0]), float64(self.Source[1]))
+	end_vector := vec2d.New(float64(self.Target[0]), float64(self.Target[1]))
+	distance := vec2d.GetDistance(end_vector, start_vector)
+	self.ArrivalTime += int64(distance/float64(self.GetSpeed()) * 100)
 }
 
 func EndMission(endPlanet *Planet, missionInfo *Mission) *Planet {

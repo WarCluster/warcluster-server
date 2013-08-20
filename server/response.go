@@ -83,7 +83,7 @@ func parseAction(request *Request) error {
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(mission)
 		db_manager.SetEntity(mission)
-		sessions.Broadcast([]byte(fmt.Sprintf("{\"%s\": %s}", key, serialized_mission)))
+		sessions.Broadcast([]byte(fmt.Sprintf("{ \"Command\": \"send_mission\", \"%s\": %s}", key, serialized_mission)))
 		return nil
 	}
 

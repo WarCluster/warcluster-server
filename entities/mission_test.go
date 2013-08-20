@@ -7,18 +7,18 @@ import (
 )
 
 func TestMissionGetKey(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC)
+	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() * 1e6
 	mission := new(Mission)
 	mission.Source = []int{32, 64}
 	mission.StartTime = start_time
 
-	if mission.GetKey() != "mission.13525884000_32_64" {
+	if mission.GetKey() != "mission.1352588400000_32_64" {
 		t.Error("Mission's time is ", mission.GetKey())
 	}
 }
 
 func TestMissionSerialize(t *testing.T) {
-	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC)
+	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() * 1e6
 	mission := Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 5}
 	expected_json := strings.Join([]string{"{\"Source\":[32,64],",
 		"\"Target\":[2,2],",
@@ -74,10 +74,10 @@ func TestEndMission(t *testing.T) {
 	mission := new(Mission)
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
-	start_time := time.Now()
+	start_time := time.Now().UnixNano() * 1e6
 	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
 	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "chochko", 10}
-	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time.Unix(), 2, 0, "chochko"}
+	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
 
 	endPlanet = EndMission(endPlanet, secondMission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
@@ -97,5 +97,24 @@ func TestEndMission(t *testing.T) {
 	*/
 	if endPlanet.Owner != "gophie" {
 		t.Error("End Planet owner was expected  to be gophie but is:", endPlanet.Owner)
+	}
+}
+
+func TestArrivalTime(t *testing.T) {
+	mission := new(Mission)
+	*mission = Mission{
+		Source: []int{100, 200},
+		Target: []int{800, 150},
+		CurrentTime: time.Now().UnixNano() / 1e6,
+		StartTime: time.Now().UnixNano() / 1e6,
+		ArrivalTime: time.Now().UnixNano() / 1e6,
+		Player: "gophie",
+		ShipCount: 50,
+	}
+	mission.CalculateArrivalTime()
+	expectedArrival := 14035 + mission.StartTime 
+
+	if mission.ArrivalTime != expectedArrival {
+		t.Error("Wrong arrival time:", mission.ArrivalTime, "instead of:", expectedArrival)
 	}
 }
