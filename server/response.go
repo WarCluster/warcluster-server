@@ -65,21 +65,23 @@ func parseAction(request *Request) error {
 		return nil
 	}()
 
-	start_planet, err := db_manager.GetEntity(request.StartPlanet)
+	source, err := db_manager.GetEntity(request.StartPlanet)
 	if err != nil {
 		return errors.New("Start planet does not exist")
 	}
 
-	end_planet, err := db_manager.GetEntity(request.EndPlanet)
+	target, err := db_manager.GetEntity(request.EndPlanet)
 	if err != nil {
 		return errors.New("End planet does not exist")
 	}
 
-	if start_planet.(*entities.Planet).Owner != request.Client.Player.String() {
+	if source.(*entities.Planet).Owner != request.Client.Player.String() {
 		err = errors.New("This is not your home!")
 	}
 
-	mission := request.Client.Player.StartMission(start_planet.(*entities.Planet), end_planet.(*entities.Planet), request.Fleet)
+	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet)
+	db_manager.SetEntity(source)
+
 	if key, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(mission)
 		db_manager.SetEntity(mission)
