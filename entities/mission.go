@@ -12,7 +12,7 @@ type Mission struct {
 	Target      []int
 	CurrentTime int64
 	StartTime   int64
-	TravelTime int64
+	TravelTime  int64
 	Player      string
 	ShipCount   int
 }
@@ -47,7 +47,7 @@ func (m *Mission) CalculateTravelTime() {
 	start_vector := vec2d.New(float64(m.Source[0]), float64(m.Source[1]))
 	end_vector := vec2d.New(float64(m.Target[0]), float64(m.Target[1]))
 	distance := vec2d.GetDistance(end_vector, start_vector)
-	m.TravelTime = int64(distance/float64(m.GetSpeed()) * 100)
+	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
 }
 
 func EndMission(endPlanet *Planet, missionInfo *Mission) *Planet {

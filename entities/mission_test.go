@@ -98,13 +98,13 @@ func TestEndMission(t *testing.T) {
 func TestTravelTime(t *testing.T) {
 	mission := new(Mission)
 	*mission = Mission{
-		Source: []int{100, 200},
-		Target: []int{800, 150},
+		Source:      []int{100, 200},
+		Target:      []int{800, 150},
 		CurrentTime: time.Now().UnixNano() / 1e6,
-		StartTime: time.Now().UnixNano() / 1e6,
-		TravelTime: time.Now().UnixNano() / 1e6,
-		Player: "gophie",
-		ShipCount: 50,
+		StartTime:   time.Now().UnixNano() / 1e6,
+		TravelTime:  time.Now().UnixNano() / 1e6,
+		Player:      "gophie",
+		ShipCount:   50,
 	}
 	mission.CalculateTravelTime()
 	var expectedTravel int64 = 7017

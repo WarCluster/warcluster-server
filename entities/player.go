@@ -32,13 +32,13 @@ func (p *Player) StartMission(source, target *Planet, fleet int) *Mission {
 	ship_count := int(source.ShipCount/100) * fleet
 	source.ShipCount -= ship_count
 	mission := Mission{
-		Source: source.GetCoords(),
-		Target: target.GetCoords(),
+		Source:      source.GetCoords(),
+		Target:      target.GetCoords(),
 		CurrentTime: current_time,
-		StartTime: current_time,
-		TravelTime: current_time,
-		Player: p.username,
-		ShipCount: ship_count,
+		StartTime:   current_time,
+		TravelTime:  current_time,
+		Player:      p.username,
+		ShipCount:   ship_count,
 	}
 	mission.CalculateTravelTime()
 	return &mission
