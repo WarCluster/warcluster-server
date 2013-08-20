@@ -20,10 +20,10 @@ type Config struct {
 	}
 }
 
-func (self *Config) Load(name string) {
+func (c *Config) Load(name string) {
 	_, filename, _, _ := runtime.Caller(1)
 	configPath := path.Join(path.Dir(filename), name)
-	if err := gcfg.ReadFileInto(self, configPath); err != nil {
+	if err := gcfg.ReadFileInto(c, configPath); err != nil {
 		log.Fatal("Error loading cfg:", err)
 	}
 }

@@ -15,46 +15,46 @@ type Sun struct {
 	position *vec2d.Vector
 }
 
-func (self *Sun) GetKey() string {
-	return fmt.Sprintf("sun.%v_%v", int64(self.position.X), int64(self.position.Y))
+func (s *Sun) GetKey() string {
+	return fmt.Sprintf("sun.%v_%v", int64(s.position.X), int64(s.position.Y))
 }
 
-func (self *Sun) String() string {
-	return fmt.Sprintf("Sun[%v, %v]", int64(self.position.X), int64(self.position.Y))
+func (s *Sun) String() string {
+	return fmt.Sprintf("Sun[%v, %v]", int64(s.position.X), int64(s.position.Y))
 }
 
-func (self *Sun) Serialize() (string, []byte, error) {
-	result, err := json.Marshal(self)
+func (s *Sun) Serialize() (string, []byte, error) {
+	result, err := json.Marshal(s)
 	if err != nil {
-		return self.GetKey(), nil, err
+		return s.GetKey(), nil, err
 	}
-	return self.GetKey(), result, nil
+	return s.GetKey(), result, nil
 }
 
-func (self *Sun) GetPosition() *vec2d.Vector {
-	return self.position
+func (s *Sun) GetPosition() *vec2d.Vector {
+	return s.position
 }
 
-func (self *Sun) Update() {
-	direction := vec2d.Sub(self.target, self.position)
-	if int(direction.Length()) >= self.speed {
-		direction.SetLength(float64(self.speed) * ((direction.Length() / 50) + 1))
-		self.position = vec2d.New(float64(self.position.X+direction.X), float64(self.position.Y+direction.Y))
+func (s *Sun) Update() {
+	direction := vec2d.Sub(s.target, s.position)
+	if int(direction.Length()) >= s.speed {
+		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
+		s.position = vec2d.New(float64(s.position.X+direction.X), float64(s.position.Y+direction.Y))
 	}
 }
 
-func (self *Sun) Collider(staticSun *Sun) {
-	distance := vec2d.GetDistance(self.position, staticSun.position)
+func (s *Sun) Collider(staticSun *Sun) {
+	distance := vec2d.GetDistance(s.position, staticSun.position)
 	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
 		overlap := SUNS_SOLAR_SYSTEM_RADIUS - distance
-		ndir := vec2d.Sub(staticSun.position, self.position)
+		ndir := vec2d.Sub(staticSun.position, s.position)
 		ndir.SetLength(overlap)
-		self.position.Sub(ndir)
+		s.position.Sub(ndir)
 	}
 }
 
-func (self *Sun) MoveSun(position *vec2d.Vector) {
-	self.target = position
+func (s *Sun) MoveSun(position *vec2d.Vector) {
+	s.target = position
 }
 
 func GenerateSun(username string, friends, others []Sun) *Sun {

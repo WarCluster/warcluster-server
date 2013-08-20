@@ -18,46 +18,46 @@ type Planet struct {
 	Owner               string
 }
 
-func (self *Planet) String() string {
-	return fmt.Sprintf("Planet[%s, %s]", self.coords[0], self.coords[1])
+func (p *Planet) String() string {
+	return fmt.Sprintf("Planet[%s, %s]", p.coords[0], p.coords[1])
 }
 
-func (self *Planet) GetKey() string {
-	return fmt.Sprintf("planet.%d_%d", self.coords[0], self.coords[1])
+func (p *Planet) GetKey() string {
+	return fmt.Sprintf("planet.%d_%d", p.coords[0], p.coords[1])
 }
 
-func (self *Planet) GetCoords() []int {
-	return self.coords
+func (p *Planet) GetCoords() []int {
+	return p.coords
 }
 
-func (self *Planet) Serialize() (string, []byte, error) {
-	_ = self.GetShipCount()
-	result, err := json.Marshal(self)
+func (p *Planet) Serialize() (string, []byte, error) {
+	_ = p.GetShipCount()
+	result, err := json.Marshal(p)
 	if err != nil {
-		return self.GetKey(), nil, err
+		return p.GetKey(), nil, err
 	}
-	return self.GetKey(), result, nil
+	return p.GetKey(), result, nil
 }
 
-func (self *Planet) GetShipCount() int {
-	if len(self.Owner) > 0 {
-		self.UpdateShipCount()
+func (p *Planet) GetShipCount() int {
+	if len(p.Owner) > 0 {
+		p.UpdateShipCount()
 	}
-	return self.ShipCount
+	return p.ShipCount
 }
 
-func (self *Planet) SetShipCount(count int) {
-	self.ShipCount = count
-	self.LastShipCountUpdate = time.Now().Unix()
+func (p *Planet) SetShipCount(count int) {
+	p.ShipCount = count
+	p.LastShipCountUpdate = time.Now().Unix()
 }
 
-func (self *Planet) UpdateShipCount() {
-	passedTime := time.Now().Unix() - self.LastShipCountUpdate
-	timeModifier := int64(self.Size/3) + 1
+func (p *Planet) UpdateShipCount() {
+	passedTime := time.Now().Unix() - p.LastShipCountUpdate
+	timeModifier := int64(p.Size/3) + 1
 	//TODO: To be completed for all planet size types
-	//if getobject(Owner.getkey).gethomeplanet == self.getkey
-	self.ShipCount += int(passedTime / timeModifier)
-	self.LastShipCountUpdate = time.Now().Unix()
+	//if getobject(Owner.getkey).gethomeplanet == p.getkey
+	p.ShipCount += int(passedTime / timeModifier)
+	p.LastShipCountUpdate = time.Now().Unix()
 }
 
 /*
@@ -85,7 +85,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 
 		planet_in_creation.Texture = int(hashElement(4*ix + 2))
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
-		//self.LastShipCountUpdate = time.Now()
+		//p.LastShipCountUpdate = time.Now()
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx

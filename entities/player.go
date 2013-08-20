@@ -14,15 +14,15 @@ type Player struct {
 	ScreenPosition []int
 }
 
-func (self *Player) String() string {
-	return self.username
+func (p *Player) String() string {
+	return p.username
 }
 
-func (self *Player) GetKey() string {
-	return fmt.Sprintf("player.%s", self.username)
+func (p *Player) GetKey() string {
+	return fmt.Sprintf("player.%s", p.username)
 }
 
-func (self *Player) StartMission(start_planet, end_planet *Planet, fleet int) *Mission {
+func (p *Player) StartMission(start_planet, end_planet *Planet, fleet int) *Mission {
 	if fleet > 100 {
 		fleet = 100
 	} else if fleet <= 0 {
@@ -37,19 +37,19 @@ func (self *Player) StartMission(start_planet, end_planet *Planet, fleet int) *M
 		CurrentTime: current_time,
 		StartTime: current_time,
 		ArrivalTime: current_time,
-		Player: self.username,
+		Player: p.username,
 		ShipCount: ship_count,
 	}
 	mission.CalculateArrivalTime()
 	return &mission
 }
 
-func (self *Player) Serialize() (string, []byte, error) {
-	result, err := json.Marshal(self)
+func (p *Player) Serialize() (string, []byte, error) {
+	result, err := json.Marshal(p)
 	if err != nil {
-		return self.GetKey(), nil, err
+		return p.GetKey(), nil, err
 	}
-	return self.GetKey(), result, nil
+	return p.GetKey(), result, nil
 }
 
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {

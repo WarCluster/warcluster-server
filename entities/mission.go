@@ -17,38 +17,38 @@ type Mission struct {
 	ShipCount   int
 }
 
-func (self *Mission) String() string {
-	return self.GetKey()
+func (m *Mission) String() string {
+	return m.GetKey()
 }
 
-func (self *Mission) GetKey() string {
+func (m *Mission) GetKey() string {
 	return fmt.Sprintf(
 		"mission.%d_%d_%d",
-		self.StartTime,
-		self.Source[0],
-		self.Source[1],
+		m.StartTime,
+		m.Source[0],
+		m.Source[1],
 	)
 }
 
-func (self *Mission) GetSpeed() int {
+func (m *Mission) GetSpeed() int {
 	return 5
 }
 
-func (self *Mission) Serialize() (string, []byte, error) {
-	self.CurrentTime = time.Now().UnixNano() / 1e6
-	result, err := json.Marshal(self)
+func (m *Mission) Serialize() (string, []byte, error) {
+	m.CurrentTime = time.Now().UnixNano() / 1e6
+	result, err := json.Marshal(m)
 	if err != nil {
-		return self.GetKey(), nil, err
+		return m.GetKey(), nil, err
 	}
-	return self.GetKey(), result, nil
+	return m.GetKey(), result, nil
 }
 
 // The CalculateArrivalTime is used to calculate the mission duration.
-func (self *Mission) CalculateArrivalTime() {
-	start_vector := vec2d.New(float64(self.Source[0]), float64(self.Source[1]))
-	end_vector := vec2d.New(float64(self.Target[0]), float64(self.Target[1]))
+func (m *Mission) CalculateArrivalTime() {
+	start_vector := vec2d.New(float64(m.Source[0]), float64(m.Source[1]))
+	end_vector := vec2d.New(float64(m.Target[0]), float64(m.Target[1]))
 	distance := vec2d.GetDistance(end_vector, start_vector)
-	self.ArrivalTime += int64(distance/float64(self.GetSpeed()) * 100)
+	m.ArrivalTime += int64(distance/float64(m.GetSpeed()) * 100)
 }
 
 func EndMission(endPlanet *Planet, missionInfo *Mission) *Planet {
