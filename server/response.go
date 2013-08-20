@@ -80,10 +80,10 @@ func parseAction(request *Request) error {
 	}
 
 	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet)
-	if key, serialized_mission, err := mission.Serialize(); err == nil {
+	if _, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(mission)
 		db_manager.SetEntity(mission)
-		sessions.Broadcast([]byte(fmt.Sprintf("{ \"Command\": \"send_mission\", \"%s\": %s}", key, serialized_mission)))
+		sessions.Broadcast([]byte(fmt.Sprintf("{ \"Command\": \"send_mission\", \"mission\": %s}", serialized_mission)))
 		if source_key, source_json, source_err := source.Serialize(); source_err == nil {
 			sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Planets\": {\"%s\": %s}}", source_key, source_json)))
 			db_manager.SetEntity(source)
