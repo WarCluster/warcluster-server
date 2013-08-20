@@ -23,13 +23,13 @@ func (self *Player) GetKey() string {
 }
 
 func (self *Player) StartMission(start_planet, end_planet *Planet, fleet int) *Mission {
-	if fleet > 10 {
-		fleet = 10
+	if fleet > 100 {
+		fleet = 100
 	} else if fleet <= 0 {
-		fleet = 1
+		fleet = 10
 	}
 	current_time := time.Now()
-	ship_count := int(start_planet.ShipCount/10) * fleet
+	ship_count := int(start_planet.ShipCount/100) * fleet
 	start_planet.ShipCount -= ship_count
 	mission := Mission{start_planet.GetCoords(), end_planet.GetCoords(), current_time, current_time, current_time, self.username, ship_count}
 	return &mission

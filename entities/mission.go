@@ -35,6 +35,7 @@ func (self *Mission) GetSpeed() int {
 }
 
 func (self *Mission) Serialize() (string, []byte, error) {
+	self.CurrentTime = time.Now()
 	result, err := json.Marshal(self)
 	if err != nil {
 		return self.GetKey(), nil, err

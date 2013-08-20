@@ -29,7 +29,7 @@ class Drone:
         if dist < 42:
             overlap = 42 - dist
             ndir = odrone.pos - self.pos
-            ndir.length = overlap
+            ndir.length = overlap * 2
             if self == targ.selected:
                 self.pos = self.pos - ndir
             elif odrone == targ.selected:
