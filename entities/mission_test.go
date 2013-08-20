@@ -7,26 +7,21 @@ import (
 )
 
 func TestMissionGetKey(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() * 1e6
+	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission := new(Mission)
 	mission.Source = []int{32, 64}
 	mission.StartTime = start_time
 
 	if mission.GetKey() != "mission.1352588400000_32_64" {
-		t.Error("Mission's time is ", mission.GetKey())
+		t.Error("Mission's key is ", mission.GetKey())
 	}
 }
 
 func TestMissionSerialize(t *testing.T) {
-	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() * 1e6
+	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() / 1e6
 	mission := Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 5}
-	expected_json := strings.Join([]string{"{\"Source\":[32,64],",
-		"\"Target\":[2,2],",
-		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
-		"\"StartTime\":\"2013-08-14T22:12:06Z\",",
-		"\"ArrivalTime\":\"2013-08-14T22:12:06Z\",",
-		"\"Player\":\"gophie\",",
-		"\"ShipCount\":5}"}, "")
+	expected_json_prefix := "{\"Source\":[32,64],\"Target\":[2,2],\"CurrentTime\""
+	expected_json_suffix := "\"StartTime\":1376518326000,\"ArrivalTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
 
 	key, json, err := mission.Serialize()
 
@@ -34,8 +29,8 @@ func TestMissionSerialize(t *testing.T) {
 		t.Error("You're not using the missions' GetKey()!")
 	}
 
-	if string(json) != expected_json {
-		t.Error("Serialized mission is ", string(json), "but it should be ", expected_json)
+	if !strings.HasPrefix(string(json), expected_json_prefix) || !strings.HasSuffix(string(json), expected_json_suffix) {
+		t.Error("Serialized mission is ", string(json))
 	}
 
 	if err != nil {

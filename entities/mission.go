@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"time"
 )
 
 type Mission struct {
@@ -34,7 +35,7 @@ func (self *Mission) GetSpeed() int {
 }
 
 func (self *Mission) Serialize() (string, []byte, error) {
-	self.CurrentTime = time.Now()
+	self.CurrentTime = time.Now().UnixNano() / 1e6
 	result, err := json.Marshal(self)
 	if err != nil {
 		return self.GetKey(), nil, err
