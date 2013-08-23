@@ -22,15 +22,16 @@ func (p *Player) GetKey() string {
 	return fmt.Sprintf("player.%s", p.username)
 }
 
-func (p *Player) StartMission(source, target *Planet, fleet int) *Mission {
+func (p *Player) StartMission(source *Planet, target *Planet, fleet int) *Mission {
 	if fleet > 100 {
 		fleet = 100
 	} else if fleet <= 0 {
 		fleet = 10
 	}
 	current_time := time.Now().UnixNano() / 1e6
-	ship_count := int(source.ShipCount/100) * fleet
+	ship_count := int(source.ShipCount * fleet / 100)
 	source.ShipCount -= ship_count
+	
 	mission := Mission{
 		Source:      source.GetCoords(),
 		Target:      target.GetCoords(),
