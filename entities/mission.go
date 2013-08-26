@@ -50,15 +50,21 @@ func (m *Mission) CalculateTravelTime() {
 	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
 }
 
-func EndMission(endPlanet *Planet, missionInfo *Mission) *Planet {
+func EndMission(endPlanet *Planet, missionInfo *Mission, deny_takeover bool) *Planet {
 	if endPlanet.Owner == missionInfo.Player {
 		endPlanet.SetShipCount(endPlanet.GetShipCount() + missionInfo.ShipCount)
 	} else {
 		if missionInfo.ShipCount < endPlanet.GetShipCount() {
 			endPlanet.SetShipCount(endPlanet.GetShipCount() - missionInfo.ShipCount)
 		} else {
-			endPlanet.SetShipCount(missionInfo.ShipCount - endPlanet.GetShipCount())
-			endPlanet.Owner = missionInfo.Player
+			if(deny_takeover){
+				exess := missionInfo.ShipCount - endPlanet.GetShipCount()
+				endPlanet.SetShipCount(0)
+			// We need to create a new mission with the exess ships to sent back to the origin planet
+			} else {
+				endPlanet.SetShipCount(missionInfo.ShipCount - endPlanet.GetShipCount())
+				endPlanet.Owner = missionInfo.Player
+			}
 		}
 	}
 	return endPlanet
