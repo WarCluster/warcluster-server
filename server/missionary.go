@@ -19,9 +19,8 @@ func StartMissionary(mission *entities.Mission) {
 
 	target_owner_entity, err := db_manager.GetEntity(target.Owner)
 	target_owner := target_owner_entity.(*entities.Player)
-	deny_takeover := (target_owner.HomePlanet == target.Owner)
 
-	result := entities.EndMission(target, mission, deny_takeover)
+	result := entities.EndMission(target, target_owner, mission)
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
 		db_manager.SetEntity(result)
