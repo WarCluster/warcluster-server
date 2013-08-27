@@ -53,7 +53,7 @@ func (p *Planet) SetShipCount(count int) {
 
 func (p *Planet) UpdateShipCount() {
 	passedTime := time.Now().Unix() - p.LastShipCountUpdate
-	timeModifier := 5 - (int64(p.Size/3) + 1)
+	timeModifier := int64(p.Size/3) + 1
 	//TODO: To be completed for all planet size types
 	//if getobject(Owner.getkey).gethomeplanet == p.getkey
 	p.ShipCount += int(passedTime / (timeModifier * 10))
