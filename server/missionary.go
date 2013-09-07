@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"time"
+	"log"
 	"warcluster/db_manager"
 	"warcluster/entities"
 )
@@ -15,9 +16,15 @@ func StartMissionary(mission *entities.Mission) {
 	time.Sleep(time.Duration(mission.TravelTime * 1e6))
 
 	target_entity, err := db_manager.GetEntity(target_key)
+	if err != nil {
+		log.Print("Error in target planet fetch: ", err.Error())
+	}
 	target := target_entity.(*entities.Planet)
 
 	target_owner_entity, err := db_manager.GetEntity(target.Owner)
+	if err != nil {
+		log.Print("Error in target planet owner fetch: ", err.Error())
+	}
 	target_owner := target_owner_entity.(*entities.Player)
 
 	result := entities.EndMission(target, target_owner, mission)

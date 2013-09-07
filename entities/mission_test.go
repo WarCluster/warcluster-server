@@ -72,7 +72,7 @@ func TestEndMission(t *testing.T) {
 	endPlanet := new(Planet)
 	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
-	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf2", "planet.0_0", []int{1, 1}, []int{2, 2}}
+	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf2", "planet.2_2", []int{1, 1}, []int{2, 2}}
 	*mission = Mission{[]int{32, 64}, []int{2, 2}, "Atack", start_time, start_time, start_time, "gophie", 15}
 	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, "Atack", start_time, start_time, start_time, "chochko", 10}
 	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}

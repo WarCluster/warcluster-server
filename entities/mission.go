@@ -52,21 +52,27 @@ func (m *Mission) CalculateTravelTime() {
 }
 
 func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Planet {
-	if target.Owner == missionInfo.Player {
-		target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
-	} else {
-		if missionInfo.ShipCount < target.GetShipCount() {
-			target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
-		} else {
-			if(target_owner.HomePlanet == target.GetKey()){
-				//exess := missionInfo.ShipCount - target.GetShipCount()
-				target.SetShipCount(0)
-			// We need to create a new mission with the exess ships to sent back to the origin planet
+	switch missionInfo.Type {
+		case "Atack":
+			if target.Owner == missionInfo.Player {
+				target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
 			} else {
-				target.SetShipCount(missionInfo.ShipCount - target.GetShipCount())
-				target.Owner = missionInfo.Player
+				if missionInfo.ShipCount < target.GetShipCount() {
+					target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
+				} else {
+					if(target_owner.HomePlanet == target.GetKey()){
+						//exess := missionInfo.ShipCount - target.GetShipCount()
+						target.SetShipCount(0)
+					// We need to create a new mission with the exess ships to sent back to the origin planet
+					} else {
+						target.SetShipCount(missionInfo.ShipCount - target.GetShipCount())
+						target.Owner = missionInfo.Player
+					}
+				}
 			}
-		}
+		case "Supply":
+			target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
+		//case "Spy":
 	}
 	return target
 }

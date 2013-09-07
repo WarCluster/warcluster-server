@@ -30,8 +30,9 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int) *Missio
 		fleet = 10
 	}
 	current_time := time.Now().UnixNano() / 1e6
-	ship_count := int(source.ShipCount * fleet / 100)
-	source.ShipCount -= ship_count
+	base_ship_count := source.GetShipCount()
+	ship_count := int(base_ship_count * fleet / 100)
+	source.SetShipCount(base_ship_count - ship_count)
 	
 	mission := Mission{
 		Source:      source.GetCoords(),
