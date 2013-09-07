@@ -3,7 +3,6 @@ package server
 import (
 	"errors"
 	"fmt"
-	"log"
 	"warcluster/db_manager"
 	"warcluster/entities"
 )
