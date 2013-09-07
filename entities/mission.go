@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
-	"log"
 	"time"
 )
 
@@ -56,14 +55,11 @@ func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Pla
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {
-			log.Println("Owner and attacker are same person :", missionInfo.Player)
 			target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
 		} else {
-			log.Println("Owner and attacker are not the same person :", missionInfo.Player)
 			if missionInfo.ShipCount < target.GetShipCount() {
 				target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
 			} else {
-				log.Println("we shoul have takeover from:", missionInfo.Player)
 				if target_owner.HomePlanet == target.GetKey() {
 					//exess := missionInfo.ShipCount - target.GetShipCount()
 					target.SetShipCount(0)
