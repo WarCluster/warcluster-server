@@ -52,7 +52,6 @@ func (m *Mission) CalculateTravelTime() {
 }
 
 func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Planet {
-	target.UpdateShipCount()
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {

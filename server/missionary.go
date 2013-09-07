@@ -37,6 +37,8 @@ func StartMissionary(mission *entities.Mission) {
 		target_owner = nil
 	}
 
+	target.UpdateShipCount()
+
 	result := entities.EndMission(target, target_owner, mission)
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
