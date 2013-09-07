@@ -58,7 +58,7 @@ func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Pla
 			target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
 		} else {
 			if(target_owner.HomePlanet == target.GetKey()){
-				exess := missionInfo.ShipCount - target.GetShipCount()
+				//exess := missionInfo.ShipCount - target.GetShipCount()
 				target.SetShipCount(0)
 			// We need to create a new mission with the exess ships to sent back to the origin planet
 			} else {

@@ -69,12 +69,14 @@ func TestEndMission(t *testing.T) {
 	mission := new(Mission)
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
+	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
+	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf2", "planet.0_0", []int{1, 1}, []int{2, 2}}
 	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
 	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "chochko", 10}
 	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
 
-	endPlanet = EndMission(endPlanet, secondMission, false)
+	endPlanet = EndMission(endPlanet, player, secondMission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
@@ -84,7 +86,7 @@ func TestEndMission(t *testing.T) {
 		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 
-	endPlanet = EndMission(endPlanet, mission, false)
+	endPlanet = EndMission(endPlanet, player, mission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
@@ -98,18 +100,20 @@ func TestEndMission(t *testing.T) {
 func TestEndMissionDenyTakeover(t *testing.T) {
 	mission := new(Mission)
 	endPlanet := new(Planet)
+	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
 	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
 	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
+	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf1", "planet.2_2", []int{1, 1}, []int{2, 2}}
 
-	endPlanet = EndMission(endPlanet, secondMission, true)
+	endPlanet = EndMission(endPlanet, player, mission)
 	//TODO: Test needs to be revised in order to handle calculation of ship count
 	if endPlanet.GetShipCount() != 0 {
 		t.Error("End Planet ship count was expected  to be 0 but it is:", endPlanet.GetShipCount())
 	}
 	//TODO: Test needs to be revised in order to handle feedback mission with exess ships
-	if endPlanet.Owner != "gophie" {
-		t.Error("End Planet owner was expected  to be gophie but is:", endPlanet.Owner)
+	if endPlanet.Owner != "chochko" {
+		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 
 type Player struct {
 	username       string
+	Color		   Color
 	TwitterID      string
 	HomePlanet     string
 	ScreenSize     []int
@@ -54,7 +55,14 @@ func (p *Player) Serialize() (string, []byte, error) {
 }
 
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
-	player := Player{username, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
+	userhash := simplifyHash(usernameHash(username))
+
+	colorElement := func(index int) int {
+		return int(60*((userhash[0] - 45)/4))
+	}
+
+	color := Color{username, colorElement(0), colorElement(1), colorElement(2)} 
+	player := Player{username, color, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	return &player
 }
