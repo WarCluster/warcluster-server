@@ -39,17 +39,31 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 //
 //  TODO: Make some proper JSON Unmarshaling out here
 func scopeOfView(request *Request) error {
+	var line_missions string
+	var line_planets string
+	var line_suns string
 	var line string
 	entity_list := db_manager.GetEntities("*")
 	for _, entity := range entity_list {
 		switch t := entity.(type) {
-		case *entities.Mission, *entities.Planet, *entities.Player, *entities.Sun:
+		case *entities.Mission:
 			if key, json, err := t.Serialize(); err == nil {
-				line += fmt.Sprintf("\"%v\": %s, ", key, json)
+				line_missions += fmt.Sprintf("\"%v\": %s, ", key, json)
+			}
+		case *entities.Planet:
+			if key, json, err := t.Serialize(); err == nil {
+				line_planets += fmt.Sprintf("\"%v\": %s, ", key, json)
+			}
+		case *entities.Sun:
+			if key, json, err := t.Serialize(); err == nil {
+				line_suns += fmt.Sprintf("\"%v\": %s, ", key, json)
 			}
 		}
 	}
-	line = fmt.Sprintf("{\"Command\": \"scope_of_view_result\", \"Planets\": {%v}}", line[:len(line)-2])
+	line = fmt.Sprintf("{\"Command\": \"scope_of_view_result\", \"Planets\": {%v}, \"Suns\": {%v}, \"Missions\": {%v}}",
+		line_planets[:len(line_planets)-2],
+		line_suns[:len(line_suns)-2],
+		line_missions[:len(line_missions)-2])
 	request.Client.Session.Send([]byte(fmt.Sprintf("%v", line)))
 	return nil
 }
@@ -77,6 +91,10 @@ func parseAction(request *Request) error {
 
 	if source.(*entities.Planet).Owner != request.Client.Player.String() {
 		err = errors.New("This is not your home!")
+	}
+
+	if request.Type != "Attack" || request.Type != "Supply" || request.Type != "Spy" {
+		err = errors.New("Invalid mission type!")
 	}
 
 	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet)

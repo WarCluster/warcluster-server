@@ -13,10 +13,10 @@ import (
 )
 
 type Color struct {
-	name			string
-	R 				int
-	G 				int
-	B 				int
+	name string
+	R    int
+	G    int
+	B    int
 }
 
 func (c *Color) String() string {

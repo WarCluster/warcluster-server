@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"log"
 	"time"
 )
 
 type Mission struct {
 	Source      []int
 	Target      []int
-	Type 		string
+	Type        string
 	CurrentTime int64
 	StartTime   int64
 	TravelTime  int64
@@ -53,25 +54,28 @@ func (m *Mission) CalculateTravelTime() {
 
 func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Planet {
 	switch missionInfo.Type {
-		case "Atack":
-			if target.Owner == missionInfo.Player {
-				target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
+	case "Attack":
+		if target.Owner == missionInfo.Player {
+			log.Println("Owner and attacker are same person :", missionInfo.Player)
+			target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
+		} else {
+			log.Println("Owner and attacker are not the same person :", missionInfo.Player)
+			if missionInfo.ShipCount < target.GetShipCount() {
+				target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
 			} else {
-				if missionInfo.ShipCount < target.GetShipCount() {
-					target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
-				} else {
-					if(target_owner.HomePlanet == target.GetKey()){
-						//exess := missionInfo.ShipCount - target.GetShipCount()
-						target.SetShipCount(0)
+				log.Println("we shoul have takeover from:", missionInfo.Player)
+				if target_owner.HomePlanet == target.GetKey() {
+					//exess := missionInfo.ShipCount - target.GetShipCount()
+					target.SetShipCount(0)
 					// We need to create a new mission with the exess ships to sent back to the origin planet
-					} else {
-						target.SetShipCount(missionInfo.ShipCount - target.GetShipCount())
-						target.Owner = missionInfo.Player
-					}
+				} else {
+					target.SetShipCount(missionInfo.ShipCount - target.GetShipCount())
+					target.Owner = missionInfo.Player
 				}
 			}
-		case "Supply":
-			target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
+		}
+	case "Supply":
+		target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
 		//case "Spy":
 	}
 	return target

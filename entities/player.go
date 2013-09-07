@@ -8,7 +8,7 @@ import (
 
 type Player struct {
 	username       string
-	Color		   Color
+	Color          Color
 	TwitterID      string
 	HomePlanet     string
 	ScreenSize     []int
@@ -33,7 +33,7 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int) *Missio
 	base_ship_count := source.GetShipCount()
 	ship_count := int(base_ship_count * fleet / 100)
 	source.SetShipCount(base_ship_count - ship_count)
-	
+
 	mission := Mission{
 		Source:      source.GetCoords(),
 		Target:      target.GetCoords(),
@@ -59,10 +59,10 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 
 	colorElement := func(index int) int {
-		return int(60*((userhash[0] - 45)/4))
+		return int(60 * ((userhash[0] - 45) / 4))
 	}
 
-	color := Color{username, colorElement(0), colorElement(1), colorElement(2)} 
+	color := Color{username, colorElement(0), colorElement(1), colorElement(2)}
 	player := Player{username, color, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	return &player

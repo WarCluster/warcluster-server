@@ -63,11 +63,11 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
 
 		//TODO: Remove the bottom three lines when the client is smart enough to invoke scope of view on all clients in order to osee the generated system
-		for planet := range planets{
+		for planet := range planets {
 			key, serialized_planet, _ := planets[planet].Serialize()
 			sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Planets\": {\"%s\": %s}}", key, serialized_planet)))
 		}
-		
+
 		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
 		log.Print("Player", player)
 		db_manager.SetEntity(player)

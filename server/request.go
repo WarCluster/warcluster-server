@@ -17,7 +17,7 @@ import (
 type Request struct {
 	Client      *Client
 	Command     string
-	Type 		string
+	Type        string
 	Position    []int
 	Resolution  []int
 	StartPlanet string
