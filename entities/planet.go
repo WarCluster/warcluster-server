@@ -78,7 +78,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 	planet_radius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planet_in_creation := Planet{Color{"Base", 22, 22, 22}, []int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, ""}
+		planet_in_creation := Planet{Color{"Base", 200, 180, 140}, []int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(

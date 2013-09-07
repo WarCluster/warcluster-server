@@ -59,11 +59,14 @@ func (p *Player) Serialize() (string, []byte, error) {
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 
-	colorElement := func(index int) int {
-		return int(60 * ((userhash[0] - 45) / 4))
+	red := []int{151, 218 , 233, 72, 27}
+	green := []int{8, 75, 177, 140, 85}
+	blue := []int{14, 15, 4, 19, 192}
+	hashValue := func(index int) int {
+		return int(userhash[0] - 48)
 	}
 
-	color := Color{username, colorElement(0), colorElement(1), colorElement(2)}
+	color := Color{username, red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
 	player := Player{username, color, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
