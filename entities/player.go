@@ -35,6 +35,7 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 	source.SetShipCount(base_ship_count - ship_count)
 
 	mission := Mission{
+		Color:       p.Color,
 		Source:      source.GetCoords(),
 		Target:      target.GetCoords(),
 		Type:        mission_type,
@@ -59,11 +60,11 @@ func (p *Player) Serialize() (string, []byte, error) {
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 
-	red := []int{151, 218 , 233, 72, 27}
-	green := []int{8, 75, 177, 140, 85}
-	blue := []int{14, 15, 4, 19, 192}
+	red := []int{151, 218, 233, 72, 245, 84}
+	green := []int{8, 75, 177, 140, 105, 146}
+	blue := []int{14, 15, 4, 19, 145, 219}
 	hashValue := func(index int) int {
-		return int((userhash[0] - 48)/2)
+		return int((userhash[0] - 48) / 2)
 	}
 
 	color := Color{username, red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}

@@ -8,6 +8,7 @@ import (
 )
 
 type Mission struct {
+	Color       Color
 	Source      []int
 	Target      []int
 	Type        string
@@ -67,6 +68,7 @@ func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Pla
 				} else {
 					target.SetShipCount(missionInfo.ShipCount - target.ShipCount)
 					target.Owner = missionInfo.Player
+					target.Color = missionInfo.Color
 				}
 			}
 		}
