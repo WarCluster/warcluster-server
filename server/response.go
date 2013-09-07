@@ -70,7 +70,6 @@ func parseAction(request *Request) error {
 	if err != nil {
 		return errors.New("Start planet does not exist")
 	}
-	log.Print("Ship count on start planet is: ", source.ShipCount)
 
 	target, err := db_manager.GetEntity(request.EndPlanet)
 	if err != nil {
