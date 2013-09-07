@@ -19,8 +19,8 @@ func TestMissionGetKey(t *testing.T) {
 
 func TestMissionSerialize(t *testing.T) {
 	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() / 1e6
-	mission := Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 5}
-	expected_json_prefix := "{\"Source\":[32,64],\"Target\":[2,2],\"CurrentTime\""
+	mission := Mission{[]int{32, 64}, []int{2, 2}, "Atack", start_time, start_time, start_time, "gophie", 5}
+	expected_json_prefix := "{\"Source\":[32,64],\"Target\":[2,2],\"Type\":\"Atack\",\"CurrentTime\""
 	expected_json_suffix := "\"StartTime\":1376518326000,\"TravelTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
 
 	key, json, err := mission.Serialize()
@@ -41,6 +41,7 @@ func TestMissionSerialize(t *testing.T) {
 func TestMissionDeserialize(t *testing.T) {
 	serialized_mission := []byte(strings.Join([]string{"{\"Source\":[32,64],",
 		"\"Target\":[2,2],",
+		"\"Type\":\"Atack\",",
 		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
 		"\"StartTime\":\"2013-08-14T22:12:06.06Z\",",
 		"\"TravelTime\":\"2013-08-14T22:12:06Z\",",
@@ -72,8 +73,8 @@ func TestEndMission(t *testing.T) {
 	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
 	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf2", "planet.0_0", []int{1, 1}, []int{2, 2}}
-	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
-	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "chochko", 10}
+	*mission = Mission{[]int{32, 64}, []int{2, 2}, "Atack", start_time, start_time, start_time, "gophie", 15}
+	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, "Atack", start_time, start_time, start_time, "chochko", 10}
 	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
 
 	endPlanet = EndMission(endPlanet, player, secondMission)
@@ -102,7 +103,7 @@ func TestEndMissionDenyTakeover(t *testing.T) {
 	endPlanet := new(Planet)
 	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
-	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
+	*mission = Mission{[]int{32, 64}, []int{2, 2}, "Atack", start_time, start_time, start_time, "gophie", 15}
 	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
 	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf1", "planet.2_2", []int{1, 1}, []int{2, 2}}
 

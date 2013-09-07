@@ -10,6 +10,7 @@ import (
 type Mission struct {
 	Source      []int
 	Target      []int
+	Type 		string
 	CurrentTime int64
 	StartTime   int64
 	TravelTime  int64
