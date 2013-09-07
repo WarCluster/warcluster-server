@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"log"
 	"time"
 )
 
@@ -52,25 +53,31 @@ func (m *Mission) CalculateTravelTime() {
 }
 
 func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Planet {
+	log.Print("tipa na misiqta e: ", missionInfo.Type)
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {
 			target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
+			log.Print("ownera i napadatelq sa ednakvi!")
 		} else {
 			if missionInfo.ShipCount < target.GetShipCount() {
 				target.SetShipCount(target.GetShipCount() - missionInfo.ShipCount)
+				log.Print("misiqta e s prekaleno nalko korabi!")
 			} else {
-				if target_owner.HomePlanet == target.GetKey() {
+				if target_owner != nil && target_owner.HomePlanet == target.GetKey() {
+					log.Print("tva bilo home planeta")
 					//exess := missionInfo.ShipCount - target.GetShipCount()
 					target.SetShipCount(0)
 					// We need to create a new mission with the exess ships to sent back to the origin planet
 				} else {
+					log.Print("Smenqme ownera")
 					target.SetShipCount(missionInfo.ShipCount - target.GetShipCount())
 					target.Owner = missionInfo.Player
 				}
 			}
 		}
 	case "Supply":
+		log.Print("nqkaksi sme pratili supply missiq!")
 		target.SetShipCount(target.GetShipCount() + missionInfo.ShipCount)
 		//case "Spy":
 	}

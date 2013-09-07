@@ -51,10 +51,10 @@ func TestCreateMission(t *testing.T) {
 	planet_end := Planet{Color{"asd1", 22, 22, 22}, []int{471, 403}, 3, 1, start_time.Unix(), 50, 1000, "gophie"}
 	player := Player{"gophie", Color{"asd1", 22, 22, 22}, "asdf", "planet.271_203", []int{1, 1}, []int{2, 2}}
 
-	valid_mission := player.StartMission(&planet_start, &planet_end, 80)
+	valid_mission := player.StartMission(&planet_start, &planet_end, 80, "Attack")
 
 	planet_start.ShipCount = 100
-	invalid_mission := player.StartMission(&planet_start, &planet_end, 120)
+	invalid_mission := player.StartMission(&planet_start, &planet_end, 120, "Attack")
 
 	if valid_mission.Source[0] != 271 || valid_mission.Source[1] != 203 {
 		t.Error(valid_mission.Source)

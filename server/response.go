@@ -60,7 +60,7 @@ func scopeOfView(request *Request) error {
 			}
 		}
 	}
-	if len(line_missions) > 0{
+	if len(line_missions) > 0 {
 		line_missions = line_missions[:len(line_missions)-2]
 	}
 
@@ -101,7 +101,7 @@ func parseAction(request *Request) error {
 		err = errors.New("Invalid mission type!")
 	}
 
-	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet)
+	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet, request.Type)
 	if _, serialized_mission, err := mission.Serialize(); err == nil {
 		go StartMissionary(mission)
 		db_manager.SetEntity(mission)

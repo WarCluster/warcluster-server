@@ -21,11 +21,21 @@ func StartMissionary(mission *entities.Mission) {
 	}
 	target := target_entity.(*entities.Planet)
 
-	target_owner_entity, err := db_manager.GetEntity(target.Owner)
-	if err != nil {
-		log.Print("Error in target planet owner fetch: ", err.Error())
+	var target_owner *entities.Player
+
+	if target.Owner != "" {
+		target_owner_entity, err := db_manager.GetEntity(target.Owner)
+		if err != nil {
+			log.Print("Error in target planet owner fetch: ", err.Error())
+		}
+		if target_owner_entity != nil {
+			target_owner = target_owner_entity.(*entities.Player)
+		} else {
+			log.Print("Error in target planet owner cast. Owner is nil!")
+		}
+	} else {
+		target_owner = nil
 	}
-	target_owner := target_owner_entity.(*entities.Player)
 
 	result := entities.EndMission(target, target_owner, mission)
 	key, serialized_planet, err := result.Serialize()

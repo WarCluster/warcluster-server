@@ -23,7 +23,7 @@ func (p *Player) GetKey() string {
 	return fmt.Sprintf("player.%s", p.username)
 }
 
-func (p *Player) StartMission(source *Planet, target *Planet, fleet int) *Mission {
+func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission_type string) *Mission {
 	if fleet > 100 {
 		fleet = 100
 	} else if fleet <= 0 {
@@ -37,6 +37,7 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int) *Missio
 	mission := Mission{
 		Source:      source.GetCoords(),
 		Target:      target.GetCoords(),
+		Type:        mission_type,
 		CurrentTime: current_time,
 		StartTime:   current_time,
 		TravelTime:  current_time,
