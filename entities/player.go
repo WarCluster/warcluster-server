@@ -63,7 +63,7 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	green := []int{8, 75, 177, 140, 85}
 	blue := []int{14, 15, 4, 19, 192}
 	hashValue := func(index int) int {
-		return int(userhash[0] - 48)
+		return int((userhash[0] - 48)/2)
 	}
 
 	color := Color{username, red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
