@@ -60,10 +60,14 @@ func scopeOfView(request *Request) error {
 			}
 		}
 	}
+	if len(line_missions) > 0{
+		line_missions = line_missions[:len(line_missions)-2]
+	}
+
 	line = fmt.Sprintf("{\"Command\": \"scope_of_view_result\", \"Planets\": {%v}, \"Suns\": {%v}, \"Missions\": {%v}}",
 		line_planets[:len(line_planets)-2],
 		line_suns[:len(line_suns)-2],
-		line_missions[:len(line_missions)-2])
+		line_missions)
 	request.Client.Session.Send([]byte(fmt.Sprintf("%v", line)))
 	return nil
 }

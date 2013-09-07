@@ -65,5 +65,6 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	color := Color{username, colorElement(0), colorElement(1), colorElement(2)}
 	player := Player{username, color, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
+	HomePlanet.Color = color
 	return &player
 }
