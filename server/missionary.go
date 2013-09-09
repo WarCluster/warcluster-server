@@ -24,7 +24,7 @@ func StartMissionary(mission *entities.Mission) {
 	var target_owner *entities.Player
 
 	if target.Owner != "" {
-		owner_id := fmt.Sprintf("player.%d", target.Owner)
+		owner_id := fmt.Sprintf("player.%s", target.Owner)
 		target_owner_entity, err := db_manager.GetEntity(owner_id)
 		if err != nil {
 			log.Print("Error in target planet owner fetch: ", err.Error(), " Searched for: ", owner_id)
