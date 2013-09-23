@@ -19,7 +19,7 @@ func TestMissionGetKey(t *testing.T) {
 
 func TestMissionSerialize(t *testing.T) {
 	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() / 1e6
-	mission := Mission{Color{"Base", 22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 5}
+	mission := Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 5}
 	expected_json_prefix := "{\"Color\":{\"R\":22,\"G\":22,\"B\":22},\"Source\":[32,64],\"Target\":[2,2],\"Type\":\"Attack\",\"CurrentTime\""
 	expected_json_suffix := "\"StartTime\":1376518326000,\"TravelTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
 
@@ -72,10 +72,10 @@ func TestEndMission(t *testing.T) {
 	endPlanet := new(Planet)
 	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
-	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf2", "planet.0_0", []int{1, 1}, []int{2, 2}}
-	*mission = Mission{Color{"Base", 22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 55}
-	*secondMission = Mission{Color{"Base", 22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "chochko", 10}
-	*endPlanet = Planet{Color{"asd1", 22, 22, 22}, []int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
+	*player = Player{"chochko", Color{22, 22, 22}, "asdf2", "planet.0_0", []int{1, 1}, []int{2, 2}}
+	*mission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 55}
+	*secondMission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "chochko", 10}
+	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
 
 	endPlanet = EndMission(endPlanet, player, secondMission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
@@ -103,9 +103,9 @@ func TestEndMissionDenyTakeover(t *testing.T) {
 	endPlanet := new(Planet)
 	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
-	*mission = Mission{Color{"Base", 22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 15}
-	*endPlanet = Planet{Color{"asd1", 22, 22, 22}, []int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
-	*player = Player{"chochko", Color{"asd1", 22, 22, 22}, "asdf1", "planet.2_2", []int{1, 1}, []int{2, 2}}
+	*mission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 15}
+	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
+	*player = Player{"chochko", Color{22, 22, 22}, "asdf1", "planet.2_2", []int{1, 1}, []int{2, 2}}
 
 	endPlanet = EndMission(endPlanet, player, mission)
 	//TODO: Test needs to be revised in order to handle calculation of ship count
@@ -121,7 +121,7 @@ func TestEndMissionDenyTakeover(t *testing.T) {
 func TestTravelTime(t *testing.T) {
 	mission := new(Mission)
 	*mission = Mission{
-		Color:       Color{"Base", 22, 22, 22},
+		Color:       Color{22, 22, 22},
 		Source:      []int{100, 200},
 		Target:      []int{800, 150},
 		CurrentTime: time.Now().UnixNano() / 1e6,

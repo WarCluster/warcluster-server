@@ -13,16 +13,16 @@ func TestGeneratePlanets(t *testing.T) {
 	hash := "5762908447300427353060676895795336101745023746116233389596883"
 	sun_position := vec2d.New(500, 300)
 	expected_planets := []Planet{
-		Planet{Color{"Base", 22, 22, 22}, []int{-76, 57}, 6, 3, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{1470, 300}, 8, 5, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{-689, -200}, 3, 1, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{-1051, 648}, 2, 8, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{1428, -1363}, 3, 1, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{2735, 300}, 6, 8, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{2818, -798}, 9, 6, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{-322, 3080}, 5, 4, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{1547, 3339}, 1, 1, start_time.Unix(), 10, 0, "gophie"},
-		Planet{Color{"Base", 22, 22, 22}, []int{-2744, -1065}, 4, 6, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{-76, 57}, 6, 3, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{1470, 300}, 8, 5, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{-689, -200}, 3, 1, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{-1051, 648}, 2, 8, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{1428, -1363}, 3, 1, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{2735, 300}, 6, 8, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{2818, -798}, 9, 6, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{-322, 3080}, 5, 4, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{1547, 3339}, 1, 1, start_time.Unix(), 10, 0, "gophie"},
+		Planet{Color{22, 22, 22}, []int{-2744, -1065}, 4, 6, start_time.Unix(), 10, 0, "gophie"},
 	}
 	generated_planets, _ := GeneratePlanets(hash, sun_position)
 
@@ -47,7 +47,7 @@ func TestGeneratePlanets(t *testing.T) {
 
 func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
 	start_time := time.Now()
-	planet := Planet{Color{"Base", 22, 22, 22}, []int{271, 203}, 3, 1, start_time.Unix(), 0, 0, ""}
+	planet := Planet{Color{22, 22, 22}, []int{271, 203}, 3, 1, start_time.Unix(), 0, 0, ""}
 	json_base := "{\"Color\":{\"R\":22,\"G\":22,\"B\":22},\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":%v,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"\"}"
 	expected_json := fmt.Sprintf(json_base, start_time.Unix())
 	expected_key := "planet.271_203"
@@ -65,7 +65,7 @@ func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
 
 func TestDatabasePreparationsWithAnOwner(t *testing.T) {
 	start_time := time.Now()
-	planet := Planet{Color{"Base", 22, 22, 22}, []int{271, 203}, 3, 1, start_time.Unix(), 0, 0, "gophie"}
+	planet := Planet{Color{22, 22, 22}, []int{271, 203}, 3, 1, start_time.Unix(), 0, 0, "gophie"}
 	json_base := "{\"Color\":{\"R\":22,\"G\":22,\"B\":22},\"Texture\":3,\"Size\":1,\"LastShipCountUpdate\":%v,\"ShipCount\":0,\"MaxShipCount\":0,\"Owner\":\"gophie\"}"
 	expected_json := fmt.Sprintf(json_base, start_time.Unix())
 	expected_key := "planet.271_203"
