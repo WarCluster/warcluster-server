@@ -7,11 +7,7 @@ import (
 type Response struct {
 	Command	    string
 	Timestamp   int64
-	Entities	struct{
-		Missions    []*entities.Mission
-		Planets     []*entities.Planet
-		Suns        []*entities.Sun
-	}
+	Entities	map[string]map[string]*entities.Entity
 }
 
 type ScopeOfView struct {

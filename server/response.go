@@ -1,10 +1,12 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"warcluster/db_manager"
 	"warcluster/entities"
+	"warcluster/server/response"
 )
 
 // The three constants bellow are used by calculateCanvasSize to determine
@@ -39,39 +41,30 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 
 // scopeOfView is not finished yet but the purpose of the function is to call calculateCanvasSize
 // and give the player the information contained in the given borders.
-//
-//  TODO: Make some proper JSON Unmarshaling out here
 func scopeOfView(request *Request) error {
-	var line_missions string
-	var line_planets string
-	var line_suns string
-	var line string
-	entity_list := db_manager.GetEntities("*")
-	for _, entity := range entity_list {
-		switch t := entity.(type) {
-		case *entities.Mission:
-			if key, json, err := t.Serialize(); err == nil {
-				line_missions += fmt.Sprintf("\"%v\": %s, ", key, json)
-			}
-		case *entities.Planet:
-			if key, json, err := t.Serialize(); err == nil {
-				line_planets += fmt.Sprintf("\"%v\": %s, ", key, json)
-			}
-		case *entities.Sun:
-			if key, json, err := t.Serialize(); err == nil {
-				line_suns += fmt.Sprintf("\"%v\": %s, ", key, json)
-			}
+	response := new(response.Response)
+	response.Command = "scope_of_view_result"
+
+	populate_entities := func(query string) (map[string]*entities.Entity) {
+		result := make(map[string]*entities.Entity)
+		entities := db_manager.GetEntities(query)
+		for _, entity := range entities {
+			result[entity.GetKey()] = &entity
 		}
-	}
-	if len(line_missions) > 0 {
-		line_missions = line_missions[:len(line_missions)-2]
+		return result
 	}
 
-	line = fmt.Sprintf("{\"Command\": \"scope_of_view_result\", \"Planets\": {%v}, \"Suns\": {%v}, \"Missions\": {%v}}",
-		line_planets[:len(line_planets)-2],
-		line_suns[:len(line_suns)-2],
-		line_missions)
-	request.Client.Session.Send([]byte(fmt.Sprintf("%v", line)))
+	response.Entities = make(map[string]map[string]*entities.Entity)
+	response.Entities["Missions"] = populate_entities("mission.*")
+	response.Entities["Planets"]  = populate_entities("planet.*")
+	response.Entities["Suns"]     = populate_entities("sun.*")
+
+	if json_response, err := json.Marshal(response); err == nil {
+		request.Client.Session.Send(json_response)
+	} else {
+		return err
+	}
+
 	return nil
 }
 
