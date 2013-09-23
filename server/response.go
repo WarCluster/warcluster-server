@@ -7,10 +7,13 @@ import (
 	"warcluster/entities"
 )
 
-// The three constants bellow are used by calculateCanvasSize to determine the size of the area for wich information will be sent to the user.
-const BEST_PING = 150
-const WORST_PING = 1500
-const STEPS = 10
+// The three constants bellow are used by calculateCanvasSize to determine
+//the size of the area for wich information will be sent to the user.
+const (
+	BEST_PING = 150
+	WORST_PING = 1500
+	STEPS = 10
+)
 
 // calculateCanvasSize is used to determine how big of an area(information about an area)
 // do we need to send to the user to eleminate traces of lag.
