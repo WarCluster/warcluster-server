@@ -13,7 +13,3 @@ func TestResponse(t *testing.T) {
 		t.Error("scopeOfView([20 50], [800 600], 200) gives", top_left, bottom_right)
 	}
 }
-
-func TestActionParser(t *testing.T) {
-
-}
