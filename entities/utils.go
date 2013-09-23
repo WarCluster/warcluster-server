@@ -3,6 +3,7 @@ package entities
 import (
 	"crypto/sha512"
 	"encoding/json"
+	"fmt"
 	"github.com/Vladimiroff/vec2d"
 	"io"
 	"math/rand"
@@ -10,6 +11,16 @@ import (
 	"strings"
 	"time"
 )
+
+type Color struct {
+	R    int
+	G    int
+	B    int
+}
+
+func (c *Color) String() string {
+	return fmt.Sprintf("Color[%s, %s, %s]", c.R, c.G, c.B)
+}
 
 func Construct(key string, data []byte) Entity {
 	entity_type := strings.Split(key, ".")[0]

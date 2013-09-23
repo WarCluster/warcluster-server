@@ -19,8 +19,8 @@ func TestMissionGetKey(t *testing.T) {
 
 func TestMissionSerialize(t *testing.T) {
 	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() / 1e6
-	mission := Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 5}
-	expected_json_prefix := "{\"Source\":[32,64],\"Target\":[2,2],\"CurrentTime\""
+	mission := Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 5}
+	expected_json_prefix := "{\"Color\":{\"R\":22,\"G\":22,\"B\":22},\"Source\":[32,64],\"Target\":[2,2],\"Type\":\"Attack\",\"CurrentTime\""
 	expected_json_suffix := "\"StartTime\":1376518326000,\"TravelTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
 
 	key, json, err := mission.Serialize()
@@ -41,6 +41,7 @@ func TestMissionSerialize(t *testing.T) {
 func TestMissionDeserialize(t *testing.T) {
 	serialized_mission := []byte(strings.Join([]string{"{\"Source\":[32,64],",
 		"\"Target\":[2,2],",
+		"\"Type\":\"Attack\",",
 		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
 		"\"StartTime\":\"2013-08-14T22:12:06.06Z\",",
 		"\"TravelTime\":\"2013-08-14T22:12:06Z\",",
@@ -69,12 +70,14 @@ func TestEndMission(t *testing.T) {
 	mission := new(Mission)
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
+	player := new(Player)
 	start_time := time.Now().UnixNano() * 1e6
-	*mission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "gophie", 15}
-	*secondMission = Mission{[]int{32, 64}, []int{2, 2}, start_time, start_time, start_time, "chochko", 10}
-	*endPlanet = Planet{[]int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
+	*player = Player{"chochko", Color{22, 22, 22}, "asdf2", "planet.0_0", []int{1, 1}, []int{2, 2}}
+	*mission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 55}
+	*secondMission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "chochko", 10}
+	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
 
-	endPlanet = EndMission(endPlanet, secondMission)
+	endPlanet = EndMission(endPlanet, player, secondMission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
@@ -84,7 +87,7 @@ func TestEndMission(t *testing.T) {
 		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 
-	endPlanet = EndMission(endPlanet, mission)
+	endPlanet = EndMission(endPlanet, player, mission)
 	/* //TODO: Test needs to be revised in order to handle calculation of ship count
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
@@ -95,9 +98,30 @@ func TestEndMission(t *testing.T) {
 	}
 }
 
+func TestEndMissionDenyTakeover(t *testing.T) {
+	mission := new(Mission)
+	endPlanet := new(Planet)
+	player := new(Player)
+	start_time := time.Now().UnixNano() * 1e6
+	*mission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 15}
+	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, 6, 3, start_time, 2, 0, "chochko"}
+	*player = Player{"chochko", Color{22, 22, 22}, "asdf1", "planet.2_2", []int{1, 1}, []int{2, 2}}
+
+	endPlanet = EndMission(endPlanet, player, mission)
+	//TODO: Test needs to be revised in order to handle calculation of ship count
+	if endPlanet.GetShipCount() != 0 {
+		t.Error("End Planet ship count was expected  to be 0 but it is:", endPlanet.GetShipCount())
+	}
+	//TODO: Test needs to be revised in order to handle feedback mission with exess ships
+	if endPlanet.Owner != "chochko" {
+		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
+	}
+}
+
 func TestTravelTime(t *testing.T) {
 	mission := new(Mission)
 	*mission = Mission{
+		Color:       Color{22, 22, 22},
 		Source:      []int{100, 200},
 		Target:      []int{800, 150},
 		CurrentTime: time.Now().UnixNano() / 1e6,
