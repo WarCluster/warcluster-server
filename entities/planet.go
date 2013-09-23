@@ -31,6 +31,10 @@ func (p *Planet) GetCoords() []int {
 	return p.coords
 }
 
+func (p *Planet) HasOwner() bool {
+	return len(p.Owner) > 0
+}
+
 func (p *Planet) Serialize() (string, []byte, error) {
 	_ = p.GetShipCount()
 	result, err := json.Marshal(p)
@@ -41,7 +45,7 @@ func (p *Planet) Serialize() (string, []byte, error) {
 }
 
 func (p *Planet) GetShipCount() int {
-	if len(p.Owner) > 0 {
+	if p.HasOwner() {
 		p.UpdateShipCount()
 	}
 	return p.ShipCount
@@ -53,7 +57,7 @@ func (p *Planet) SetShipCount(count int) {
 }
 
 func (p *Planet) UpdateShipCount() {
-	if len(p.Owner) > 0 {
+	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
 		timeModifier := int64(p.Size/3) + 1
 		//TODO: To be completed for all planet size types

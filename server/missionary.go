@@ -23,7 +23,7 @@ func StartMissionary(mission *entities.Mission) {
 
 	var target_owner *entities.Player
 
-	if target.Owner != "" {
+	if target.HasOwner() {
 		owner_id := fmt.Sprintf("player.%s", target.Owner)
 		target_owner_entity, err := db_manager.GetEntity(owner_id)
 		if err != nil {
