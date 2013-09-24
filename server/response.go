@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 	"warcluster/db_manager"
 	"warcluster/entities"
 	"warcluster/server/response"
@@ -58,6 +59,7 @@ func scopeOfView(request *Request) error {
 	response.Entities["Missions"] = populate_entities("mission.*")
 	response.Entities["Planets"]  = populate_entities("planet.*")
 	response.Entities["Suns"]     = populate_entities("sun.*")
+	response.Timestamp            = time.Now().UnixNano() / 1e6
 
 	if json_response, err := json.Marshal(response); err == nil {
 		request.Client.Session.Send(json_response)
