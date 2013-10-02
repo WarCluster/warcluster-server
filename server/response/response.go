@@ -4,12 +4,21 @@ import (
 	"warcluster/entities"
 )
 
-type Response struct {
+type BaseResponse struct {
 	Command	    string
 	Timestamp   int64
-	Entities	map[string]map[string]*entities.Entity
 }
 
 type ScopeOfView struct {
-	Response
+	BaseResponse
+	Entities	map[string]map[string]*entities.Entity
+}
+
+type StateChange struct {
+	ScopeOfView
+}
+
+type SendMission struct {
+	BaseResponse
+	Mission     *entities.Mission
 }
