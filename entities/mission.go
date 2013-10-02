@@ -74,7 +74,7 @@ func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Pla
 		}
 	case "Supply":
 		target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
-		//case "Spy":
+	case "Spy":
 	}
 	return target
 }
