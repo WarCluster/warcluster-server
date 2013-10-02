@@ -43,7 +43,7 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 // scopeOfView is not finished yet but the purpose of the function is to call calculateCanvasSize
 // and give the player the information contained in the given borders.
 func scopeOfView(request *Request) error {
-	response := new(response.Response)
+	response := new(response.ScopeOfView)
 	response.Command = "scope_of_view_result"
 
 	populate_entities := func(query string) (map[string]*entities.Entity) {
@@ -100,15 +100,27 @@ func parseAction(request *Request) error {
 	}
 
 	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet, request.Type)
-	if _, serialized_mission, err := mission.Serialize(); err == nil {
-		go StartMissionary(mission)
-		db_manager.SetEntity(mission)
-		sessions.Broadcast([]byte(fmt.Sprintf("{ \"Command\": \"send_mission\", \"Mission\": %s}", serialized_mission)))
-		if source_key, source_json, source_err := source.Serialize(); source_err == nil {
-			sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Planets\": {\"%s\": %s}}", source_key, source_json)))
-			db_manager.SetEntity(source)
-		}
-		return nil
+	go StartMissionary(mission)
+	db_manager.SetEntity(mission)
+
+	send_mission := new(response.SendMission)
+	send_mission.Command = "send_mission"
+	send_mission.Mission = mission
+
+	if serialized_send_mission, err := json.Marshal(send_mission); err == nil {
+		sessions.Broadcast(serialized_send_mission)
+	}
+
+	state_change := new(response.StateChange)
+	state_change.Command = "state_change"
+	state_change.Entities = make(map[string]map[string]*entities.Entity)
+	state_change.Entities["Planets"] = map[string]*entities.Entity{
+		source.GetKey(): &source,
+	}
+
+	if serialized_state_change, err := json.Marshal(state_change); err == nil {
+		sessions.Broadcast(serialized_state_change)
+	 	db_manager.SetEntity(source)
 	}
 
 	return err
