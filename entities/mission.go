@@ -52,7 +52,7 @@ func (m *Mission) CalculateTravelTime() {
 	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
 }
 
-func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Planet {
+func EndMission(target *Planet, missionInfo *Mission) *Planet {
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {
@@ -61,7 +61,7 @@ func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Pla
 			if missionInfo.ShipCount < target.ShipCount {
 				target.SetShipCount(target.ShipCount - missionInfo.ShipCount)
 			} else {
-				if target.HasOwner() && target_owner.HomePlanet == target.GetKey() {
+				if target.IsHome {
 					//exess := missionInfo.ShipCount - target.GetShipCount()
 					target.SetShipCount(0)
 					// We need to create a new mission with the exess ships to sent back to the origin planet

@@ -21,26 +21,9 @@ func StartMissionary(mission *entities.Mission) {
 	}
 	target := target_entity.(*entities.Planet)
 
-	var target_owner *entities.Player
-
-	if target.HasOwner() {
-		owner_id := fmt.Sprintf("player.%s", target.Owner)
-		target_owner_entity, err := db_manager.GetEntity(owner_id)
-		if err != nil {
-			log.Print("Error in target planet owner fetch: ", err.Error(), " Searched for: ", owner_id)
-		}
-		if target_owner_entity != nil {
-			target_owner = target_owner_entity.(*entities.Player)
-		} else {
-			log.Print("Error in target planet owner cast. Owner is nil!")
-		}
-	} else {
-		target_owner = nil
-	}
-
 	target.UpdateShipCount()
 
-	result := entities.EndMission(target, target_owner, mission)
+	result := entities.EndMission(target, mission)
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
 		db_manager.SetEntity(result)

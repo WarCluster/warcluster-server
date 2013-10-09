@@ -47,8 +47,8 @@ func TestDeserializePlayer(t *testing.T) {
 
 func TestCreateMission(t *testing.T) {
 	start_time := time.Now()
-	planet_start := Planet{Color{22, 22, 22}, []int{271, 203}, 3, 1, start_time.Unix(), 100, 1000, "gophie"}
-	planet_end := Planet{Color{22, 22, 22}, []int{471, 403}, 3, 1, start_time.Unix(), 50, 1000, "gophie"}
+	planet_start := Planet{Color{22, 22, 22}, []int{271, 203}, true, 3, 1, start_time.Unix(), 100, 1000, "gophie"}
+	planet_end := Planet{Color{22, 22, 22}, []int{471, 403}, false, 3, 1, start_time.Unix(), 50, 1000, "gophie"}
 	player := Player{"gophie", Color{22, 22, 22}, "asdf", "planet.271_203", []int{1, 1}, []int{2, 2}}
 
 	valid_mission := player.StartMission(&planet_start, &planet_end, 80, "Attack")
