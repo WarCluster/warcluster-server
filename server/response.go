@@ -40,8 +40,9 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 	return top_left, bottom_right
 }
 
-// scopeOfView is not finished yet but the purpose of the function is to call calculateCanvasSize
-// and give the player the information contained in the given borders.
+// scopeOfView is not finished yet but the purpose of the function is
+// to call calculateCanvasSize and give the player the information
+// contained in the given borders.
 func scopeOfView(request *Request) error {
 	response := new(response.ScopeOfView)
 	response.Command = "scope_of_view_result"
@@ -55,11 +56,9 @@ func scopeOfView(request *Request) error {
 		return result
 	}
 
-	response.Entities = make(map[string]map[string]*entities.Entity)
-	response.Entities["Missions"] = populate_entities("mission.*")
-	response.Entities["Planets"]  = populate_entities("planet.*")
-	response.Entities["Suns"]     = populate_entities("sun.*")
-	response.Timestamp            = time.Now().UnixNano() / 1e6
+	response.Missions = populate_entities("mission.*")
+	response.Planets  = populate_entities("planet.*")
+	response.Suns     = populate_entities("sun.*")
 
 	if json_response, err := json.Marshal(response); err == nil {
 		request.Client.Session.Send(json_response)
@@ -113,8 +112,7 @@ func parseAction(request *Request) error {
 
 	state_change := new(response.StateChange)
 	state_change.Command = "state_change"
-	state_change.Entities = make(map[string]map[string]*entities.Entity)
-	state_change.Entities["Planets"] = map[string]*entities.Entity{
+	state_change.Planets = map[string]*entities.Entity{
 		source.GetKey(): &source,
 	}
 

@@ -11,11 +11,18 @@ type BaseResponse struct {
 
 type ScopeOfView struct {
 	BaseResponse
-	Entities	map[string]map[string]*entities.Entity
+	Missions map[string]*entities.Entity
+	Planets  map[string]*entities.Entity
+	Suns     map[string]*entities.Entity
+	Entities map[string]*entities.Entity
 }
 
 type StateChange struct {
-	ScopeOfView
+	BaseResponse
+	Missions map[string]*entities.Entity `json:",omitempty"`
+	Planets  map[string]*entities.Entity `json:",omitempty"`
+	Suns     map[string]*entities.Entity `json:",omitempty"`
+	Entities map[string]*entities.Entity `json:",omitempty"`
 }
 
 type SendMission struct {
