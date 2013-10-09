@@ -11,6 +11,7 @@ import (
 type Planet struct {
 	Color               Color
 	coords              []int
+	IsHome              bool
 	Texture             int
 	Size                int
 	LastShipCountUpdate int64
@@ -82,7 +83,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 	planet_radius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planet_in_creation := Planet{Color{200, 180, 140}, []int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, ""}
+		planet_in_creation := Planet{Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
@@ -96,5 +97,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	return result, result[int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS+1))]
+	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
+	result[homePlanetIdx].IsHome = true
+	return result, result[homePlanetIdx]
 }
