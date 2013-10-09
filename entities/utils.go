@@ -13,9 +13,9 @@ import (
 )
 
 type Color struct {
-	R    int
-	G    int
-	B    int
+	R int
+	G int
+	B int
 }
 
 func (c *Color) String() string {

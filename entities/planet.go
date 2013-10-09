@@ -11,7 +11,7 @@ import (
 type Planet struct {
 	Color               Color
 	coords              []int
-	IsHome				bool
+	IsHome              bool
 	Texture             int
 	Size                int
 	LastShipCountUpdate int64
@@ -97,7 +97,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS+1))
+	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
 	result[homePlanetIdx].IsHome = true
 	return result, result[homePlanetIdx]
 }
