@@ -1,12 +1,13 @@
 package response
 
 import (
+	"time"
 	"warcluster/entities"
 )
 
 type BaseResponse struct {
-	Command	    string
-	Timestamp   int64
+	Command   string
+	Timestamp int64
 }
 
 type ScopeOfView struct {
@@ -27,5 +28,15 @@ type StateChange struct {
 
 type SendMission struct {
 	BaseResponse
-	Mission     *entities.Mission
+	Mission *entities.Mission
+}
+
+func NewScopeOfView() *ScopeOfView {
+	r := new(ScopeOfView)
+	r.Command = "scope_of_view_result"
+	return r
+}
+
+func (r *BaseResponse) MakeATimeStamp() {
+	r.Timestamp = time.Now().UnixNano() / 1e6
 }

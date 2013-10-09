@@ -13,9 +13,9 @@ import (
 // The three constants bellow are used by calculateCanvasSize to determine
 //the size of the area for wich information will be sent to the user.
 const (
-	BEST_PING = 150
+	BEST_PING  = 150
 	WORST_PING = 1500
-	STEPS = 10
+	STEPS      = 10
 )
 
 // calculateCanvasSize is used to determine how big of an area(information about an area)
@@ -44,10 +44,9 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 // to call calculateCanvasSize and give the player the information
 // contained in the given borders.
 func scopeOfView(request *Request) error {
-	response := new(response.ScopeOfView)
-	response.Command = "scope_of_view_result"
+	res := response.NewScopeOfView()
 
-	populate_entities := func(query string) (map[string]*entities.Entity) {
+	populate_entities := func(query string) map[string]*entities.Entity {
 		result := make(map[string]*entities.Entity)
 		entities := db_manager.GetEntities(query)
 		for _, entity := range entities {
@@ -56,11 +55,12 @@ func scopeOfView(request *Request) error {
 		return result
 	}
 
-	response.Missions = populate_entities("mission.*")
-	response.Planets  = populate_entities("planet.*")
-	response.Suns     = populate_entities("sun.*")
+	res.Missions = populate_entities("mission.*")
+	res.Planets = populate_entities("planet.*")
+	res.Suns = populate_entities("sun.*")
+	res.MakeATimeStamp()
 
-	if json_response, err := json.Marshal(response); err == nil {
+	if json_response, err := json.Marshal(res); err == nil {
 		request.Client.Session.Send(json_response)
 	} else {
 		return err
@@ -118,7 +118,7 @@ func parseAction(request *Request) error {
 
 	if serialized_state_change, err := json.Marshal(state_change); err == nil {
 		sessions.Broadcast(serialized_state_change)
-	 	db_manager.SetEntity(source)
+		db_manager.SetEntity(source)
 	}
 
 	return err
