@@ -56,7 +56,7 @@ func scopeOfView(request *Request) error {
 	res.Missions = populate_entities("mission.*")
 	res.Planets = populate_entities("planet.*")
 	res.Suns = populate_entities("sun.*")
-	res.MakeATimeStamp()
+	res.MakeATimestamp()
 
 	if json_response, err := json.Marshal(res); err == nil {
 		request.Client.Session.Send(json_response)

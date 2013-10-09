@@ -37,6 +37,6 @@ func NewScopeOfView() *ScopeOfView {
 	return r
 }
 
-func (r *BaseResponse) MakeATimeStamp() {
+func (r *BaseResponse) MakeATimestamp() {
 	r.Timestamp = time.Now().UnixNano() / 1e6
 }
