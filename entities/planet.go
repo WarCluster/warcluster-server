@@ -11,6 +11,7 @@ import (
 type Planet struct {
 	Color               Color
 	coords              []int
+	IsHome              bool
 	Texture             int
 	Size                int
 	LastShipCountUpdate int64
@@ -31,6 +32,10 @@ func (p *Planet) GetCoords() []int {
 	return p.coords
 }
 
+func (p *Planet) HasOwner() bool {
+	return len(p.Owner) > 0
+}
+
 func (p *Planet) Serialize() (string, []byte, error) {
 	_ = p.GetShipCount()
 	result, err := json.Marshal(p)
@@ -41,7 +46,7 @@ func (p *Planet) Serialize() (string, []byte, error) {
 }
 
 func (p *Planet) GetShipCount() int {
-	if len(p.Owner) > 0 {
+	if p.HasOwner() {
 		p.UpdateShipCount()
 	}
 	return p.ShipCount
@@ -53,7 +58,7 @@ func (p *Planet) SetShipCount(count int) {
 }
 
 func (p *Planet) UpdateShipCount() {
-	if len(p.Owner) > 0 {
+	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
 		timeModifier := int64(p.Size/3) + 1
 		//TODO: To be completed for all planet size types
@@ -78,7 +83,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 	planet_radius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planet_in_creation := Planet{Color{"Base", 200, 180, 140}, []int{0, 0}, 0, 0, time.Now().Unix(), 10, 0, ""}
+		planet_in_creation := Planet{Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
 		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
@@ -92,5 +97,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	return result, result[int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS+1))]
+	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
+	result[homePlanetIdx].IsHome = true
+	return result, result[homePlanetIdx]
 }

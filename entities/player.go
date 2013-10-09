@@ -67,7 +67,7 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 		return int((userhash[0] - 48) / 2)
 	}
 
-	color := Color{username, red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
+	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
 	player := Player{username, color, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
