@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"time"
 	"warcluster/db_manager"
 	"warcluster/entities"
@@ -15,9 +16,31 @@ func StartMissionary(mission *entities.Mission) {
 	time.Sleep(time.Duration(mission.TravelTime * 1e6))
 
 	target_entity, err := db_manager.GetEntity(target_key)
+	if err != nil {
+		log.Print("Error in target planet fetch: ", err.Error())
+	}
 	target := target_entity.(*entities.Planet)
 
-	result := entities.EndMission(target, mission)
+	var target_owner *entities.Player
+
+	if target.HasOwner() {
+		owner_id := fmt.Sprintf("player.%s", target.Owner)
+		target_owner_entity, err := db_manager.GetEntity(owner_id)
+		if err != nil {
+			log.Print("Error in target planet owner fetch: ", err.Error(), " Searched for: ", owner_id)
+		}
+		if target_owner_entity != nil {
+			target_owner = target_owner_entity.(*entities.Player)
+		} else {
+			log.Print("Error in target planet owner cast. Owner is nil!")
+		}
+	} else {
+		target_owner = nil
+	}
+
+	target.UpdateShipCount()
+
+	result := entities.EndMission(target, target_owner, mission)
 	key, serialized_planet, err := result.Serialize()
 	if err == nil {
 		db_manager.SetEntity(result)

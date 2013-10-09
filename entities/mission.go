@@ -8,8 +8,10 @@ import (
 )
 
 type Mission struct {
+	Color       Color
 	Source      []int
 	Target      []int
+	Type        string
 	CurrentTime int64
 	StartTime   int64
 	TravelTime  int64
@@ -50,16 +52,29 @@ func (m *Mission) CalculateTravelTime() {
 	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
 }
 
-func EndMission(endPlanet *Planet, missionInfo *Mission) *Planet {
-	if endPlanet.Owner == missionInfo.Player {
-		endPlanet.SetShipCount(endPlanet.GetShipCount() + missionInfo.ShipCount)
-	} else {
-		if missionInfo.ShipCount < endPlanet.GetShipCount() {
-			endPlanet.SetShipCount(endPlanet.GetShipCount() - missionInfo.ShipCount)
+func EndMission(target *Planet, target_owner *Player, missionInfo *Mission) *Planet {
+	switch missionInfo.Type {
+	case "Attack":
+		if target.Owner == missionInfo.Player {
+			target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
 		} else {
-			endPlanet.SetShipCount(missionInfo.ShipCount - endPlanet.GetShipCount())
-			endPlanet.Owner = missionInfo.Player
+			if missionInfo.ShipCount < target.ShipCount {
+				target.SetShipCount(target.ShipCount - missionInfo.ShipCount)
+			} else {
+				if target.HasOwner() && target_owner.HomePlanet == target.GetKey() {
+					//exess := missionInfo.ShipCount - target.GetShipCount()
+					target.SetShipCount(0)
+					// We need to create a new mission with the exess ships to sent back to the origin planet
+				} else {
+					target.SetShipCount(missionInfo.ShipCount - target.ShipCount)
+					target.Owner = missionInfo.Player
+					target.Color = missionInfo.Color
+				}
+			}
 		}
+	case "Supply":
+		target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
+		//case "Spy":
 	}
-	return endPlanet
+	return target
 }
