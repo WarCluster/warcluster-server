@@ -77,7 +77,7 @@ func TestEndMission(t *testing.T) {
 	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, false, 6, 3, start_time, 2, 0, "chochko"}
 
 	t.Skip()
-	endPlanet = EndMission(endPlanet, player, secondMission)
+	endPlanet = EndMission(endPlanet, secondMission)
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
 	}
@@ -86,7 +86,7 @@ func TestEndMission(t *testing.T) {
 		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 
-	endPlanet = EndMission(endPlanet, player, mission)
+	endPlanet = EndMission(endPlanet, mission)
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
 	}
