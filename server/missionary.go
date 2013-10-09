@@ -18,6 +18,7 @@ func StartMissionary(mission *entities.Mission) {
 	target_entity, err := db_manager.GetEntity(target_key)
 	if err != nil {
 		log.Print("Error in target planet fetch: ", err.Error())
+		return
 	}
 	target := target_entity.(*entities.Planet)
 
