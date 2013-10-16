@@ -9,7 +9,6 @@ type StateChange struct {
 	Missions map[string]entities.Entity `json:",omitempty"`
 	Planets  map[string]entities.Entity `json:",omitempty"`
 	Suns     map[string]entities.Entity `json:",omitempty"`
-	Entities map[string]entities.Entity `json:",omitempty"`
 }
 
 func NewStateChange() *StateChange {
