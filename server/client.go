@@ -8,6 +8,7 @@ import (
 	"log"
 	"warcluster/db_manager"
 	"warcluster/entities"
+	"warcluster/server/response"
 )
 
 // The information for each person is stored in two seperate structures. Player and Client.
@@ -62,21 +63,26 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		hash := entities.GenerateHash(nickname)
 		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
 
-		//TODO: Remove the bottom three lines when the client is smart enough to invoke scope of view on all clients in order to osee the generated system
-		for planet := range planets {
-			key, serialized_planet, _ := planets[planet].Serialize()
-			sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Planets\": {\"%s\": %s}}", key, serialized_planet)))
+		//TODO: Remove the bottom three lines when the client is smart enough to invoke
+		//      scope of view on all clients in order to osee the generated system
+		for _, planet := range planets {
+			db_manager.SetEntity(planet)
+			state_change := response.NewStateChange()
+			state_change.Planets = map[string]entities.Entity {
+				planet.GetKey(): planet,
+			}
+			response.Send(state_change, sessions.Broadcast)
 		}
-		sun_key, serialized_sun, _ := sun.Serialize()
-		sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Suns\": {\"%s\": %s}}", sun_key, serialized_sun)))
 
 		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
-		log.Print("Player", player)
 		db_manager.SetEntity(player)
 		db_manager.SetEntity(sun)
-		for i := 0; i < len(planets); i++ {
-			db_manager.SetEntity(planets[i])
+
+		state_change := response.NewStateChange()
+		state_change.Suns = map[string]entities.Entity {
+				sun.GetKey(): sun,
 		}
+		response.Send(state_change, sessions.Broadcast)
 	} else {
 		player = entity.(*entities.Player)
 	}

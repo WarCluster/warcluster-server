@@ -6,6 +6,7 @@ import (
 	"time"
 	"warcluster/db_manager"
 	"warcluster/entities"
+	"warcluster/server/response"
 )
 
 // StartMissionary is used when a call to initiate a new mission is rescived.
@@ -25,10 +26,10 @@ func StartMissionary(mission *entities.Mission) {
 	target.UpdateShipCount()
 
 	result := entities.EndMission(target, mission)
-	key, serialized_planet, err := result.Serialize()
-	if err == nil {
-		db_manager.SetEntity(result)
-		sessions.Broadcast([]byte(fmt.Sprintf("{\"Command\": \"state_change\", \"Planets\": {\"%s\": %s}}", key, serialized_planet)))
+	state_change := response.NewStateChange()
+	state_change.Planets = map[string]entities.Entity {
+			result.GetKey(): result,
 	}
+	response.Send(state_change, sessions.Broadcast)
 	db_manager.DeleteEntity(mission.GetKey())
 }
