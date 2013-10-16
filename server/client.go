@@ -62,6 +62,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		sun := entities.GenerateSun(nickname, all_suns, []entities.Sun{})
 		hash := entities.GenerateHash(nickname)
 		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
+		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
 
 		//TODO: Remove the bottom three lines when the client is smart enough to invoke
 		//      scope of view on all clients in order to osee the generated system
@@ -74,7 +75,6 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 			response.Send(state_change, sessions.Broadcast)
 		}
 
-		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
 		db_manager.SetEntity(player)
 		db_manager.SetEntity(sun)
 

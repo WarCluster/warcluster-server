@@ -93,7 +93,7 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 
 		planet_in_creation.Texture = int(hashElement(4*ix + 2))
 		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
-		//p.LastShipCountUpdate = time.Now()
+		planet_in_creation.LastShipCountUpdate = time.Now().UnixNano() / 1e6
 		result = append(result, &planet_in_creation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
