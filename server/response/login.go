@@ -6,18 +6,18 @@ type LoginSuccess struct {
 	Position []int
 }
 
-type LoginFail struct {
+type LoginFailed struct {
 	baseResponse
 }
 
 func NewLoginSuccess() *LoginSuccess {
-	l := new(LoginSuccess)
-	l.Command = "login_success"
-	return l
+	r := new(LoginSuccess)
+	r.Command = "login_success"
+	return r
 }
 
-func NewLoginFail() *LoginFail {
-	l := new(LoginFail)
-	l.Command = "login_fail"
-	return l
+func NewLoginFailed() *LoginFailed {
+	r := new(LoginFailed)
+	r.Command = "login_failed"
+	return r
 }
