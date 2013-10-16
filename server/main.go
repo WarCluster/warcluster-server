@@ -101,16 +101,16 @@ func login(session sockjs.Session) (*Client, error) {
 //
 // Shocking right?!?!
 func handler(session sockjs.Session) {
-	sessions.Add(session)
-	defer sessions.Remove(session)
 	defer func() {
 		if panicked := recover(); panicked != nil {
 			log.Println(string(debug.Stack()))
 			return
 		}
 	}()
+	defer sessions.Remove(session)
 
 	if client, err := login(session); err == nil {
+		sessions.Add(session)
 		for {
 			message := session.Receive()
 			if message == nil {
