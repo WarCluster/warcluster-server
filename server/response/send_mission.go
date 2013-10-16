@@ -1,9 +1,11 @@
 package response
 
-import "warcluster/entities"
+import (
+	"warcluster/entities"
+)
 
 type SendMission struct {
-	BaseResponse
+	baseResponse
 	Mission *entities.Mission
 }
 

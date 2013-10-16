@@ -1,23 +1,23 @@
 package response
 
 type LoginSuccess struct {
-	BaseResponse
+	baseResponse
 	Username string
 	Position []int
 }
 
 type LoginFail struct {
-	BaseResponse
+	baseResponse
 }
 
 func NewLoginSuccess() *LoginSuccess {
-	r := new(LoginSuccess)
-	r.Command = "login_success"
-	return r
+	l := new(LoginSuccess)
+	l.Command = "login_success"
+	return l
 }
 
 func NewLoginFail() *LoginFail {
-	r := new(LoginFail)
-	r.Command = "login_fail"
-	return r
+	l := new(LoginFail)
+	l.Command = "login_fail"
+	return l
 }

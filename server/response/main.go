@@ -5,16 +5,20 @@ import (
 	"time"
 )
 
-type BaseResponse struct {
+type Response interface {
+	MakeATimestamp()
+}
+
+type baseResponse struct {
 	Command   string
 	Timestamp int64
 }
 
-func (r *BaseResponse) MakeATimestamp() {
+func (r *baseResponse) MakeATimestamp() {
 	r.Timestamp = time.Now().UnixNano() / 1e6
 }
 
-func (r *BaseResponse) Send(sender func([]byte) error {
+func Send(r Response, sender func([]byte)) error {
 	r.MakeATimestamp()
 	serialized, err := json.Marshal(r)
 	if err == nil {
