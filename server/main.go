@@ -80,8 +80,7 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 func login(session sockjs.Session) (*Client, error) {
 	nickname, player, err := authenticate(session)
 	if err != nil {
-		login_failed := response.NewLoginFailed()
-		response.Send(login_failed, session.Send)
+		response.Send(response.NewLoginFailed(), session.Send)
 		return nil, errors.New("Login failed")
 	}
 
