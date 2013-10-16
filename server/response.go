@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
 	"warcluster/db_manager"
 	"warcluster/entities"
@@ -44,11 +43,11 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 func scopeOfView(request *Request) error {
 	res := response.NewScopeOfView()
 
-	populate_entities := func(query string) map[string]*entities.Entity {
-		result := make(map[string]*entities.Entity)
+	populate_entities := func(query string) map[string]entities.Entity {
+		result := make(map[string]entities.Entity)
 		entities := db_manager.GetEntities(query)
 		for _, entity := range entities {
-			result[entity.GetKey()] = &entity
+			result[entity.GetKey()] = entity
 		}
 		return result
 	}
@@ -56,15 +55,7 @@ func scopeOfView(request *Request) error {
 	res.Missions = populate_entities("mission.*")
 	res.Planets = populate_entities("planet.*")
 	res.Suns = populate_entities("sun.*")
-	res.MakeATimestamp()
-
-	if json_response, err := json.Marshal(res); err == nil {
-		request.Client.Session.Send(json_response)
-	} else {
-		return err
-	}
-
-	return nil
+	return response.Send(res, request.Client.Session.Send)
 }
 
 // This function makes all the checks needed for creation of a new mission.
@@ -89,35 +80,28 @@ func parseAction(request *Request) error {
 	}
 
 	if source.(*entities.Planet).Owner != request.Client.Player.String() {
-		err = errors.New("This is not your home!")
+		return errors.New("This is not your home!")
 	}
 
 	if request.Type != "Attack" || request.Type != "Supply" || request.Type != "Spy" {
-		err = errors.New("Invalid mission type!")
+		return errors.New("Invalid mission type!")
 	}
 
 	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet, request.Type)
 	go StartMissionary(mission)
 	db_manager.SetEntity(mission)
+	db_manager.SetEntity(source)
 
-	send_mission := new(response.SendMission)
-	send_mission.Command = "send_mission"
+	send_mission := response.NewSendMission()
 	send_mission.Mission = mission
-
-	if serialized_send_mission, err := json.Marshal(send_mission); err == nil {
-		sessions.Broadcast(serialized_send_mission)
+	err = response.Send(send_mission, sessions.Broadcast)
+	if err != nil {
+		return err
 	}
 
-	state_change := new(response.StateChange)
-	state_change.Command = "state_change"
-	state_change.Planets = map[string]*entities.Entity{
-		source.GetKey(): &source,
+	state_change := response.NewStateChange()
+	state_change.Planets = map[string]entities.Entity{
+		source.GetKey(): source,
 	}
-
-	if serialized_state_change, err := json.Marshal(state_change); err == nil {
-		sessions.Broadcast(serialized_state_change)
-		db_manager.SetEntity(source)
-	}
-
-	return err
+	return response.Send(state_change, sessions.Broadcast)
 }

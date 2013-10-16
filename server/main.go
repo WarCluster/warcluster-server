@@ -14,6 +14,7 @@ import (
 	"runtime/debug"
 	"warcluster/db_manager"
 	"warcluster/entities"
+	"warcluster/server/response"
 )
 
 var listener net.Listener
@@ -79,6 +80,7 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 func login(session sockjs.Session) (*Client, error) {
 	nickname, player, err := authenticate(session)
 	if err != nil {
+		response.Send(response.NewLoginFailed(), session.Send)
 		return nil, errors.New("Login failed")
 	}
 
@@ -90,8 +92,11 @@ func login(session sockjs.Session) (*Client, error) {
 
 	home_planet_entity, _ := db_manager.GetEntity(client.Player.HomePlanet)
 	home_planet := home_planet_entity.(*entities.Planet)
-	session.Send([]byte(fmt.Sprintf("{\"Command\": \"login_success\", \"Username\": \"%s\", \"Position\": [%d, %d] }",
-		client.Nickname, home_planet.GetCoords()[0], home_planet.GetCoords()[1])))
+
+	login_success := response.NewLoginSuccess()
+	login_success.Username = client.Nickname
+	login_success.Position = home_planet.GetCoords()
+	response.Send(login_success, session.Send)
 	return client, nil
 }
 
