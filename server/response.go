@@ -83,7 +83,7 @@ func parseAction(request *Request) error {
 		return errors.New("This is not your home!")
 	}
 
-	if request.Type != "Attack" || request.Type != "Supply" || request.Type != "Spy" {
+	if request.Type != "Attack" && request.Type != "Supply" && request.Type != "Spy" {
 		return errors.New("Invalid mission type!")
 	}
 
