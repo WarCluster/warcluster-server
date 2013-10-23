@@ -1,0 +1,12 @@
+[Unit]
+Description=WarCluster
+Requires=redis.service
+After=redis.service
+
+[Service]
+User=owl
+ExecStart=/home/owl/go/bin/warcluster
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
