@@ -14,5 +14,3 @@ const (
 	SUNS_RANDOM_SPAWN_ZONE_RADIUS = 50000
 	SUNS_SOLAR_SYSTEM_RADIUS      = 9000
 )
-
-var Types map[string]Entity
