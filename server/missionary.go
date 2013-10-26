@@ -27,8 +27,8 @@ func StartMissionary(mission *entities.Mission) {
 
 	result := entities.EndMission(target, mission)
 	state_change := response.NewStateChange()
-	state_change.Planets = map[string]entities.Entity {
-			result.GetKey(): result,
+	state_change.Planets = map[string]entities.Entity{
+		result.GetKey(): result,
 	}
 	response.Send(state_change, sessions.Broadcast)
 	db_manager.DeleteEntity(mission.GetKey())

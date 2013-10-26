@@ -69,7 +69,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		for _, planet := range planets {
 			db_manager.SetEntity(planet)
 			state_change := response.NewStateChange()
-			state_change.Planets = map[string]entities.Entity {
+			state_change.Planets = map[string]entities.Entity{
 				planet.GetKey(): planet,
 			}
 			response.Send(state_change, sessions.Broadcast)
@@ -79,8 +79,8 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		db_manager.SetEntity(sun)
 
 		state_change := response.NewStateChange()
-		state_change.Suns = map[string]entities.Entity {
-				sun.GetKey(): sun,
+		state_change.Suns = map[string]entities.Entity{
+			sun.GetKey(): sun,
 		}
 		response.Send(state_change, sessions.Broadcast)
 	} else {
