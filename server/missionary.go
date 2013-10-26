@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 	"warcluster/entities"
-	"warcluster/entities/db"
 	"warcluster/server/response"
 )
 
@@ -16,7 +15,7 @@ func StartMissionary(mission *entities.Mission) {
 	target_key := fmt.Sprintf("planet.%d_%d", mission.Target[0], mission.Target[1])
 	time.Sleep(time.Duration(mission.TravelTime * 1e6))
 
-	target_entity, err := db.GetEntity(target_key)
+	target_entity, err := entities.Get(target_key)
 	if err != nil {
 		log.Print("Error in target planet fetch: ", err.Error())
 		return
@@ -31,5 +30,5 @@ func StartMissionary(mission *entities.Mission) {
 		result.GetKey(): result,
 	}
 	response.Send(state_change, sessions.Broadcast)
-	db.DeleteEntity(mission.GetKey())
+	entities.Delete(mission.GetKey())
 }

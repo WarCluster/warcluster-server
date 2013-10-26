@@ -3,7 +3,6 @@ package server
 import (
 	"errors"
 	"warcluster/entities"
-	"warcluster/entities/db"
 	"warcluster/server/response"
 )
 
@@ -45,7 +44,7 @@ func scopeOfView(request *Request) error {
 
 	populate_entities := func(query string) map[string]entities.Entity {
 		result := make(map[string]entities.Entity)
-		entities := db.GetEntities(query)
+		entities := entities.Find(query)
 		for _, entity := range entities {
 			result[entity.GetKey()] = entity
 		}
@@ -69,12 +68,12 @@ func parseAction(request *Request) error {
 		return nil
 	}()
 
-	source, err := db.GetEntity(request.StartPlanet)
+	source, err := entities.Get(request.StartPlanet)
 	if err != nil {
 		return errors.New("Start planet does not exist")
 	}
 
-	target, err := db.GetEntity(request.EndPlanet)
+	target, err := entities.Get(request.EndPlanet)
 	if err != nil {
 		return errors.New("End planet does not exist")
 	}
@@ -89,8 +88,8 @@ func parseAction(request *Request) error {
 
 	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet, request.Type)
 	go StartMissionary(mission)
-	db.SetEntity(mission)
-	db.SetEntity(source)
+	entities.Save(mission)
+	entities.Save(source)
 
 	send_mission := response.NewSendMission()
 	send_mission.Mission = mission

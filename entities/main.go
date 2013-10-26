@@ -1,7 +1,9 @@
 package entities
 
 import (
+	"fmt"
 	"encoding/json"
+	"strings"
 	"warcluster/entities/db"
 )
 
@@ -25,14 +27,28 @@ type planetMarshalHook Planet
 // Finds records in the database, by given key
 // All Redis wildcards are allowed.
 func Find(query string) []Entity {
+	var entity_list []Entity
+
+	if records, err := db.GetList(query); err == nil {
+		results := fmt.Sprintf("%s", records)
+		for _, key := range strings.Split(results[1:len(results)-1], " ") {
+			if entity, err := Get(key); err == nil {
+				entity_list = append(entity_list, entity)
+			}
+		}
+	}
+
+	return entity_list
 }
 
 // Fetches a single record in the database, by given concrete key.
 // If there is no entity with such key, returns error.
 func Get(key string) (Entity, error) {
-	if record, err := db.Get(key); err != nil {
+	record, err := db.Get(key)
+	if err != nil {
 		return nil, err
 	}
+
 	return Construct(key, record), nil
 }
 
