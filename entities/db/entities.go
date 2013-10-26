@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
@@ -11,39 +10,30 @@ import (
 
 // SetEntity takes an Entity (struct used as template for all data containers to ease the managing of the DB)
 // and generates an unique key in order to add the record to the DB.
-func SetEntity(entity entities.Entity) bool {
-	key := entity.GetKey()
-	prepared_entity, err := json.Marshal(entity)
-	if err != nil {
-		return false
-	}
+func Save(key string, value []byte) error {
+	defer mutex.Unlock()
 
 	mutex.Lock()
-	send_err := connection.Send("SET", key, prepared_entity)
-	mutex.Unlock()
+	send_err := connection.Send("SET", key, value)
+	flush_err := connection.Flush()
 	if send_err != nil {
 		log.Print(send_err)
+		return send_err
 	}
-
-	mutex.Lock()
-	flush_err := connection.Flush()
-	mutex.Unlock()
 	if flush_err != nil {
 		log.Print(flush_err)
+		return flush_err
 	}
-	return true
+	return nil
 }
 
 // GetEntity is used to pull information from the DB in order to be used by the server.
 // GetEntity operates as read only function and does not modify the data in the DB.
-func GetEntity(key string) (entities.Entity, error) {
+func Get(key string) (entities.Entity, error) {
+	defer mutex.Unlock()
 	mutex.Lock()
-	result, err := redis.Bytes(connection.Do("GET", key))
-	mutex.Unlock()
-	if err != nil {
-		return nil, err
-	}
-	return entities.Construct(key, result), nil
+
+	return redis.Bytes(connection.Do("GET", key)
 }
 
 // GetList is a special function needed to parse a list of keys stored in the DB for quick acsess.
@@ -89,9 +79,9 @@ func GetEntities(pattern string) []entities.Entity {
 }
 
 // I think DeleteEntity speaks for itself but still. This function is used to remove entrys from the DB.
-func DeleteEntity(key string) error {
+func Delete(key string) error {
+	defer mutex.Unlock()
 	mutex.Lock()
 	_, err := redis.Bytes(connection.Do("DEL", key))
-	mutex.Unlock()
 	return err
 }
