@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
 	"strconv"
@@ -52,7 +53,8 @@ func TestDatabasePreparationsWithoutAnOwner(t *testing.T) {
 	expected_json := fmt.Sprintf(json_base, start_time.Unix())
 	expected_key := "planet.271_203"
 
-	key, json, err := planet.Serialize()
+	key := planet.GetKey()
+	json, err := json.Marshal(planet)
 	if key != expected_key || string(json) != expected_json {
 		t.Error(string(json))
 		t.Error("Planet JSON formatting gone wrong!")
@@ -70,7 +72,9 @@ func TestDatabasePreparationsWithAnOwner(t *testing.T) {
 	expected_json := fmt.Sprintf(json_base, start_time.Unix())
 	expected_key := "planet.271_203"
 
-	key, json, err := planet.Serialize()
+	key := planet.GetKey()
+	json, err := json.Marshal(planet)
+
 	if key != expected_key || string(json) != expected_json {
 		t.Error(string(json))
 		t.Error(string(expected_json))

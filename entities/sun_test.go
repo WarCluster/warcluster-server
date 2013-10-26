@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"encoding/json"
 	"github.com/Vladimiroff/vec2d"
 	"testing"
 )
@@ -10,7 +11,9 @@ func TestBasePreparations(t *testing.T) {
 	expected_json := "{\"Username\":\"gophie\"}"
 	expected_key := "sun.20_20"
 
-	key, json, err := sun.Serialize()
+	key := sun.GetKey()
+	json, err := json.Marshal(sun)
+
 	if key != expected_key || string(json) != expected_json {
 		t.Error(string(json))
 		t.Error("Sun JSON formatting gone wrong!")

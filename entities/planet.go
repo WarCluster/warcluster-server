@@ -20,8 +20,6 @@ type Planet struct {
 	Owner               string
 }
 
-type marshalHook Planet
-
 func (p *Planet) String() string {
 	return fmt.Sprintf("Planet[%s, %s]", p.coords[0], p.coords[1])
 }
@@ -40,16 +38,7 @@ func (p *Planet) HasOwner() bool {
 
 func (p *Planet) MarshalJSON() ([]byte, error) {
 	p.UpdateShipCount()
-	return json.Marshal((*marshalHook)(p))
-}
-
-func (p *Planet) Serialize() (string, []byte, error) {
-	_ = p.GetShipCount()
-	result, err := json.Marshal(p)
-	if err != nil {
-		return p.GetKey(), nil, err
-	}
-	return p.GetKey(), result, nil
+	return json.Marshal((*planetMarshalHook)(p))
 }
 
 func (p *Planet) GetShipCount() int {
