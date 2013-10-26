@@ -2,26 +2,16 @@ package db
 
 import (
 	"github.com/garyburd/redigo/redis"
-	"log"
 )
 
 // Save takes a key (struct used as template for all data containers to ease the managing of the DB)
 // and generates an unique key in order to add the record to the DB.
 func Save(key string, value []byte) error {
 	defer mutex.Unlock()
-
 	mutex.Lock()
-	send_err := connection.Send("SET", key, value)
-	flush_err := connection.Flush()
-	if send_err != nil {
-		log.Print(send_err)
-		return send_err
-	}
-	if flush_err != nil {
-		log.Print(flush_err)
-		return flush_err
-	}
-	return nil
+
+	_, err := connection.Do("SET", key, value)
+	return err
 }
 
 // Get is used to pull information from the DB in order to be used by the server.
@@ -29,6 +19,7 @@ func Save(key string, value []byte) error {
 func Get(key string) ([]byte, error) {
 	defer mutex.Unlock()
 	mutex.Lock()
+
 	return redis.Bytes(connection.Do("GET", key))
 }
 
@@ -37,6 +28,7 @@ func Get(key string) ([]byte, error) {
 func GetList(pattern string) ([]interface{}, error) {
 	defer mutex.Unlock()
 	mutex.Lock()
+
 	return redis.Values(connection.Do("KEYS", pattern))
 }
 
@@ -44,6 +36,7 @@ func GetList(pattern string) ([]interface{}, error) {
 func Delete(key string) error {
 	defer mutex.Unlock()
 	mutex.Lock()
+
 	_, err := connection.Do("DEL", key)
 	return err
 }
