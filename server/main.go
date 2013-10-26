@@ -12,7 +12,6 @@ import (
 	"path"
 	"runtime"
 	"runtime/debug"
-	"warcluster/db_manager"
 	"warcluster/entities"
 	"warcluster/server/response"
 )
@@ -90,7 +89,7 @@ func login(session sockjs.Session) (*Client, error) {
 		Player:   player,
 	}
 
-	home_planet_entity, _ := db_manager.GetEntity(client.Player.HomePlanet)
+	home_planet_entity, _ := entities.Get(client.Player.HomePlanet)
 	home_planet := home_planet_entity.(*entities.Planet)
 
 	login_success := response.NewLoginSuccess()

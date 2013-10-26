@@ -4,7 +4,7 @@ import (
 	"os"
 	"os/signal"
 	"warcluster/config"
-	"warcluster/db_manager"
+	"warcluster/entities/db"
 	"warcluster/server"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	defer final()
 
 	cfg.Load("config/config.gcfg")
-	db_manager.Connect(cfg.Database.Network, cfg.Database.Host, cfg.Database.Port)
+	db.Connect(cfg.Database.Network, cfg.Database.Host, cfg.Database.Port)
 	server.Start(cfg.Server.Host, cfg.Server.Port)
 }
 
@@ -24,7 +24,7 @@ func final() {
 	signal.Notify(sigtermchan, os.Interrupt)
 	<-sigtermchan
 
-	db_manager.Finalize()
+	db.Finalize()
 	server.Stop()
 	os.Exit(0)
 }
