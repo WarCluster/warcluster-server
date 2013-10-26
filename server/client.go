@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
-	"warcluster/db_manager"
+	"warcluster/entities/db"
 	"warcluster/entities"
 	"warcluster/server/response"
 )
@@ -52,9 +52,9 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		}
 	}
 
-	entity, _ := db_manager.GetEntity(fmt.Sprintf("player.%s", []byte(nickname)))
+	entity, _ := db.GetEntity(fmt.Sprintf("player.%s", []byte(nickname)))
 	if entity == nil {
-		all_suns_entities := db_manager.GetEntities("sun.*")
+		all_suns_entities := db.GetEntities("sun.*")
 		all_suns := []entities.Sun{}
 		for _, entity := range all_suns_entities {
 			all_suns = append(all_suns, *entity.(*entities.Sun))
@@ -67,7 +67,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 		//TODO: Remove the bottom three lines when the client is smart enough to invoke
 		//      scope of view on all clients in order to osee the generated system
 		for _, planet := range planets {
-			db_manager.SetEntity(planet)
+			db.SetEntity(planet)
 			state_change := response.NewStateChange()
 			state_change.Planets = map[string]entities.Entity{
 				planet.GetKey(): planet,
@@ -75,8 +75,8 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 			response.Send(state_change, sessions.Broadcast)
 		}
 
-		db_manager.SetEntity(player)
-		db_manager.SetEntity(sun)
+		db.SetEntity(player)
+		db.SetEntity(sun)
 
 		state_change := response.NewStateChange()
 		state_change.Suns = map[string]entities.Entity{

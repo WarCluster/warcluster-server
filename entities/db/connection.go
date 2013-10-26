@@ -1,5 +1,5 @@
-// DB_manager is the package responsible for database maintenence and managing DB I/O.
-package db_manager
+// db is the package responsible for database maintenence and managing DB I/O.
+package db
 
 import (
 	"fmt"

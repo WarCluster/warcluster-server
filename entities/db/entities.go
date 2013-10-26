@@ -1,4 +1,4 @@
-package db_manager
+package db
 
 import (
 	"encoding/json"
