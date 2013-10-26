@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -47,14 +46,6 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 	}
 	mission.CalculateTravelTime()
 	return &mission
-}
-
-func (p *Player) Serialize() (string, []byte, error) {
-	result, err := json.Marshal(p)
-	if err != nil {
-		return p.GetKey(), nil, err
-	}
-	return p.GetKey(), result, nil
 }
 
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {

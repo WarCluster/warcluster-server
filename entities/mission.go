@@ -36,13 +36,9 @@ func (m *Mission) GetSpeed() int {
 	return 10
 }
 
-func (m *Mission) Serialize() (string, []byte, error) {
+func (m *Mission) MarshalJSON() ([]byte, error) {
 	m.CurrentTime = time.Now().UnixNano() / 1e6
-	result, err := json.Marshal(m)
-	if err != nil {
-		return m.GetKey(), nil, err
-	}
-	return m.GetKey(), result, nil
+	return json.Marshal((*missionMarshalHook)(m))
 }
 
 func (m *Mission) CalculateTravelTime() {

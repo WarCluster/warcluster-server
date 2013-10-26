@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
 )
@@ -21,14 +20,6 @@ func (s *Sun) GetKey() string {
 
 func (s *Sun) String() string {
 	return fmt.Sprintf("Sun[%v, %v]", int64(s.position.X), int64(s.position.Y))
-}
-
-func (s *Sun) Serialize() (string, []byte, error) {
-	result, err := json.Marshal(s)
-	if err != nil {
-		return s.GetKey(), nil, err
-	}
-	return s.GetKey(), result, nil
 }
 
 func (s *Sun) GetPosition() *vec2d.Vector {

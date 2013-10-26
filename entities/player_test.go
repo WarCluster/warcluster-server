@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 )
@@ -10,9 +11,10 @@ func TestDatabasePreparations(t *testing.T) {
 	expected_json := "{\"Color\":{\"R\":22,\"G\":22,\"B\":22},\"TwitterID\":\"asdf\",\"HomePlanet\":\"planet.0_0\",\"ScreenSize\":[1,1],\"ScreenPosition\":[2,2]}"
 	expected_key := "player.gophie"
 
-	key, byteJson, err := player.Serialize()
-	if key != expected_key || string(byteJson) != expected_json {
-		t.Error(string(byteJson))
+	key := player.GetKey()
+	json, err := json.Marshal(player)
+	if key != expected_key || string(json) != expected_json {
+		t.Error(string(json))
 		t.Error("Player JSON formatting gone wrong!")
 	}
 
