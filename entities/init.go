@@ -1,11 +1,5 @@
 package entities
 
-type Entity interface {
-	GetKey() string
-	Serialize() (string, []byte, error)
-	String() string
-}
-
 const (
 	PLANETS_RING_OFFSET           = 300
 	PLANETS_PLANET_RADIUS         = 300
@@ -14,3 +8,11 @@ const (
 	SUNS_RANDOM_SPAWN_ZONE_RADIUS = 50000
 	SUNS_SOLAR_SYSTEM_RADIUS      = 9000
 )
+
+type Entity interface {
+	GetKey() string
+	String() string
+}
+
+type missionMarshalHook Mission
+type planetMarshalHook Planet

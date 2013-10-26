@@ -1,6 +1,7 @@
 package db_manager
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
@@ -11,7 +12,8 @@ import (
 // SetEntity takes an Entity (struct used as template for all data containers to ease the managing of the DB)
 // and generates an unique key in order to add the record to the DB.
 func SetEntity(entity entities.Entity) bool {
-	key, prepared_entity, err := entity.Serialize()
+	key := entity.GetKey()
+	prepared_entity, err := json.Marshal(entity)
 	if err != nil {
 		return false
 	}

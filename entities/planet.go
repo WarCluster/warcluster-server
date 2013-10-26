@@ -40,16 +40,7 @@ func (p *Planet) HasOwner() bool {
 
 func (p *Planet) MarshalJSON() ([]byte, error) {
 	p.UpdateShipCount()
-	return json.Marshal((*marshalHook)(p))
-}
-
-func (p *Planet) Serialize() (string, []byte, error) {
-	_ = p.GetShipCount()
-	result, err := json.Marshal(p)
-	if err != nil {
-		return p.GetKey(), nil, err
-	}
-	return p.GetKey(), result, nil
+	return json.Marshal((*planetMarshalHook)(p))
 }
 
 func (p *Planet) GetShipCount() int {
