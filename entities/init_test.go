@@ -26,4 +26,12 @@ var (
 		MaxShipCount:        0,
 		Owner:               "gophie",
 	}
+	player Player = Player{
+		username: "gophie",
+		Color: Color{22, 22, 22},
+		TwitterID: "asdf",
+		HomePlanet: "planet.271_203",
+		ScreenSize: []int{1, 1},
+		ScreenPosition: []int{2, 2},
+	}
 )
