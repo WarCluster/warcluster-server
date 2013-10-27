@@ -2,9 +2,25 @@ package entities
 
 import (
 	"encoding/json"
-	"strings"
+	"reflect"
 	"testing"
 	"time"
+)
+
+
+var (
+	timeStamp int64 = time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
+	mission Mission = Mission{
+		Color:       Color{22, 22, 22},
+		Source:      []int{100, 200},
+		Target:      []int{800, 150},
+		Type:        "Attack",
+		CurrentTime: timeStamp,
+		StartTime:   timeStamp,
+		TravelTime:  timeStamp,
+		Player:      "gophie",
+		ShipCount:   5,
+	}
 )
 
 func TestMissionGetKey(t *testing.T) {
@@ -18,63 +34,40 @@ func TestMissionGetKey(t *testing.T) {
 	}
 }
 
-func TestMissionSerialization(t *testing.T) {
-	start_time := time.Date(2013, time.August, 14, 22, 12, 6, 0, time.UTC).UnixNano() / 1e6
-	mission := Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 5}
-	expected_json_prefix := "{\"Color\":{\"R\":22,\"G\":22,\"B\":22},\"Source\":[32,64],\"Target\":[2,2],\"Type\":\"Attack\",\"CurrentTime\""
-	expected_json_suffix := "\"StartTime\":1376518326000,\"TravelTime\":1376518326000,\"Player\":\"gophie\",\"ShipCount\":5}"
+func TestMissionMarshalling(t *testing.T) {
+	var uMission Mission
 
-	key := mission.GetKey()
-	json, err := json.Marshal(mission)
-
-	if key != mission.GetKey() {
-		t.Error("You're not using the missions' GetKey()!")
-	}
-
-	if !strings.HasPrefix(string(json), expected_json_prefix) || !strings.HasSuffix(string(json), expected_json_suffix) {
-		t.Error("Serialized mission is ", string(json))
-	}
-
+	mMission, err := json.Marshal(mission)
 	if err != nil {
-		t.Error("Error during serialization: ", err)
-	}
-}
-
-func TestMissionDeserialize(t *testing.T) {
-	serialized_mission := []byte(strings.Join([]string{"{\"Source\":[32,64],",
-		"\"Target\":[2,2],",
-		"\"Type\":\"Attack\",",
-		"\"CurrentTime\":\"2013-08-14T22:12:06Z\",",
-		"\"StartTime\":\"2013-08-14T22:12:06.06Z\",",
-		"\"TravelTime\":\"2013-08-14T22:12:06Z\",",
-		"\"Player\":\"gophie\",",
-		"\"ShipCount\":5}"}, ""))
-	mission := Construct("mission.137650752666_32_64", serialized_mission).(*Mission)
-
-	if mission.Player != "gophie" {
-		t.Error("Mission's player is ", mission.Player)
+		t.Error("Mission marshaling failed:", err)
 	}
 
-	if mission.ShipCount != 5 {
-		t.Error("Mission's ShipCount is ", mission.ShipCount)
+	err = json.Unmarshal(mMission, &uMission)
+	if err != nil {
+		t.Error("Mission unmarshaling failed:", err)
 	}
 
-	if mission.Source[0] != 32 || mission.Source[1] != 64 {
-		t.Error("Mission's Source is ", mission.Source)
+	uMission.CurrentTime = timeStamp
+
+	if mission.GetKey() != uMission.GetKey() {
+		t.Error(
+			"Keys of both missions are different!\n",
+			mission.GetKey(),
+			"!=",
+			uMission.GetKey(),
+		)
 	}
 
-	if mission.Target[0] != 2 || mission.Target[1] != 2 {
-		t.Error("Mission's Target is ", mission.Target)
+	if !reflect.DeepEqual(mission, uMission) {
+		t.Error("Missions are different after the marshal->unmarshal step")
 	}
 }
 
 //TODO: Test needs to be revised in order to handle calculation of ship count
 func TestEndMission(t *testing.T) {
-	mission := new(Mission)
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
 	start_time := time.Now().UnixNano() * 1e6
-	*mission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 55}
 	*secondMission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "chochko", 10}
 	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, false, 6, 3, start_time, 2, 0, "chochko"}
 
@@ -88,7 +81,7 @@ func TestEndMission(t *testing.T) {
 		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 
-	endPlanet = EndMission(endPlanet, mission)
+	endPlanet = EndMission(endPlanet, &mission)
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
 	}
@@ -98,36 +91,23 @@ func TestEndMission(t *testing.T) {
 	}
 }
 
+//TODO: Test needs to be revised in order to handle calculation of ship count
+//TODO: Test needs to be revised in order to handle feedback mission with exess ships
 func TestEndMissionDenyTakeover(t *testing.T) {
-	mission := new(Mission)
 	endPlanet := new(Planet)
-	start_time := time.Now().UnixNano() * 1e6
-	*mission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "gophie", 15}
-	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, true, 6, 3, start_time, 2, 0, "chochko"}
+	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, true, 6, 3, timeStamp, 2, 0, "chochko"}
 
-	endPlanet = EndMission(endPlanet, mission)
-	//TODO: Test needs to be revised in order to handle calculation of ship count
+	endPlanet = EndMission(endPlanet, &mission)
 	if endPlanet.GetShipCount() != 0 {
 		t.Error("End Planet ship count was expected  to be 0 but it is:", endPlanet.GetShipCount())
 	}
-	//TODO: Test needs to be revised in order to handle feedback mission with exess ships
+
 	if endPlanet.Owner != "chochko" {
 		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 }
 
 func TestTravelTime(t *testing.T) {
-	mission := new(Mission)
-	*mission = Mission{
-		Color:       Color{22, 22, 22},
-		Source:      []int{100, 200},
-		Target:      []int{800, 150},
-		CurrentTime: time.Now().UnixNano() / 1e6,
-		StartTime:   time.Now().UnixNano() / 1e6,
-		TravelTime:  time.Now().UnixNano() / 1e6,
-		Player:      "gophie",
-		ShipCount:   50,
-	}
 	mission.CalculateTravelTime()
 	var expectedTravel int64 = 7017
 
