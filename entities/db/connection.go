@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -13,7 +12,7 @@ import (
 var connection redis.Conn
 
 // Pool maintains a pool of connections to the database
-var pool redis.Pool
+var pool *redis.Pool
 
 // This function is called in order to insure propper db acsess.
 // It creates the DB connection and stores it in the connection variable.
@@ -26,7 +25,6 @@ func InitPool(host string, port int) {
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
-			var err error
 			connection, err = redis.Dial("tcp", serverAddr)
 			if err != nil {
 				log.Fatal(err)
@@ -39,7 +37,6 @@ func InitPool(host string, port int) {
 			return err
 		},
 	}
-
 }
 
 // Finalize is called upon the death of the server(intended or not :)

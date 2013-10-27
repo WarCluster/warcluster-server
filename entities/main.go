@@ -60,7 +60,8 @@ func Get(key string) (Entity, error) {
 // point of failure in this function... I supose.
 func Save(entity Entity) error {
 	key := entity.GetKey()
-	if value, err := json.Marshal(entity); err != nil {
+	value, err := json.Marshal(entity)
+	if err != nil {
 		return err
 	}
 	return db.Save(key, value)
