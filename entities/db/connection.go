@@ -17,7 +17,7 @@ var pool redis.Pool
 
 // This function is called in order to insure propper db acsess.
 // It creates the DB connection and stores it in the connection variable.
-func NewPool(host string, port int) {
+func InitPool(host string, port int) {
 	var err error
 	log.Print("Initializing database connection... ")
 	serverAddr := fmt.Sprintf("%v:%v", host, port)
