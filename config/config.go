@@ -14,8 +14,8 @@ type Config struct {
 		Port int
 	}
 	Database struct {
-		Host    string
-		Port    int
+		Host string
+		Port int
 	}
 }
 

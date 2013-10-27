@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 	"os/signal"
+	"syscall"
 	"warcluster/config"
 	"warcluster/entities/db"
 	"warcluster/server"
-	"syscall"
 )
 
 var cfg config.Config
