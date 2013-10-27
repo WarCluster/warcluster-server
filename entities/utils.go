@@ -34,7 +34,6 @@ func Construct(key string, data []byte) Entity {
 	case "planet":
 		planet := new(Planet)
 		json.Unmarshal(data, planet)
-		planet.coords = ExtractPlanetCoords(key)
 		return planet
 	case "mission":
 		mission := new(Mission)
@@ -51,14 +50,6 @@ func Construct(key string, data []byte) Entity {
 
 func GenerateHash(username string) string {
 	return simplifyHash(usernameHash(username))
-}
-
-func ExtractPlanetCoords(key string) []int {
-	key_coords := strings.Split(key, ".")[1]
-	planet_coords := strings.Split(key_coords, "_")
-	planet_coords_0, _ := strconv.Atoi(planet_coords[0])
-	planet_coords_1, _ := strconv.Atoi(planet_coords[1])
-	return []int{planet_coords_0, planet_coords_1}
 }
 
 func ExtractSunKey(key string) *vec2d.Vector {

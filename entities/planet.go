@@ -10,7 +10,7 @@ import (
 
 type Planet struct {
 	Color               Color
-	coords              []int
+	Coords              []int
 	IsHome              bool
 	Texture             int
 	Size                int
@@ -23,15 +23,11 @@ type Planet struct {
 type marshalHook Planet
 
 func (p *Planet) String() string {
-	return fmt.Sprintf("Planet[%s, %s]", p.coords[0], p.coords[1])
+	return fmt.Sprintf("Planet[%s, %s]", p.Coords[0], p.Coords[1])
 }
 
 func (p *Planet) GetKey() string {
-	return fmt.Sprintf("planet.%d_%d", p.coords[0], p.coords[1])
-}
-
-func (p *Planet) GetCoords() []int {
-	return p.coords
+	return fmt.Sprintf("planet.%d_%d", p.Coords[0], p.Coords[1])
 }
 
 func (p *Planet) HasOwner() bool {
@@ -83,9 +79,9 @@ func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Plane
 		planet_in_creation := Planet{Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ring_offset += planet_radius + hashElement(4*ix)*5
 
-		planet_in_creation.coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
+		planet_in_creation.Coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
 			hashElement(4*ix+1)*40))
-		planet_in_creation.coords[1] = int(float64(sun_position.Y) + ring_offset*math.Sin(
+		planet_in_creation.Coords[1] = int(float64(sun_position.Y) + ring_offset*math.Sin(
 			hashElement(4*ix+1)*40))
 
 		planet_in_creation.Texture = int(hashElement(4*ix + 2))

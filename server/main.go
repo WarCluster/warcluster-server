@@ -94,7 +94,7 @@ func login(session sockjs.Session) (*Client, error) {
 
 	login_success := response.NewLoginSuccess()
 	login_success.Username = client.Nickname
-	login_success.Position = home_planet.GetCoords()
+	login_success.Position = home_planet.Coords
 	response.Send(login_success, session.Send)
 	return client, nil
 }

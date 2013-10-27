@@ -35,8 +35,8 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 
 	mission := Mission{
 		Color:       p.Color,
-		Source:      source.GetCoords(),
-		Target:      target.GetCoords(),
+		Source:      source.Coords,
+		Target:      target.Coords,
 		Type:        mission_type,
 		CurrentTime: current_time,
 		StartTime:   current_time,
