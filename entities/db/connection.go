@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+// connection is the pointer to the db used for db comunication.
+var connection redis.Conn
+
 // Pool maintains a pool of connections to the database
 var pool redis.Pool
 
@@ -23,12 +26,13 @@ func NewPool(host string, port int) {
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", serverAddr)
+			var err error
+			connection, err = redis.Dial("tcp", serverAddr)
 			if err != nil {
 				log.Fatal(err)
 				return nil, err
 			}
-			return c, err
+			return connection, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			_, err := c.Do("PING")
