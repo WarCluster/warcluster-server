@@ -26,7 +26,6 @@ func final() {
 	signal.Notify(exit_chan, syscall.SIGTERM)
 	<-exit_chan
 
-	db.Finalize()
 	server.Stop()
 	os.Exit(0)
 }
