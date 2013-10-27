@@ -43,7 +43,7 @@ func InitPool(host string, port int) {
 // it ensures the propper closing of the DB connection.
 func Finalize() {
 	log.Print("Closing database connection... ")
-	if err := connection.Close(); err != nil {
-		log.Fatal(err)
+	if connection != nil {
+		connection.Close()
 	}
 }
