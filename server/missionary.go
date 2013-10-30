@@ -21,14 +21,16 @@ func StartMissionary(mission *entities.Mission) {
 		return
 	}
 	target := target_entity.(*entities.Planet)
-
 	target.UpdateShipCount()
 
 	result := entities.EndMission(target, mission)
+	entities.Save(result)
+
 	state_change := response.NewStateChange()
 	state_change.Planets = map[string]entities.Entity{
 		result.GetKey(): result,
 	}
 	response.Send(state_change, sessions.Broadcast)
+
 	entities.Delete(mission.GetKey())
 }
