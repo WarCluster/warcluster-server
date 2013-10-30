@@ -5,4 +5,3 @@
 [database]
     host = "localhost"
     port = 6379
-    network = "tcp"

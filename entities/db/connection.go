@@ -5,30 +5,32 @@ import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
-	"sync"
+	"time"
 )
 
-// connection is the pointer to the db used for db comunication.
-var connection redis.Conn
-
-// I think we all know that mutex is like I/O trafic light needed to avoid really bad stuff
-var mutex sync.Mutex
+// Pool maintains a pool of connections to the database
+var pool *redis.Pool
 
 // This function is called in order to insure propper db acsess.
 // It creates the DB connection and stores it in the connection variable.
-func Connect(network, host string, port int) {
-	var err error
+func InitPool(host string, port int) {
 	log.Print("Initializing database connection... ")
-	if connection, err = redis.Dial(network, fmt.Sprintf("%v:%v", host, port)); err != nil {
-		log.Fatal(err)
-	}
-}
+	serverAddr := fmt.Sprintf("%v:%v", host, port)
 
-// Finalize is called upon the death of the server(intended or not :)
-// it ensures the propper closing of the DB connection.
-func Finalize() {
-	log.Print("Closing database connection... ")
-	if err := connection.Close(); err != nil {
-		log.Fatal(err)
+	pool = &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			conn, err := redis.Dial("tcp", serverAddr)
+			if err != nil {
+				log.Fatal(err)
+				return nil, err
+			}
+			return conn, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
 	}
 }
