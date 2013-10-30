@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -76,5 +77,33 @@ func TestCreateMission(t *testing.T) {
 	if invalid_mission.ShipCount != 100 {
 		t.Error(invalid_mission.ShipCount)
 		t.Error("Mission ShipCount was expected to be 100!")
+	}
+}
+
+func TestPlayerMarshalling(t *testing.T) {
+	var uPlayer Player
+
+	mPlayer, err := json.Marshal(player)
+	if err != nil {
+		t.Error("Player marshaling failed:", err)
+	}
+
+	err = json.Unmarshal(mPlayer, &uPlayer)
+	if err != nil {
+		t.Error("Player unmarshaling failed:", err)
+	}
+	uPlayer.username = player.username
+
+	if player.GetKey() != uPlayer.GetKey() {
+		t.Error(
+			"Keys of both players are different!\n",
+			player.GetKey(),
+			"!=",
+			uPlayer.GetKey(),
+		)
+	}
+
+	if !reflect.DeepEqual(player, uPlayer) {
+		t.Error("Players are different after the marshal->unmarshal step")
 	}
 }
