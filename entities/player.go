@@ -18,6 +18,10 @@ func (p *Player) String() string {
 	return p.username
 }
 
+func (p *Player) Username() string {
+	return p.username
+}
+
 func (p *Player) GetKey() string {
 	return fmt.Sprintf("player.%s", p.username)
 }
