@@ -3,38 +3,35 @@ package entities
 import (
 	"encoding/json"
 	"github.com/Vladimiroff/vec2d"
+	"reflect"
 	"testing"
 )
 
-func TestBasePreparations(t *testing.T) {
-	sun := Sun{"gophie", 1, vec2d.New(0, 0), vec2d.New(20, 20)}
-	expected_json := "{\"Username\":\"gophie\"}"
-	expected_key := "sun.20_20"
+func TestSunMarshalling(t *testing.T) {
+	var uSun Sun
 
-	key := sun.GetKey()
-	json, err := json.Marshal(sun)
-
-	if key != expected_key || string(json) != expected_json {
-		t.Error(string(json))
-		t.Error("Sun JSON formatting gone wrong!")
-	}
-
+	mSun, err := json.Marshal(sun)
 	if err != nil {
-		t.Error("Error during serialization: ", err)
-	}
-}
-
-func TestDeserializeSun(t *testing.T) {
-	var sun *Sun
-	serialized_Sun := []byte("{\"Username\":\"gophie\"}")
-	sun = Construct("sun.20_20", serialized_Sun).(*Sun)
-
-	if sun.Username != "gophie" {
-		t.Error("Player's name is ", sun.Username)
+		t.Error("Sun marshaling failed:", err)
 	}
 
-	if sun.position.Y != 20 || sun.position.X != 20 {
-		t.Error("Kiro da napravi serialize na vektori is ", sun.position.Y, sun.position.X)
+	err = json.Unmarshal(mSun, &uSun)
+	if err != nil {
+		t.Error("Sun unmarshaling failed:", err)
+	}
+	uSun.position = ExtractSunKey(sun.GetKey())
+
+	if sun.GetKey() != uSun.GetKey() {
+		t.Error(
+			"Keys of both sun are different!\n",
+			sun.GetKey(),
+			"!=",
+			uSun.GetKey(),
+		)
+	}
+
+	if !reflect.DeepEqual(sun, uSun) {
+		t.Error("Suns are different after the marshal->unmarshal step")
 	}
 }
 

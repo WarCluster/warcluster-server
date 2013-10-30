@@ -1,6 +1,9 @@
 package entities
 
-import "time"
+import (
+	"github.com/Vladimiroff/vec2d"
+	"time"
+)
 
 var (
 	timeStamp int64   = time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
@@ -33,5 +36,9 @@ var (
 		HomePlanet:     "planet.271_203",
 		ScreenSize:     []int{1, 1},
 		ScreenPosition: []int{2, 2},
+	}
+	sun Sun = Sun{
+		Username: "gophie",
+		position: vec2d.New(20, 20),
 	}
 )
