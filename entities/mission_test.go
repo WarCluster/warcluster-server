@@ -76,7 +76,7 @@ func TestEndMission(t *testing.T) {
 }
 
 //TODO: Test needs to be revised in order to handle calculation of ship count
-//TODO: Test needs to be revised in order to handle feedback mission with exess ships
+//TODO: Test needs to be revised in order to handle feedback mission with excess ships
 func TestEndMissionDenyTakeover(t *testing.T) {
 	endPlanet := new(Planet)
 	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, true, 6, 3, timeStamp, 2, 0, "chochko"}

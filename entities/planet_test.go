@@ -70,3 +70,14 @@ func TestPlanetMarshalling(t *testing.T) {
 		t.Error("Planets are different after the marshal->unmarshal step")
 	}
 }
+
+func TestPlanetHasOwner(t *testing.T) {
+	if !planet.HasOwner() {
+		t.Fail()
+	}
+
+	planet.Owner = ""
+	if planet.HasOwner() {
+		t.Fail()
+	}
+}
