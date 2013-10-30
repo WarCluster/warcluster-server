@@ -18,6 +18,10 @@ func (p *Player) String() string {
 	return p.username
 }
 
+func (p *Player) Username() string {
+	return p.username
+}
+
 func (p *Player) GetKey() string {
 	return fmt.Sprintf("player.%s", p.username)
 }
@@ -35,8 +39,8 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 
 	mission := Mission{
 		Color:       p.Color,
-		Source:      source.GetCoords(),
-		Target:      target.GetCoords(),
+		Source:      source.Coords,
+		Target:      target.Coords,
 		Type:        mission_type,
 		CurrentTime: current_time,
 		StartTime:   current_time,
