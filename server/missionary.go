@@ -45,7 +45,7 @@ func StartMissionary(mission *entities.Mission) {
 		playerEntity, err := entities.Get(mission.Player)
 		player := playerEntity.(*entities.Player)
 
-		excessMission := player.StartMission(target, sourceEntity.(*entities.Planet), 100, "Attack")
+		excessMission := player.StartMission(target, sourceEntity.(*entities.Planet), 100, "Supply")
 		excessMission.ShipCount = excessShips
 		go StartMissionary(excessMission)
 		entities.Save(excessMission)
