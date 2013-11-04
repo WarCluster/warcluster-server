@@ -19,21 +19,21 @@ const (
 func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
 	step := int(WORST_PING - BEST_PING/STEPS)
 	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
-	end_resolution := []int{
+	endResolution := []int{
 		int(float32(resolution[0]) * multiply),
 		int(float32(resolution[1]) * multiply),
 	}
 
-	top_left := []int{
-		position[0] - int((end_resolution[0]-resolution[0])/2),
-		position[1] - int((end_resolution[1]-resolution[1])/2),
+	topLeft := []int{
+		position[0] - int((endResolution[0]-resolution[0])/2),
+		position[1] - int((endResolution[1]-resolution[1])/2),
 	}
 
-	bottom_right := []int{
-		position[0] + resolution[0] + int((end_resolution[0]-resolution[0])/2),
-		position[1] + resolution[1] + int((end_resolution[1]-resolution[1])/2),
+	bottomRight := []int{
+		position[0] + resolution[0] + int((endResolution[0]-resolution[0])/2),
+		position[1] + resolution[1] + int((endResolution[1]-resolution[1])/2),
 	}
-	return top_left, bottom_right
+	return topLeft, bottomRight
 }
 
 // scopeOfView is not finished yet but the purpose of the function is
@@ -42,7 +42,7 @@ func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []in
 func scopeOfView(request *Request) error {
 	res := response.NewScopeOfView()
 
-	populate_entities := func(query string) map[string]entities.Entity {
+	populateEntities := func(query string) map[string]entities.Entity {
 		result := make(map[string]entities.Entity)
 		entities := entities.Find(query)
 		for _, entity := range entities {
@@ -51,9 +51,9 @@ func scopeOfView(request *Request) error {
 		return result
 	}
 
-	res.Missions = populate_entities("mission.*")
-	res.Planets = populate_entities("planet.*")
-	res.Suns = populate_entities("sun.*")
+	res.Missions = populateEntities("mission.*")
+	res.Planets = populateEntities("planet.*")
+	res.Suns = populateEntities("sun.*")
 	return response.Send(res, request.Client.Session.Send)
 }
 
@@ -96,16 +96,16 @@ func parseAction(request *Request) error {
 	entities.Save(mission)
 	entities.Save(source)
 
-	send_mission := response.NewSendMission()
-	send_mission.Mission = mission
-	err = response.Send(send_mission, sessions.Broadcast)
+	sendMission := response.NewSendMission()
+	sendMission.Mission = mission
+	err = response.Send(sendMission, sessions.Broadcast)
 	if err != nil {
 		return err
 	}
 
-	state_change := response.NewStateChange()
-	state_change.Planets = map[string]entities.Entity{
+	stateChange := response.NewStateChange()
+	stateChange.Planets = map[string]entities.Entity{
 		source.GetKey(): source,
 	}
-	return response.Send(state_change, sessions.Broadcast)
+	return response.Send(stateChange, sessions.Broadcast)
 }

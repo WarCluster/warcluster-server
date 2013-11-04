@@ -10,8 +10,8 @@ import (
 
 func TestGeneratePlanets(t *testing.T) {
 	hash := "5762908447300427353060676895795336101745023746116233389596883"
-	sun_position := vec2d.New(500, 300)
-	expected_planets := []Planet{
+	sunPosition := vec2d.New(500, 300)
+	expectedPlanets := []Planet{
 		Planet{Color{22, 22, 22}, []int{-76, 57}, false, 6, 3, timeStamp, 10, 0, "gophie"},
 		Planet{Color{22, 22, 22}, []int{1470, 300}, false, 8, 5, timeStamp, 10, 0, "gophie"},
 		Planet{Color{22, 22, 22}, []int{-689, -200}, false, 3, 1, timeStamp, 10, 0, "gophie"},
@@ -23,23 +23,23 @@ func TestGeneratePlanets(t *testing.T) {
 		Planet{Color{22, 22, 22}, []int{1547, 3339}, false, 1, 1, timeStamp, 10, 0, "gophie"},
 		Planet{Color{22, 22, 22}, []int{-2744, -1065}, false, 4, 6, timeStamp, 10, 0, "gophie"},
 	}
-	generated_planets, _ := GeneratePlanets(hash, sun_position)
+	generatedPlanets, _ := GeneratePlanets(hash, sunPosition)
 
-	if len(generated_planets) != 10 {
+	if len(generatedPlanets) != 10 {
 		t.Error("Wrong planets count")
 	}
 	for i := 0; i < 10; i++ {
-		if generated_planets[i].Coords[0] != expected_planets[i].Coords[0] {
-			t.Error("X coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].Coords[0], "Actual ", generated_planets[i].Coords[0])
+		if generatedPlanets[i].Coords[0] != expectedPlanets[i].Coords[0] {
+			t.Error("X coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Coords[0], "Actual ", generatedPlanets[i].Coords[0])
 		}
-		if generated_planets[i].Coords[1] != expected_planets[i].Coords[1] {
-			t.Error("Y coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].Coords[1], "Actual ", generated_planets[i].Coords[1])
+		if generatedPlanets[i].Coords[1] != expectedPlanets[i].Coords[1] {
+			t.Error("Y coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Coords[1], "Actual ", generatedPlanets[i].Coords[1])
 		}
-		if generated_planets[i].Texture != expected_planets[i].Texture {
-			t.Error("Ring offset missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].Texture, "Actual ", generated_planets[i].Texture)
+		if generatedPlanets[i].Texture != expectedPlanets[i].Texture {
+			t.Error("Ring offset missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Texture, "Actual ", generatedPlanets[i].Texture)
 		}
-		if generated_planets[i].Size != expected_planets[i].Size {
-			t.Error("Size missmatch on Planet[", strconv.Itoa(i), "] Expected", expected_planets[i].Size, "Actual ", generated_planets[i].Size)
+		if generatedPlanets[i].Size != expectedPlanets[i].Size {
+			t.Error("Size missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Size, "Actual ", generatedPlanets[i].Size)
 		}
 	}
 }

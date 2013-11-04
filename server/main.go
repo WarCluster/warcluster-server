@@ -89,13 +89,13 @@ func login(session sockjs.Session) (*Client, error) {
 		Player:   player,
 	}
 
-	home_planet_entity, _ := entities.Get(client.Player.HomePlanet)
-	home_planet := home_planet_entity.(*entities.Planet)
+	homePlanetEntity, _ := entities.Get(client.Player.HomePlanet)
+	homePlanet := homePlanetEntity.(*entities.Planet)
 
-	login_success := response.NewLoginSuccess()
-	login_success.Username = client.Nickname
-	login_success.Position = home_planet.Coords
-	response.Send(login_success, session.Send)
+	loginSuccess := response.NewLoginSuccess()
+	loginSuccess.Username = client.Nickname
+	loginSuccess.Position = homePlanet.Coords
+	response.Send(loginSuccess, session.Send)
 	return client, nil
 }
 

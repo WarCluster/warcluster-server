@@ -30,18 +30,18 @@ type planetMarshalHook Planet
 // Finds records in the database, by given key
 // All Redis wildcards are allowed.
 func Find(query string) []Entity {
-	var entity_list []Entity
+	var entityList []Entity
 
 	if records, err := db.GetList(query); err == nil {
 		results := fmt.Sprintf("%s", records)
 		for _, key := range strings.Split(results[1:len(results)-1], " ") {
 			if entity, err := Get(key); err == nil {
-				entity_list = append(entity_list, entity)
+				entityList = append(entityList, entity)
 			}
 		}
 	}
 
-	return entity_list
+	return entityList
 }
 
 // Fetches a single record in the database, by given concrete key.

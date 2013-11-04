@@ -66,28 +66,28 @@ TODO: We need to add ship count on new planet creation
 TODO: Put all funny numbers in a constans in our config file
 NOTE: 5 in ring_offset is the distance between planets
 */
-func GeneratePlanets(hash string, sun_position *vec2d.Vector) ([]*Planet, *Planet) {
+func GeneratePlanets(hash string, sunPosition *vec2d.Vector) ([]*Planet, *Planet) {
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48 // The offset of simbol "1" in the ascii table
 	}
 
 	result := []*Planet{}
-	ring_offset := float64(PLANETS_RING_OFFSET)
-	planet_radius := float64(PLANETS_PLANET_RADIUS)
+	ringOffset := float64(PLANETS_RING_OFFSET)
+	planetRadius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planet_in_creation := Planet{Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
-		ring_offset += planet_radius + hashElement(4*ix)*5
+		planetInCreation := Planet{Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
+		ringOffset += planetRadius + hashElement(4*ix)*5
 
-		planet_in_creation.Coords[0] = int(float64(sun_position.X) + ring_offset*math.Cos(
+		planetInCreation.Coords[0] = int(float64(sunPosition.X) + ringOffset*math.Cos(
 			hashElement(4*ix+1)*40))
-		planet_in_creation.Coords[1] = int(float64(sun_position.Y) + ring_offset*math.Sin(
+		planetInCreation.Coords[1] = int(float64(sunPosition.Y) + ringOffset*math.Sin(
 			hashElement(4*ix+1)*40))
 
-		planet_in_creation.Texture = int(hashElement(4*ix + 2))
-		planet_in_creation.Size = 1 + int(hashElement(4*ix+3))
-		planet_in_creation.LastShipCountUpdate = time.Now().Unix()
-		result = append(result, &planet_in_creation)
+		planetInCreation.Texture = int(hashElement(4*ix + 2))
+		planetInCreation.Size = 1 + int(hashElement(4*ix+3))
+		planetInCreation.LastShipCountUpdate = time.Now().Unix()
+		result = append(result, &planetInCreation)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
 	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))

@@ -8,10 +8,10 @@ import (
 )
 
 func TestMissionGetKey(t *testing.T) {
-	start_time := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
+	startTime := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission := new(Mission)
 	mission.Source = []int{32, 64}
-	mission.StartTime = start_time
+	mission.StartTime = startTime
 
 	if mission.GetKey() != "mission.1352588400000_32_64" {
 		t.Error("Mission's key is ", mission.GetKey())
@@ -52,9 +52,9 @@ func TestEndMission(t *testing.T) {
 	var excessShips int
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
-	start_time := time.Now().UnixNano() * 1e6
-	*secondMission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", start_time, start_time, start_time, "chochko", 10}
-	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, false, 6, 3, start_time, 2, 0, "chochko"}
+	startTime := time.Now().UnixNano() * 1e6
+	*secondMission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", startTime, startTime, startTime, "chochko", 10}
+	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, false, 6, 3, startTime, 2, 0, "chochko"}
 
 	t.Skip()
 	excessShips = EndMission(endPlanet, secondMission)

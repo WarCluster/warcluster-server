@@ -32,7 +32,7 @@ type Client struct {
 func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 	var player *entities.Player
 	var nickname string
-	var twitter_id string
+	var twitterId string
 	request := new(Request)
 
 	for {
@@ -42,7 +42,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 			if err := json.Unmarshal(message, request); err == nil {
 				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
 					nickname = request.Username
-					twitter_id = request.TwitterID
+					twitterId = request.TwitterID
 					break
 				}
 			} else {
@@ -53,35 +53,35 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
 	if entity == nil {
-		all_suns_entities := entities.Find("sun.*")
-		all_suns := []entities.Sun{}
-		for _, entity := range all_suns_entities {
-			all_suns = append(all_suns, *entity.(*entities.Sun))
+		allSunsEntities := entities.Find("sun.*")
+		allSuns := []entities.Sun{}
+		for _, entity := range allSunsEntities {
+			allSuns = append(allSuns, *entity.(*entities.Sun))
 		}
-		sun := entities.GenerateSun(nickname, all_suns, []entities.Sun{})
+		sun := entities.GenerateSun(nickname, allSuns, []entities.Sun{})
 		hash := entities.GenerateHash(nickname)
-		planets, home_planet := entities.GeneratePlanets(hash, sun.GetPosition())
-		player = entities.CreatePlayer(nickname, twitter_id, home_planet)
+		planets, homePlanet := entities.GeneratePlanets(hash, sun.GetPosition())
+		player = entities.CreatePlayer(nickname, twitterId, homePlanet)
 
 		//TODO: Remove the bottom three lines when the client is smart enough to invoke
 		//      scope of view on all clients in order to osee the generated system
 		for _, planet := range planets {
 			entities.Save(planet)
-			state_change := response.NewStateChange()
-			state_change.Planets = map[string]entities.Entity{
+			stateChange := response.NewStateChange()
+			stateChange.Planets = map[string]entities.Entity{
 				planet.GetKey(): planet,
 			}
-			response.Send(state_change, sessions.Broadcast)
+			response.Send(stateChange, sessions.Broadcast)
 		}
 
 		entities.Save(player)
 		entities.Save(sun)
 
-		state_change := response.NewStateChange()
-		state_change.Suns = map[string]entities.Entity{
+		stateChange := response.NewStateChange()
+		stateChange.Suns = map[string]entities.Entity{
 			sun.GetKey(): sun,
 		}
-		response.Send(state_change, sessions.Broadcast)
+		response.Send(stateChange, sessions.Broadcast)
 	} else {
 		player = entity.(*entities.Player)
 	}

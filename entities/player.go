@@ -26,27 +26,27 @@ func (p *Player) GetKey() string {
 	return fmt.Sprintf("player.%s", p.username)
 }
 
-func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission_type string) *Mission {
+func (p *Player) StartMission(source *Planet, target *Planet, fleet int, missionType string) *Mission {
 	if fleet > 100 {
 		fleet = 100
 	} else if fleet <= 0 {
 		fleet = 10
 	}
-	current_time := time.Now().UnixNano() / 1e6
-	base_ship_count := source.GetShipCount()
-	ship_count := int(base_ship_count * fleet / 100)
-	source.SetShipCount(base_ship_count - ship_count)
+	currentTime := time.Now().UnixNano() / 1e6
+	baseShipCount := source.GetShipCount()
+	shipCount := int(baseShipCount * fleet / 100)
+	source.SetShipCount(baseShipCount - shipCount)
 
 	mission := Mission{
 		Color:       p.Color,
 		Source:      source.Coords,
 		Target:      target.Coords,
-		Type:        mission_type,
-		CurrentTime: current_time,
-		StartTime:   current_time,
-		TravelTime:  current_time,
+		Type:        missionType,
+		CurrentTime: currentTime,
+		StartTime:   currentTime,
+		TravelTime:  currentTime,
 		Player:      p.username,
-		ShipCount:   ship_count,
+		ShipCount:   shipCount,
 	}
 	mission.CalculateTravelTime()
 	return &mission

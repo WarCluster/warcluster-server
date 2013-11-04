@@ -42,9 +42,9 @@ func (m *Mission) MarshalJSON() ([]byte, error) {
 }
 
 func (m *Mission) CalculateTravelTime() {
-	start_vector := vec2d.New(float64(m.Source[0]), float64(m.Source[1]))
-	end_vector := vec2d.New(float64(m.Target[0]), float64(m.Target[1]))
-	distance := vec2d.GetDistance(end_vector, start_vector)
+	startVector := vec2d.New(float64(m.Source[0]), float64(m.Source[1]))
+	endVector := vec2d.New(float64(m.Target[0]), float64(m.Target[1]))
+	distance := vec2d.GetDistance(endVector, startVector)
 	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
 }
 

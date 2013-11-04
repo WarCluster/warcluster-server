@@ -20,11 +20,11 @@ func main() {
 }
 
 func final() {
-	exit_chan := make(chan os.Signal, 1)
-	signal.Notify(exit_chan, syscall.SIGINT)
-	signal.Notify(exit_chan, syscall.SIGKILL)
-	signal.Notify(exit_chan, syscall.SIGTERM)
-	<-exit_chan
+	exitChan := make(chan os.Signal, 1)
+	signal.Notify(exitChan, syscall.SIGINT)
+	signal.Notify(exitChan, syscall.SIGKILL)
+	signal.Notify(exitChan, syscall.SIGTERM)
+	<-exitChan
 
 	server.Stop()
 	os.Exit(0)
