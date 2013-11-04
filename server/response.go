@@ -86,7 +86,12 @@ func parseAction(request *Request) error {
 		return errors.New("Invalid mission type!")
 	}
 
-	mission := request.Client.Player.StartMission(source.(*entities.Planet), target.(*entities.Planet), request.Fleet, request.Type)
+	mission := request.Client.Player.StartMission(
+		source.(*entities.Planet),
+		target.(*entities.Planet),
+		request.Fleet,
+		request.Type,
+	)
 	go StartMissionary(mission)
 	entities.Save(mission)
 	entities.Save(source)
