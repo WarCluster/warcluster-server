@@ -35,23 +35,27 @@ func StartMissionary(mission *entities.Mission) {
 	entities.Delete(mission.GetKey())
 
 	if excessShips > 0 {
-		sourceKey := fmt.Sprintf("planet.%d_%d", mission.Source[0], mission.Source[1])
-		sourceEntity, err := entities.Get(sourceKey)
-		if err != nil {
-			log.Print("Error in target planet fetch: ", err.Error())
-			return
-		}
-
-		playerEntity, err := entities.Get(mission.Player)
-		player := playerEntity.(*entities.Player)
-
-		excessMission := player.StartMission(target, sourceEntity.(*entities.Planet), 100, "Supply")
-		excessMission.ShipCount = excessShips
-		go StartMissionary(excessMission)
-		entities.Save(excessMission)
-
-		sendMission := response.NewSendMission()
-		sendMission.Mission = excessMission
-		response.Send(sendMission, sessions.Broadcast)
+		startExcessMission(mission, target, excessShips)
 	}
+}
+
+func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, ships int) {
+	newTargetKey := fmt.Sprintf("planet.%d_%d", mission.Source[0], mission.Source[1])
+	newTargetEntity, err := entities.Get(newTargetKey)
+	if err != nil {
+		log.Print("Error in homePlanet planet fetch: ", err.Error())
+		return
+	}
+
+	playerEntity, err := entities.Get(mission.Player)
+	player := playerEntity.(*entities.Player)
+
+	excessMission := player.StartMission(homePlanet, newTargetEntity.(*entities.Planet), 100, "Supply")
+	excessMission.ShipCount = ships
+	go StartMissionary(excessMission)
+	entities.Save(excessMission)
+
+	sendMission := response.NewSendMission()
+	sendMission.Mission = excessMission
+	response.Send(sendMission, sessions.Broadcast)
 }
