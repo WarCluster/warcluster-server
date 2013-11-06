@@ -66,7 +66,8 @@ TODO: We need to add ship count on new planet creation
 TODO: Put all funny numbers in a constans in our config file
 NOTE: 5 in ring_offset is the distance between planets
 */
-func GeneratePlanets(hash string, sunPosition *vec2d.Vector) ([]*Planet, *Planet) {
+func GeneratePlanets(nickname string, sunPosition *vec2d.Vector) ([]*Planet, *Planet) {
+	hash := generateHash(nickname)
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48 // The offset of simbol "1" in the ascii table
 	}

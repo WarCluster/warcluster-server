@@ -48,7 +48,7 @@ func Construct(key string, data []byte) Entity {
 	return nil
 }
 
-func GenerateHash(username string) string {
+func generateHash(username string) string {
 	return simplifyHash(usernameHash(username))
 }
 
