@@ -9,6 +9,7 @@ import (
 )
 
 type Planet struct {
+	Name                string
 	Color               Color
 	Coords              []int
 	IsHome              bool
@@ -77,7 +78,7 @@ func GeneratePlanets(nickname string, sunPosition *vec2d.Vector) ([]*Planet, *Pl
 	planetRadius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planetInCreation := Planet{Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
+		planetInCreation := Planet{"", Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
 		planetInCreation.Coords[0] = int(float64(sunPosition.X) + ringOffset*math.Cos(
