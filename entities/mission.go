@@ -48,7 +48,7 @@ func (m *Mission) CalculateTravelTime() {
 	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
 }
 
-func EndMission(target *Planet, missionInfo *Mission) *Planet {
+func EndMission(target *Planet, missionInfo *Mission) (excessShips int) {
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {
@@ -59,8 +59,7 @@ func EndMission(target *Planet, missionInfo *Mission) *Planet {
 			} else {
 				if target.IsHome {
 					target.SetShipCount(0)
-					// TODO: We need to create a new mission with the exess ships to sent back to the origin planet
-					//       (exess := missionInfo.ShipCount - target.GetShipCount())
+					excessShips = missionInfo.ShipCount - target.ShipCount
 				} else {
 					target.SetShipCount(missionInfo.ShipCount - target.ShipCount)
 					target.Owner = missionInfo.Player
@@ -72,5 +71,6 @@ func EndMission(target *Planet, missionInfo *Mission) *Planet {
 		target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
 	case "Spy":
 	}
-	return target
+
+	return
 }
