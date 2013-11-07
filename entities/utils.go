@@ -92,7 +92,7 @@ func getRandomStartPosition(scope int) *vec2d.Vector {
 func extractUsernameInitials(nickname string) string {
 	letters := []rune{}
 	nonLetters := []rune{}
-	for _, s:= range nickname {
+	for _, s := range nickname {
 		symbol := rune(s)
 		if unicode.IsLetter(symbol) {
 			letters = append(letters, symbol)

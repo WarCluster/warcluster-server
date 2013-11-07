@@ -68,6 +68,7 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 		target:   vec2d.New(0, 0),
 		position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
 	}
+	newSun.generateName(username)
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {
