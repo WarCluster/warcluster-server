@@ -85,7 +85,7 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		planetInCreation.Coords[1] = int(float64(sun.GetPosition().Y) + ringOffset*math.Sin(
 			hashElement(4*ix+1)*40))
 
-		planetInCreation.Name = fmt.Sprintf("%s%c", sun.Name, ix)
+		planetInCreation.Name = fmt.Sprintf("%s%v", sun.Name, ix)
 		planetInCreation.Texture = int(hashElement(4*ix + 2))
 		planetInCreation.Size = 1 + int(hashElement(4*ix+3))
 		planetInCreation.LastShipCountUpdate = time.Now().Unix()

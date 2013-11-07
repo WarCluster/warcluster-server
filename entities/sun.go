@@ -57,7 +57,7 @@ func (s *Sun) generateName(nickname string) {
 	random := rand.New(rand.NewSource(hash))
 	initials := extractUsernameInitials(nickname)
 	number := random.Int31n(899) + 100 // we need a 3-digit number
-	s.Name = fmt.Sprintf("%s%c", initials, number)
+	s.Name = fmt.Sprintf("%s%v", initials, number)
 }
 
 func GenerateSun(username string, friends, others []Sun) *Sun {
