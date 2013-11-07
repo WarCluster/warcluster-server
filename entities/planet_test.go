@@ -9,7 +9,6 @@ import (
 )
 
 func TestGeneratePlanets(t *testing.T) {
-	sunPosition := vec2d.New(500, 300)
 	expectedPlanets := []Planet{
 		Planet{"", Color{22, 22, 22}, []int{-76, 57}, false, 6, 3, timeStamp, 10, 0, "gophie"},
 		Planet{"", Color{22, 22, 22}, []int{1470, 300}, false, 8, 5, timeStamp, 10, 0, "gophie"},
@@ -22,7 +21,8 @@ func TestGeneratePlanets(t *testing.T) {
 		Planet{"", Color{22, 22, 22}, []int{1547, 3339}, false, 1, 1, timeStamp, 10, 0, "gophie"},
 		Planet{"", Color{22, 22, 22}, []int{-2744, -1065}, false, 4, 6, timeStamp, 10, 0, "gophie"},
 	}
-	generatedPlanets, _ := GeneratePlanets("gophie", sunPosition)
+	sun.position = vec2d.New(500, 300)
+	generatedPlanets, _ := GeneratePlanets("gophie", &sun)
 
 	if len(generatedPlanets) != 10 {
 		t.Error("Wrong planets count")

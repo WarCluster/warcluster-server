@@ -59,7 +59,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 			allSuns = append(allSuns, *entity.(*entities.Sun))
 		}
 		sun := entities.GenerateSun(nickname, allSuns, []entities.Sun{})
-		planets, homePlanet := entities.GeneratePlanets(nickname, sun.GetPosition())
+		planets, homePlanet := entities.GeneratePlanets(nickname, sun)
 		player = entities.CreatePlayer(nickname, twitterId, homePlanet)
 
 		//TODO: Remove the bottom three lines when the client is smart enough to invoke

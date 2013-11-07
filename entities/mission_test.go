@@ -85,7 +85,7 @@ func TestEndMission(t *testing.T) {
 func TestEndMissionDenyTakeover(t *testing.T) {
 	var excessShips int
 	endPlanet := new(Planet)
-	*endPlanet= Planet{"", Color{22, 22, 22}, []int{2, 2}, true, 6, 3, timeStamp, 2, 0, "chochko"}
+	*endPlanet = Planet{"", Color{22, 22, 22}, []int{2, 2}, true, 6, 3, timeStamp, 2, 0, "chochko"}
 
 	excessShips = EndMission(endPlanet, &mission)
 	if endPlanet.GetShipCount() != 0 {

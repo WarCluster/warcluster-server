@@ -3,7 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Vladimiroff/vec2d"
 	"math"
 	"time"
 )
@@ -67,7 +66,7 @@ TODO: We need to add ship count on new planet creation
 TODO: Put all funny numbers in a constans in our config file
 NOTE: 5 in ring_offset is the distance between planets
 */
-func GeneratePlanets(nickname string, sunPosition *vec2d.Vector) ([]*Planet, *Planet) {
+func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	hash := generateHash(nickname)
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48 // The offset of simbol "1" in the ascii table
@@ -81,11 +80,12 @@ func GeneratePlanets(nickname string, sunPosition *vec2d.Vector) ([]*Planet, *Pl
 		planetInCreation := Planet{"", Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
-		planetInCreation.Coords[0] = int(float64(sunPosition.X) + ringOffset*math.Cos(
+		planetInCreation.Coords[0] = int(float64(sun.GetPosition().X) + ringOffset*math.Cos(
 			hashElement(4*ix+1)*40))
-		planetInCreation.Coords[1] = int(float64(sunPosition.Y) + ringOffset*math.Sin(
+		planetInCreation.Coords[1] = int(float64(sun.GetPosition().Y) + ringOffset*math.Sin(
 			hashElement(4*ix+1)*40))
 
+		planetInCreation.Name = fmt.Sprintf("%s%c", sun.Name, ix)
 		planetInCreation.Texture = int(hashElement(4*ix + 2))
 		planetInCreation.Size = 1 + int(hashElement(4*ix+3))
 		planetInCreation.LastShipCountUpdate = time.Now().Unix()
