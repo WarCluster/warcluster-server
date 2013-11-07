@@ -9,21 +9,20 @@ import (
 )
 
 func TestGeneratePlanets(t *testing.T) {
-	hash := "5762908447300427353060676895795336101745023746116233389596883"
-	sunPosition := vec2d.New(500, 300)
 	expectedPlanets := []Planet{
-		Planet{Color{22, 22, 22}, []int{-76, 57}, false, 6, 3, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{1470, 300}, false, 8, 5, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{-689, -200}, false, 3, 1, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{-1051, 648}, false, 2, 8, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{1428, -1363}, false, 3, 1, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{2735, 300}, false, 6, 8, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{2818, -798}, false, 9, 6, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{-322, 3080}, false, 5, 4, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{1547, 3339}, false, 1, 1, timeStamp, 10, 0, "gophie"},
-		Planet{Color{22, 22, 22}, []int{-2744, -1065}, false, 4, 6, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{-76, 57}, false, 6, 3, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{1470, 300}, false, 8, 5, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{-689, -200}, false, 3, 1, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{-1051, 648}, false, 2, 8, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{1428, -1363}, false, 3, 1, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{2735, 300}, false, 6, 8, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{2818, -798}, false, 9, 6, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{-322, 3080}, false, 5, 4, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{1547, 3339}, false, 1, 1, timeStamp, 10, 0, "gophie"},
+		Planet{"", Color{22, 22, 22}, []int{-2744, -1065}, false, 4, 6, timeStamp, 10, 0, "gophie"},
 	}
-	generatedPlanets, _ := GeneratePlanets(hash, sunPosition)
+	sun.position = vec2d.New(500, 300)
+	generatedPlanets, _ := GeneratePlanets("gophie", &sun)
 
 	if len(generatedPlanets) != 10 {
 		t.Error("Wrong planets count")

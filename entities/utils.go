@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 type Color struct {
@@ -48,7 +49,7 @@ func Construct(key string, data []byte) Entity {
 	return nil
 }
 
-func GenerateHash(username string) string {
+func generateHash(username string) string {
 	return simplifyHash(usernameHash(username))
 }
 
@@ -82,4 +83,30 @@ func getRandomStartPosition(scope int) *vec2d.Vector {
 	xGenerator := rand.New(rand.NewSource(xSeed))
 	yGenerator := rand.New(rand.NewSource(ySeed))
 	return vec2d.New(float64(xGenerator.Intn(scope)-scope/2), float64(yGenerator.Intn(scope)-scope/2))
+}
+
+// Gets the first three letters from twitter's username
+// and returns them in upper-case. If there are no three
+// letters there (like in @r2d2) we take as many non-letter
+// symbols as we need (@r2d2 should go to RD2)
+func extractUsernameInitials(nickname string) string {
+	letters := []rune{}
+	nonLetters := []rune{}
+	for _, s := range nickname {
+		symbol := rune(s)
+		if unicode.IsLetter(symbol) {
+			letters = append(letters, symbol)
+		} else {
+			nonLetters = append(nonLetters, symbol)
+		}
+	}
+	for len(letters) < 3 {
+		letters = append(letters, nonLetters[0])
+	}
+	return fmt.Sprintf(
+		"%c%c%c",
+		unicode.ToUpper(letters[0]),
+		unicode.ToUpper(letters[1]),
+		unicode.ToUpper(letters[2]),
+	)
 }

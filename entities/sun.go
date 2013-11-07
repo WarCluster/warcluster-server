@@ -3,12 +3,15 @@ package entities
 import (
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"math/rand"
+	"strconv"
 )
 
 var sunCounter = []int{0, 0}
 
 type Sun struct {
 	Username string
+	Name     string
 	speed    int
 	target   *vec2d.Vector
 	position *vec2d.Vector
@@ -48,8 +51,24 @@ func (s *Sun) MoveSun(position *vec2d.Vector) {
 	s.target = position
 }
 
+// Generate sun's name out of user's initials and 3-digit random number
+func (s *Sun) generateName(nickname string) {
+	hash, _ := strconv.ParseInt(generateHash(nickname), 10, 64)
+	random := rand.New(rand.NewSource(hash))
+	initials := extractUsernameInitials(nickname)
+	number := random.Int31n(899) + 100 // we need a 3-digit number
+	s.Name = fmt.Sprintf("%s%v", initials, number)
+}
+
 func GenerateSun(username string, friends, others []Sun) *Sun {
-	newSun := Sun{username, 5, vec2d.New(0, 0), getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS)}
+	newSun := Sun{
+		Username: username,
+		Name:     "",
+		speed:    5,
+		target:   vec2d.New(0, 0),
+		position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
+	}
+	newSun.generateName(username)
 	targetposition := vec2d.New(0, 0)
 
 	for _, friend := range friends {

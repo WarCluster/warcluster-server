@@ -54,7 +54,7 @@ func TestEndMission(t *testing.T) {
 	endPlanet := new(Planet)
 	startTime := time.Now().UnixNano() * 1e6
 	*secondMission = Mission{Color{22, 22, 22}, []int{32, 64}, []int{2, 2}, "Attack", startTime, startTime, startTime, "chochko", 10}
-	*endPlanet = Planet{Color{22, 22, 22}, []int{2, 2}, false, 6, 3, startTime, 2, 0, "chochko"}
+	*endPlanet = Planet{"", Color{22, 22, 22}, []int{2, 2}, false, 6, 3, startTime, 2, 0, "chochko"}
 
 	t.Skip()
 	excessShips = EndMission(endPlanet, secondMission)
@@ -85,7 +85,7 @@ func TestEndMission(t *testing.T) {
 func TestEndMissionDenyTakeover(t *testing.T) {
 	var excessShips int
 	endPlanet := new(Planet)
-	*endPlanet= Planet{Color{22, 22, 22}, []int{2, 2}, true, 6, 3, timeStamp, 2, 0, "chochko"}
+	*endPlanet = Planet{"", Color{22, 22, 22}, []int{2, 2}, true, 6, 3, timeStamp, 2, 0, "chochko"}
 
 	excessShips = EndMission(endPlanet, &mission)
 	if endPlanet.GetShipCount() != 0 {

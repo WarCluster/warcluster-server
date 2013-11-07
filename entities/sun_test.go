@@ -36,7 +36,7 @@ func TestSunMarshalling(t *testing.T) {
 }
 
 func TestUpdateSun(t *testing.T) {
-	sun := Sun{"gophie", 4, vec2d.New(100, 100), vec2d.New(20, 20)}
+	sun := Sun{"gophie", "", 4, vec2d.New(100, 100), vec2d.New(20, 20)}
 	sun.Update()
 
 	if sun.position.X != 29.22842712474619 {
