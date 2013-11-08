@@ -43,7 +43,6 @@ func Construct(key string, data []byte) Entity {
 	case "sun":
 		sun := new(Sun)
 		json.Unmarshal(data, sun)
-		sun.position = ExtractSunKey(key)
 		return sun
 	}
 	return nil
@@ -51,15 +50,6 @@ func Construct(key string, data []byte) Entity {
 
 func generateHash(username string) string {
 	return simplifyHash(usernameHash(username))
-}
-
-func ExtractSunKey(key string) *vec2d.Vector {
-	paramsRaw := strings.Split(key, ".")[1]
-	params := strings.Split(paramsRaw, "_")
-	sunCoords_0, _ := strconv.ParseFloat(params[0], 64)
-	sunCoords_1, _ := strconv.ParseFloat(params[1], 64)
-	coords := vec2d.New(sunCoords_0, sunCoords_1)
-	return coords
 }
 
 func usernameHash(username string) []byte {

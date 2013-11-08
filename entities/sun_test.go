@@ -19,7 +19,6 @@ func TestSunMarshalling(t *testing.T) {
 	if err != nil {
 		t.Error("Sun unmarshaling failed:", err)
 	}
-	uSun.position = ExtractSunKey(sun.GetKey())
 
 	if sun.GetKey() != uSun.GetKey() {
 		t.Error(
@@ -37,9 +36,9 @@ func TestSunMarshalling(t *testing.T) {
 
 func TestUpdateSun(t *testing.T) {
 	sun := Sun{"gophie", "", 4, vec2d.New(100, 100), vec2d.New(20, 20)}
-	sun.Update()
+	sun.update()
 
-	if sun.position.X != 29.22842712474619 {
-		t.Error("Suns's position is wrong: ", sun.position.X)
+	if sun.Position.X != 29.22842712474619 {
+		t.Error("Suns's position is wrong: ", sun.Position.X)
 	}
 }

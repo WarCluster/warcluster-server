@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"github.com/Vladimiroff/vec2d"
 	"reflect"
 	"testing"
 	"time"
@@ -10,8 +11,9 @@ import (
 func TestCreateMission(t *testing.T) {
 	startTime := time.Now()
 	planetStart := Planet{
+		Name:                "GOP5610",
 		Color:               Color{22, 22, 22},
-		Coords:              []int{271, 203},
+		Position:            vec2d.New(271, 203),
 		IsHome:              true,
 		Texture:             3,
 		Size:                1,
@@ -21,8 +23,9 @@ func TestCreateMission(t *testing.T) {
 		Owner:               "gophie",
 	}
 	planetEnd := Planet{
+		Name:                "GOP5611",
 		Color:               Color{22, 22, 22},
-		Coords:              []int{471, 403},
+		Position:            vec2d.New(471, 403),
 		IsHome:              false,
 		Texture:             3,
 		Size:                1,
@@ -45,12 +48,12 @@ func TestCreateMission(t *testing.T) {
 	planetStart.ShipCount = 100
 	invalidMission := player.StartMission(&planetStart, &planetEnd, 120, "Attack")
 
-	if validMission.Source[0] != 271 || validMission.Source[1] != 203 {
+	if validMission.Source != "GOP5610" {
 		t.Error(validMission.Source)
 		t.Error("Planet planet.271_203 was expected as start planet!")
 	}
 
-	if validMission.Target[0] != 471 || validMission.Target[1] != 403 {
+	if validMission.Target != "GOP5611" {
 		t.Error(validMission.Target)
 		t.Error("Planet planet.471_403 was expected as end planet!")
 	}

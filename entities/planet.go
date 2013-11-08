@@ -3,6 +3,7 @@ package entities
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Vladimiroff/vec2d"
 	"math"
 	"time"
 )
@@ -10,7 +11,7 @@ import (
 type Planet struct {
 	Name                string
 	Color               Color
-	Coords              []int
+	Position            *vec2d.Vector
 	IsHome              bool
 	Texture             int
 	Size                int
@@ -20,14 +21,15 @@ type Planet struct {
 	Owner               string
 }
 
-type marshalHook Planet
+// This type is used as a proxy type while marshaling Planet
+type planetMarshalHook Planet
 
 func (p *Planet) String() string {
-	return fmt.Sprintf("Planet[%s, %s]", p.Coords[0], p.Coords[1])
+	return fmt.Sprintf("Planet %s", p.Name)
 }
 
 func (p *Planet) GetKey() string {
-	return fmt.Sprintf("planet.%d_%d", p.Coords[0], p.Coords[1])
+	return fmt.Sprintf("planet.%s", p.Name)
 }
 
 func (p *Planet) HasOwner() bool {
@@ -77,19 +79,27 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	planetRadius := float64(PLANETS_PLANET_RADIUS)
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
-		planetInCreation := Planet{"", Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
+		planet := Planet{
+			Name:                "",
+			Color:               Color{200, 180, 140},
+			Position:            new(vec2d.Vector),
+			IsHome:              false,
+			Texture:             0,
+			Size:                0,
+			LastShipCountUpdate: time.Now().Unix(),
+			ShipCount:           10,
+			MaxShipCount:        0,
+			Owner:               "",
+		}
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
-		planetInCreation.Coords[0] = int(float64(sun.GetPosition().X) + ringOffset*math.Cos(
-			hashElement(4*ix+1)*40))
-		planetInCreation.Coords[1] = int(float64(sun.GetPosition().Y) + ringOffset*math.Sin(
-			hashElement(4*ix+1)*40))
-
-		planetInCreation.Name = fmt.Sprintf("%s%v", sun.Name, ix)
-		planetInCreation.Texture = int(hashElement(4*ix + 2))
-		planetInCreation.Size = 1 + int(hashElement(4*ix+3))
-		planetInCreation.LastShipCountUpdate = time.Now().Unix()
-		result = append(result, &planetInCreation)
+		planet.Name = fmt.Sprintf("%s%v", sun.Name, ix)
+		planet.Position.X = math.Floor(sun.Position.X + ringOffset*math.Cos(hashElement(4*ix+1)*40))
+		planet.Position.Y = math.Floor(sun.Position.Y + ringOffset*math.Sin(hashElement(4*ix+1)*40))
+		planet.Texture = int(hashElement(4*ix + 2))
+		planet.Size = 1 + int(hashElement(4*ix+3))
+		planet.LastShipCountUpdate = time.Now().Unix()
+		result = append(result, &planet)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
 	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))

@@ -1,9 +1,11 @@
 package response
 
+import "github.com/Vladimiroff/vec2d"
+
 type LoginSuccess struct {
 	baseResponse
 	Username string
-	Position []int
+	Position *vec2d.Vector
 }
 
 type LoginFailed struct {

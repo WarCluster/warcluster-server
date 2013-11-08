@@ -10,29 +10,29 @@ import (
 
 func TestGeneratePlanets(t *testing.T) {
 	expectedPlanets := []Planet{
-		Planet{"", Color{22, 22, 22}, []int{-76, 57}, false, 6, 3, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{1470, 300}, false, 8, 5, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{-689, -200}, false, 3, 1, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{-1051, 648}, false, 2, 8, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{1428, -1363}, false, 3, 1, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{2735, 300}, false, 6, 8, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{2818, -798}, false, 9, 6, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{-322, 3080}, false, 5, 4, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{1547, 3339}, false, 1, 1, timeStamp, 10, 0, "gophie"},
-		Planet{"", Color{22, 22, 22}, []int{-2744, -1065}, false, 4, 6, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-77, 57), false, 6, 3, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(1470, 300), false, 8, 5, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-690, -201), false, 3, 1, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-1052, 648), false, 2, 8, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(1428, -1364), false, 3, 1, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(2735, 300), false, 6, 8, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(2818, -799), false, 9, 6, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-323, 3080), false, 5, 4, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(1547, 3339), false, 1, 1, timeStamp, 10, 0, "gophie"},
+		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-2745, -1066), false, 4, 6, timeStamp, 10, 0, "gophie"},
 	}
-	sun.position = vec2d.New(500, 300)
+	sun.Position = vec2d.New(500, 300)
 	generatedPlanets, _ := GeneratePlanets("gophie", &sun)
 
 	if len(generatedPlanets) != 10 {
 		t.Error("Wrong planets count")
 	}
 	for i := 0; i < 10; i++ {
-		if generatedPlanets[i].Coords[0] != expectedPlanets[i].Coords[0] {
-			t.Error("X coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Coords[0], "Actual ", generatedPlanets[i].Coords[0])
+		if generatedPlanets[i].Position.X != expectedPlanets[i].Position.X {
+			t.Error("X coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Position.X, "Actual ", generatedPlanets[i].Position.X)
 		}
-		if generatedPlanets[i].Coords[1] != expectedPlanets[i].Coords[1] {
-			t.Error("Y coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Coords[1], "Actual ", generatedPlanets[i].Coords[1])
+		if generatedPlanets[i].Position.Y != expectedPlanets[i].Position.Y {
+			t.Error("Y coordinate missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Position.Y, "Actual ", generatedPlanets[i].Position.Y)
 		}
 		if generatedPlanets[i].Texture != expectedPlanets[i].Texture {
 			t.Error("Ring offset missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Texture, "Actual ", generatedPlanets[i].Texture)

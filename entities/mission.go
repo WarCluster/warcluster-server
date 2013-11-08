@@ -1,22 +1,19 @@
 package entities
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
-	"time"
 )
 
 type Mission struct {
-	Color       Color
-	Source      []int
-	Target      []int
-	Type        string
-	CurrentTime int64
-	StartTime   int64
-	TravelTime  int64
-	Player      string
-	ShipCount   int
+	Color      Color
+	Source     string
+	Target     string
+	Type       string
+	StartTime  int64
+	TravelTime int64
+	Player     string
+	ShipCount  int
 }
 
 func (m *Mission) String() string {
@@ -24,28 +21,16 @@ func (m *Mission) String() string {
 }
 
 func (m *Mission) GetKey() string {
-	return fmt.Sprintf(
-		"mission.%d_%d_%d",
-		m.StartTime,
-		m.Source[0],
-		m.Source[1],
-	)
+	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
 }
 
-func (m *Mission) GetSpeed() int {
+func (m *Mission) GetSpeed() int64 {
 	return 10
 }
 
-func (m *Mission) MarshalJSON() ([]byte, error) {
-	m.CurrentTime = time.Now().UnixNano() / 1e6
-	return json.Marshal((*missionMarshalHook)(m))
-}
-
-func (m *Mission) CalculateTravelTime() {
-	startVector := vec2d.New(float64(m.Source[0]), float64(m.Source[1]))
-	endVector := vec2d.New(float64(m.Target[0]), float64(m.Target[1]))
-	distance := vec2d.GetDistance(endVector, startVector)
-	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
+func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {
+	distance := vec2d.GetDistance(source, target)
+	return int64(distance / float64(speed) * 100)
 }
 
 func EndMission(target *Planet, missionInfo *Mission) (excessShips int) {
