@@ -30,7 +30,7 @@ var (
 		Owner:               "gophie",
 	}
 	player Player = Player{
-		username:       "gophie",
+		Username:       "gophie",
 		Color:          Color{22, 22, 22},
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.271_203",

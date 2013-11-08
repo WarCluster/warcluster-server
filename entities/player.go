@@ -6,7 +6,7 @@ import (
 )
 
 type Player struct {
-	username       string
+	Username       string
 	Color          Color
 	TwitterID      string
 	HomePlanet     string
@@ -14,12 +14,8 @@ type Player struct {
 	ScreenPosition []int
 }
 
-func (p *Player) Username() string {
-	return p.username
-}
-
 func (p *Player) Key() string {
-	return fmt.Sprintf("player.%s", p.username)
+	return fmt.Sprintf("player.%s", p.Username)
 }
 
 func (p *Player) StartMission(source *Planet, target *Planet, fleet int, missionType string) *Mission {
@@ -39,7 +35,7 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 		Target:    target.Name,
 		Type:      missionType,
 		StartTime: currentTime,
-		Player:    p.username,
+		Player:    p.Username,
 		ShipCount: shipCount,
 	}
 	mission.TravelTime = calculateTravelTime(source.Position, target.Position, mission.GetSpeed())

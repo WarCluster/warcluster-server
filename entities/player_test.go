@@ -35,7 +35,7 @@ func TestCreateMission(t *testing.T) {
 		Owner:               "gophie",
 	}
 	player := Player{
-		username:       "gophie",
+		Username:       "gophie",
 		Color:          Color{22, 22, 22},
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.271_203",
@@ -81,7 +81,7 @@ func TestPlayerMarshalling(t *testing.T) {
 	if err != nil {
 		t.Error("Player unmarshaling failed:", err)
 	}
-	uPlayer.username = player.username
+	uPlayer.Username = player.Username
 
 	if player.Key() != uPlayer.Key() {
 		t.Error(

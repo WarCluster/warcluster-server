@@ -26,7 +26,6 @@ func Construct(key string, data []byte) Entity {
 	case "player":
 		player := new(Player)
 		json.Unmarshal(data, player)
-		player.username = strings.Split(key, "player.")[1]
 		return player
 	case "planet":
 		planet := new(Planet)
