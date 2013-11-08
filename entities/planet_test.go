@@ -21,7 +21,7 @@ func TestGeneratePlanets(t *testing.T) {
 		Planet{"", Color{22, 22, 22}, []int{1547, 3339}, false, 1, 1, timeStamp, 10, 0, "gophie"},
 		Planet{"", Color{22, 22, 22}, []int{-2744, -1065}, false, 4, 6, timeStamp, 10, 0, "gophie"},
 	}
-	sun.position = vec2d.New(500, 300)
+	sun.Position = vec2d.New(500, 300)
 	generatedPlanets, _ := GeneratePlanets("gophie", &sun)
 
 	if len(generatedPlanets) != 10 {

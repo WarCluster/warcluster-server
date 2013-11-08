@@ -80,9 +80,9 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		planetInCreation := Planet{"", Color{200, 180, 140}, []int{0, 0}, false, 0, 0, time.Now().Unix(), 10, 0, ""}
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
-		planetInCreation.Coords[0] = int(float64(sun.GetPosition().X) + ringOffset*math.Cos(
+		planetInCreation.Coords[0] = int(float64(sun.Position.X) + ringOffset*math.Cos(
 			hashElement(4*ix+1)*40))
-		planetInCreation.Coords[1] = int(float64(sun.GetPosition().Y) + ringOffset*math.Sin(
+		planetInCreation.Coords[1] = int(float64(sun.Position.Y) + ringOffset*math.Sin(
 			hashElement(4*ix+1)*40))
 
 		planetInCreation.Name = fmt.Sprintf("%s%v", sun.Name, ix)

@@ -19,6 +19,7 @@ var (
 		ShipCount:   5,
 	}
 	planet Planet = Planet{
+		Name:                "ABC1234",
 		Color:               Color{22, 22, 22},
 		Coords:              []int{271, 203},
 		IsHome:              false,
@@ -38,7 +39,8 @@ var (
 		ScreenPosition: []int{2, 2},
 	}
 	sun Sun = Sun{
+		Name:     "ABC123",
 		Username: "gophie",
-		position: vec2d.New(20, 20),
+		Position: vec2d.New(20, 20),
 	}
 )

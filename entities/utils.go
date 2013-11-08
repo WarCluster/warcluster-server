@@ -43,7 +43,6 @@ func Construct(key string, data []byte) Entity {
 	case "sun":
 		sun := new(Sun)
 		json.Unmarshal(data, sun)
-		sun.position = ExtractSunKey(key)
 		return sun
 	}
 	return nil
