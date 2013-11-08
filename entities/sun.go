@@ -41,10 +41,6 @@ func (s *Sun) collider(staticSun *Sun) {
 	}
 }
 
-func (s *Sun) MoveSun(position *vec2d.Vector) {
-	s.target = position
-}
-
 // Generate sun's name out of user's initials and 3-digit random number
 func (s *Sun) generateName(nickname string) {
 	hash, _ := strconv.ParseInt(generateHash(nickname), 10, 64)
