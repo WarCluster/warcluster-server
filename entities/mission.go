@@ -6,14 +6,14 @@ import (
 )
 
 type Mission struct {
-	Color       Color
-	Source      string
-	Target      string
-	Type        string
-	StartTime   int64
-	TravelTime  int64
-	Player      string
-	ShipCount   int
+	Color      Color
+	Source     string
+	Target     string
+	Type       string
+	StartTime  int64
+	TravelTime int64
+	Player     string
+	ShipCount  int
 }
 
 func (m *Mission) String() string {

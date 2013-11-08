@@ -8,14 +8,14 @@ import (
 var (
 	timeStamp int64   = time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission   Mission = Mission{
-		Color:       Color{22, 22, 22},
-		Source:      "GOP5610",
-		Target:      "GOP5611",
-		Type:        "Attack",
-		StartTime:   timeStamp,
-		TravelTime:  timeStamp,
-		Player:      "gophie",
-		ShipCount:   5,
+		Color:      Color{22, 22, 22},
+		Source:     "GOP5610",
+		Target:     "GOP5611",
+		Type:       "Attack",
+		StartTime:  timeStamp,
+		TravelTime: timeStamp,
+		Player:     "gophie",
+		ShipCount:  5,
 	}
 	planet Planet = Planet{
 		Name:                "GOP5610",

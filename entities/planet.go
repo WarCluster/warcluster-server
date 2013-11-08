@@ -21,7 +21,8 @@ type Planet struct {
 	Owner               string
 }
 
-type marshalHook Planet
+// This type is used as a proxy type while marshaling Planet
+type planetMarshalHook Planet
 
 func (p *Planet) String() string {
 	return fmt.Sprintf("Planet %s", p.Name)

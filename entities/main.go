@@ -21,12 +21,6 @@ type Entity interface {
 	String() string
 }
 
-// This type is used as a proxy type while marshaling Mission
-type missionMarshalHook Mission
-
-// This type is used as a proxy type while marshaling Planet
-type planetMarshalHook Planet
-
 // Finds records in the database, by given key
 // All Redis wildcards are allowed.
 func Find(query string) []Entity {
