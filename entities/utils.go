@@ -52,15 +52,6 @@ func generateHash(username string) string {
 	return simplifyHash(usernameHash(username))
 }
 
-func ExtractSunKey(key string) *vec2d.Vector {
-	paramsRaw := strings.Split(key, ".")[1]
-	params := strings.Split(paramsRaw, "_")
-	sunCoords_0, _ := strconv.ParseFloat(params[0], 64)
-	sunCoords_1, _ := strconv.ParseFloat(params[1], 64)
-	coords := vec2d.New(sunCoords_0, sunCoords_1)
-	return coords
-}
-
 func usernameHash(username string) []byte {
 	hash := sha512.New()
 	io.WriteString(hash, username)

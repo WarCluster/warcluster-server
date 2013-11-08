@@ -18,11 +18,11 @@ type Sun struct {
 }
 
 func (s *Sun) GetKey() string {
-	return fmt.Sprintf("sun.%v_%v", int64(s.Position.X), int64(s.Position.Y))
+	return fmt.Sprintf("sun.%s", s.Name)
 }
 
 func (s *Sun) String() string {
-	return fmt.Sprintf("Sun[%v, %v]", int64(s.Position.X), int64(s.Position.Y))
+	return fmt.Sprintf("Sun %s", s.Name)
 }
 
 func (s *Sun) Update() {

@@ -19,7 +19,6 @@ func TestSunMarshalling(t *testing.T) {
 	if err != nil {
 		t.Error("Sun unmarshaling failed:", err)
 	}
-	uSun.Position = ExtractSunKey(sun.GetKey())
 
 	if sun.GetKey() != uSun.GetKey() {
 		t.Error(
