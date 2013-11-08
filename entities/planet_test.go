@@ -56,12 +56,12 @@ func TestPlanetMarshalling(t *testing.T) {
 		t.Error("Planet unmarshaling failed:", err)
 	}
 
-	if planet.GetKey() != uPlanet.GetKey() {
+	if planet.Key() != uPlanet.Key() {
 		t.Error(
 			"Keys of both planets are different!\n",
-			planet.GetKey(),
+			planet.Key(),
 			"!=",
-			uPlanet.GetKey(),
+			uPlanet.Key(),
 		)
 	}
 

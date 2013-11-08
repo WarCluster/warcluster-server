@@ -83,12 +83,12 @@ func TestPlayerMarshalling(t *testing.T) {
 	}
 	uPlayer.username = player.username
 
-	if player.GetKey() != uPlayer.GetKey() {
+	if player.Key() != uPlayer.Key() {
 		t.Error(
 			"Keys of both players are different!\n",
-			player.GetKey(),
+			player.Key(),
 			"!=",
-			uPlayer.GetKey(),
+			uPlayer.Key(),
 		)
 	}
 

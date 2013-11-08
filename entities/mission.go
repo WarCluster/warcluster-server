@@ -17,10 +17,10 @@ type Mission struct {
 }
 
 func (m *Mission) String() string {
-	return m.GetKey()
+	return m.Key()
 }
 
-func (m *Mission) GetKey() string {
+func (m *Mission) Key() string {
 	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
 }
 

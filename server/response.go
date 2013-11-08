@@ -46,7 +46,7 @@ func scopeOfView(request *Request) error {
 		result := make(map[string]entities.Entity)
 		entities := entities.Find(query)
 		for _, entity := range entities {
-			result[entity.GetKey()] = entity
+			result[entity.Key()] = entity
 		}
 		return result
 	}
@@ -105,7 +105,7 @@ func parseAction(request *Request) error {
 
 	stateChange := response.NewStateChange()
 	stateChange.Planets = map[string]entities.Entity{
-		source.GetKey(): source,
+		source.Key(): source,
 	}
 	return response.Send(stateChange, sessions.Broadcast)
 }

@@ -8,14 +8,14 @@ import (
 	"time"
 )
 
-func TestMissionGetKey(t *testing.T) {
+func TestMissionKey(t *testing.T) {
 	startTime := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission := new(Mission)
 	mission.Source = "GOP5610"
 	mission.StartTime = startTime
 
-	if mission.GetKey() != "mission.1352588400000_GOP5610" {
-		t.Error("Mission's key is ", mission.GetKey())
+	if mission.Key() != "mission.1352588400000_GOP5610" {
+		t.Error("Mission's key is ", mission.Key())
 	}
 }
 
@@ -32,12 +32,12 @@ func TestMissionMarshalling(t *testing.T) {
 		t.Error("Mission unmarshaling failed:", err)
 	}
 
-	if mission.GetKey() != uMission.GetKey() {
+	if mission.Key() != uMission.Key() {
 		t.Error(
 			"Keys of both missions are different!\n",
-			mission.GetKey(),
+			mission.Key(),
 			"!=",
-			uMission.GetKey(),
+			uMission.Key(),
 		)
 	}
 

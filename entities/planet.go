@@ -28,7 +28,7 @@ func (p *Planet) String() string {
 	return fmt.Sprintf("Planet %s", p.Name)
 }
 
-func (p *Planet) GetKey() string {
+func (p *Planet) Key() string {
 	return fmt.Sprintf("planet.%s", p.Name)
 }
 

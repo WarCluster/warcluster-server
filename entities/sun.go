@@ -15,7 +15,7 @@ type Sun struct {
 	Position *vec2d.Vector
 }
 
-func (s *Sun) GetKey() string {
+func (s *Sun) Key() string {
 	return fmt.Sprintf("sun.%s", s.Name)
 }
 

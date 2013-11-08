@@ -28,11 +28,11 @@ func StartMissionary(mission *entities.Mission) {
 
 	stateChange := response.NewStateChange()
 	stateChange.Planets = map[string]entities.Entity{
-		target.GetKey(): target,
+		target.Key(): target,
 	}
 	response.Send(stateChange, sessions.Broadcast)
 
-	entities.Delete(mission.GetKey())
+	entities.Delete(mission.Key())
 
 	if excessShips > 0 {
 		startExcessMission(mission, target, excessShips)

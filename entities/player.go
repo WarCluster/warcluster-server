@@ -22,7 +22,7 @@ func (p *Player) Username() string {
 	return p.username
 }
 
-func (p *Player) GetKey() string {
+func (p *Player) Key() string {
 	return fmt.Sprintf("player.%s", p.username)
 }
 
@@ -61,7 +61,7 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	}
 
 	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
-	player := Player{username, color, TwitterID, HomePlanet.GetKey(), []int{0, 0}, []int{0, 0}}
+	player := Player{username, color, TwitterID, HomePlanet.Key(), []int{0, 0}, []int{0, 0}}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
 	return &player

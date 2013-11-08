@@ -20,12 +20,12 @@ func TestSunMarshalling(t *testing.T) {
 		t.Error("Sun unmarshaling failed:", err)
 	}
 
-	if sun.GetKey() != uSun.GetKey() {
+	if sun.Key() != uSun.Key() {
 		t.Error(
 			"Keys of both sun are different!\n",
-			sun.GetKey(),
+			sun.Key(),
 			"!=",
-			uSun.GetKey(),
+			uSun.Key(),
 		)
 	}
 

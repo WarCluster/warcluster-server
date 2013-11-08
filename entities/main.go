@@ -17,7 +17,7 @@ const (
 )
 
 type Entity interface {
-	GetKey() string
+	Key() string
 	String() string
 }
 
@@ -49,14 +49,14 @@ func Get(key string) (Entity, error) {
 	return Construct(key, record), nil
 }
 
-// Saves an entity to the database. Records' key is entity.GetKey()
+// Saves an entity to the database. Records' key is entity.Key()
 // If there is a record with such key in the database, simply updates
 // the record. Otherwise creates a new one.
 //
 // Failed marshaling of the given entity is pretty much the only
 // point of failure in this function... I supose.
 func Save(entity Entity) error {
-	key := entity.GetKey()
+	key := entity.Key()
 	value, err := json.Marshal(entity)
 	if err != nil {
 		return err
