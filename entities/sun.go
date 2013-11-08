@@ -31,7 +31,7 @@ func (s *Sun) update() {
 	}
 }
 
-func (s *Sun) Collider(staticSun *Sun) {
+func (s *Sun) collider(staticSun *Sun) {
 	distance := vec2d.GetDistance(s.Position, staticSun.Position)
 	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
 		overlap := SUNS_SOLAR_SYSTEM_RADIUS - distance
@@ -79,7 +79,7 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 		oldPos = newSun.Position
 		newSun.update()
 		for _, sunEntity := range append(friends, others...) {
-			newSun.Collider(&sunEntity)
+			newSun.collider(&sunEntity)
 		}
 
 		if int64(newSun.Position.X) == int64(oldPos.X) && int64(newSun.Position.Y) == int64(oldPos.Y) {
