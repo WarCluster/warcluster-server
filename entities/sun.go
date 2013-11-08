@@ -7,8 +7,6 @@ import (
 	"strconv"
 )
 
-var sunCounter = []int{0, 0}
-
 type Sun struct {
 	Username string
 	Name     string
