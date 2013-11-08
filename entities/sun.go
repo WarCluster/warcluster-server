@@ -44,7 +44,7 @@ func (s *Sun) collider(staticSun *Sun) {
 
 // Generate sun's name out of user's initials and 3-digit random number
 func (s *Sun) generateName(nickname string) {
-	hash, _ := strconv.ParseInt(generateHash(nickname), 10, 64)
+	hash, _ := strconv.ParseInt(generateHash(nickname)[0:18], 10, 64)
 	random := rand.New(rand.NewSource(hash))
 	initials := extractUsernameInitials(nickname)
 	number := random.Int31n(899) + 100 // we need a 3-digit number
