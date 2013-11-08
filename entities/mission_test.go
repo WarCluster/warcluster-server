@@ -32,8 +32,6 @@ func TestMissionMarshalling(t *testing.T) {
 		t.Error("Mission unmarshaling failed:", err)
 	}
 
-	uMission.CurrentTime = timeStamp
-
 	if mission.GetKey() != uMission.GetKey() {
 		t.Error(
 			"Keys of both missions are different!\n",
@@ -54,7 +52,7 @@ func TestEndMission(t *testing.T) {
 	secondMission := new(Mission)
 	endPlanet := new(Planet)
 	startTime := time.Now().UnixNano() * 1e6
-	*secondMission = Mission{Color{22, 22, 22}, "GOP5610", "GOP5611", "Attack", startTime, startTime, startTime, "chochko", 10}
+	*secondMission = Mission{Color{22, 22, 22}, "GOP5610", "GOP5611", "Attack", startTime, startTime, "chochko", 10}
 	*endPlanet = Planet{"", Color{22, 22, 22}, vec2d.New(2, 2), false, 6, 3, startTime, 2, 0, "chochko"}
 
 	t.Skip()

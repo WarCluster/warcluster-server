@@ -42,7 +42,6 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 		Source:      source.Name,
 		Target:      target.Name,
 		Type:        missionType,
-		CurrentTime: currentTime,
 		StartTime:   currentTime,
 		Player:      p.username,
 		ShipCount:   shipCount,

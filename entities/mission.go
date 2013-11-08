@@ -1,10 +1,8 @@
 package entities
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
-	"time"
 )
 
 type Mission struct {
@@ -12,7 +10,6 @@ type Mission struct {
 	Source      string
 	Target      string
 	Type        string
-	CurrentTime int64
 	StartTime   int64
 	TravelTime  int64
 	Player      string
@@ -29,11 +26,6 @@ func (m *Mission) GetKey() string {
 
 func (m *Mission) GetSpeed() int64 {
 	return 10
-}
-
-func (m *Mission) MarshalJSON() ([]byte, error) {
-	m.CurrentTime = time.Now().UnixNano() / 1e6
-	return json.Marshal((*missionMarshalHook)(m))
 }
 
 func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {

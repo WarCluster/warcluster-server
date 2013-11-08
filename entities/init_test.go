@@ -12,7 +12,6 @@ var (
 		Source:      "GOP5610",
 		Target:      "GOP5611",
 		Type:        "Attack",
-		CurrentTime: timeStamp,
 		StartTime:   timeStamp,
 		TravelTime:  timeStamp,
 		Player:      "gophie",
