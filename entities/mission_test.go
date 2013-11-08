@@ -90,11 +90,11 @@ func TestEndMissionDenyTakeover(t *testing.T) {
 
 	excessShips = EndMission(endPlanet, &mission)
 	if endPlanet.GetShipCount() != 0 {
-		t.Error("End Planet ship count was expected  to be 0 but it is:", endPlanet.GetShipCount())
+		t.Error("End Planet ship count was expected to be 0 but it is:", endPlanet.GetShipCount())
 	}
 
 	if endPlanet.Owner != "chochko" {
-		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
+		t.Error("End Planet owner was expected to be chochko but is:", endPlanet.Owner)
 	}
 
 	if excessShips != 5 {
@@ -103,10 +103,18 @@ func TestEndMissionDenyTakeover(t *testing.T) {
 }
 
 func TestTravelTime(t *testing.T) {
-	mission.CalculateTravelTime()
-	var expectedTravel int64 = 7017
+	source := vec2d.New(100, 200)
+	target := vec2d.New(800, 150)
+	expectedTime := int64(7017)
+	time := calculateTravelTime(source, target, 10)
 
-	if mission.TravelTime != expectedTravel {
-		t.Error("Wrong arrival time:", mission.TravelTime, "instead of:", expectedTravel)
+	if time != expectedTime {
+		t.Errorf(
+			"CalculateTravelTime(%v, %v, 10) = %d instead of %d",
+			source,
+			target,
+			time,
+			expectedTime,
+		)
 	}
 }

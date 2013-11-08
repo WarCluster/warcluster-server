@@ -27,7 +27,7 @@ func (m *Mission) GetKey() string {
 	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
 }
 
-func (m *Mission) GetSpeed() int {
+func (m *Mission) GetSpeed() int64 {
 	return 10
 }
 
@@ -36,11 +36,9 @@ func (m *Mission) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*missionMarshalHook)(m))
 }
 
-func (m *Mission) CalculateTravelTime() {
-	startVector := vec2d.New(float64(m.Source[0]), float64(m.Source[1]))
-	endVector := vec2d.New(float64(m.Target[0]), float64(m.Target[1]))
-	distance := vec2d.GetDistance(endVector, startVector)
-	m.TravelTime = int64(distance / float64(m.GetSpeed()) * 100)
+func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {
+	distance := vec2d.GetDistance(source, target)
+	return int64(distance / float64(speed) * 100)
 }
 
 func EndMission(target *Planet, missionInfo *Mission) (excessShips int) {
