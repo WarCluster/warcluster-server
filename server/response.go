@@ -78,7 +78,7 @@ func parseAction(request *Request) error {
 		return errors.New("End planet does not exist")
 	}
 
-	if source.(*entities.Planet).Owner != request.Client.Player.String() {
+	if source.(*entities.Planet).Owner != request.Client.Player.Username() {
 		return errors.New("This is not your home!")
 	}
 
