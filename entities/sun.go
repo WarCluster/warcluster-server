@@ -28,7 +28,7 @@ func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
 	if int(direction.Length()) >= s.speed {
 		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
-		s.Position = vec2d.New(math.Floor(s.Position.X+direction.X), math.Floor(s.Position.Y+direction.Y))
+		s.Position = vec2d.New(s.Position.X+direction.X, s.Position.Y+direction.Y)
 	}
 }
 
@@ -83,6 +83,9 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 			noChange = true
 		}
 	}
+
+	newSun.Position.X = math.Floor(newSun.Position.X)
+	newSun.Position.Y = math.Floor(newSun.Position.Y)
 	return &newSun
 	//Base player placement on worker movement from BotWars
 }

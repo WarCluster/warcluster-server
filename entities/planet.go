@@ -80,12 +80,12 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
 		planet := Planet{
-			Color:               Color{200, 180, 140},
-			Position:            new(vec2d.Vector),
-			IsHome:              false,
-			ShipCount:           10,
-			MaxShipCount:        0,
-			Owner:               "",
+			Color:        Color{200, 180, 140},
+			Position:     new(vec2d.Vector),
+			IsHome:       false,
+			ShipCount:    10,
+			MaxShipCount: 0,
+			Owner:        "",
 		}
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
