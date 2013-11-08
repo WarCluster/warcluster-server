@@ -9,8 +9,8 @@ var (
 	timeStamp int64   = time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission   Mission = Mission{
 		Color:       Color{22, 22, 22},
-		Source:      []int{100, 200},
-		Target:      []int{800, 150},
+		Source:      "GOP5610",
+		Target:      "GOP5611",
 		Type:        "Attack",
 		CurrentTime: timeStamp,
 		StartTime:   timeStamp,
@@ -19,9 +19,9 @@ var (
 		ShipCount:   5,
 	}
 	planet Planet = Planet{
-		Name:                "ABC1234",
+		Name:                "GOP5610",
 		Color:               Color{22, 22, 22},
-		Coords:              []int{271, 203},
+		Position:            vec2d.New(271, 203),
 		IsHome:              false,
 		Texture:             3,
 		Size:                1,
@@ -39,7 +39,7 @@ var (
 		ScreenPosition: []int{2, 2},
 	}
 	sun Sun = Sun{
-		Name:     "ABC123",
+		Name:     "GOP561",
 		Username: "gophie",
 		Position: vec2d.New(20, 20),
 	}

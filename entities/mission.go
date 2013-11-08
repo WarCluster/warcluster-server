@@ -9,8 +9,8 @@ import (
 
 type Mission struct {
 	Color       Color
-	Source      []int
-	Target      []int
+	Source      string
+	Target      string
 	Type        string
 	CurrentTime int64
 	StartTime   int64
@@ -24,12 +24,7 @@ func (m *Mission) String() string {
 }
 
 func (m *Mission) GetKey() string {
-	return fmt.Sprintf(
-		"mission.%d_%d_%d",
-		m.StartTime,
-		m.Source[0],
-		m.Source[1],
-	)
+	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
 }
 
 func (m *Mission) GetSpeed() int {
