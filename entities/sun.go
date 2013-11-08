@@ -25,7 +25,7 @@ func (s *Sun) String() string {
 	return fmt.Sprintf("Sun %s", s.Name)
 }
 
-func (s *Sun) Update() {
+func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
 	if int(direction.Length()) >= s.speed {
 		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
@@ -79,7 +79,7 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 	var oldPos *vec2d.Vector
 	for noChange != true {
 		oldPos = newSun.Position
-		newSun.Update()
+		newSun.update()
 		for _, sunEntity := range append(friends, others...) {
 			newSun.Collider(&sunEntity)
 		}
