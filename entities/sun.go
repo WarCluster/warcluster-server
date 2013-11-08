@@ -3,6 +3,7 @@ package entities
 import (
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"math"
 	"math/rand"
 	"strconv"
 )
@@ -27,7 +28,7 @@ func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
 	if int(direction.Length()) >= s.speed {
 		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
-		s.Position = vec2d.New(float64(s.Position.X+direction.X), float64(s.Position.Y+direction.Y))
+		s.Position = vec2d.New(math.Floor(s.Position.X+direction.X), math.Floor(s.Position.Y+direction.Y))
 	}
 }
 

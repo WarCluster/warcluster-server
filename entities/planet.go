@@ -80,13 +80,9 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
 		planet := Planet{
-			Name:                "",
 			Color:               Color{200, 180, 140},
 			Position:            new(vec2d.Vector),
 			IsHome:              false,
-			Texture:             0,
-			Size:                0,
-			LastShipCountUpdate: time.Now().Unix(),
 			ShipCount:           10,
 			MaxShipCount:        0,
 			Owner:               "",
