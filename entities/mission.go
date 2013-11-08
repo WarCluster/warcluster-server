@@ -16,10 +16,6 @@ type Mission struct {
 	ShipCount  int
 }
 
-func (m *Mission) String() string {
-	return m.Key()
-}
-
 func (m *Mission) Key() string {
 	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
 }

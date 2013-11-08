@@ -24,10 +24,6 @@ type Planet struct {
 // This type is used as a proxy type while marshaling Planet
 type planetMarshalHook Planet
 
-func (p *Planet) String() string {
-	return fmt.Sprintf("Planet %s", p.Name)
-}
-
 func (p *Planet) Key() string {
 	return fmt.Sprintf("planet.%s", p.Name)
 }

@@ -18,7 +18,6 @@ const (
 
 type Entity interface {
 	Key() string
-	String() string
 }
 
 // Finds records in the database, by given key

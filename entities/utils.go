@@ -19,10 +19,6 @@ type Color struct {
 	B int
 }
 
-func (c *Color) String() string {
-	return fmt.Sprintf("Color[%s, %s, %s]", c.R, c.G, c.B)
-}
-
 func Construct(key string, data []byte) Entity {
 	entityType := strings.Split(key, ".")[0]
 

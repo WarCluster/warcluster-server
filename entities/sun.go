@@ -20,10 +20,6 @@ func (s *Sun) Key() string {
 	return fmt.Sprintf("sun.%s", s.Name)
 }
 
-func (s *Sun) String() string {
-	return fmt.Sprintf("Sun %s", s.Name)
-}
-
 func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
 	if int(direction.Length()) >= s.speed {

@@ -14,10 +14,6 @@ type Player struct {
 	ScreenPosition []int
 }
 
-func (p *Player) String() string {
-	return p.username
-}
-
 func (p *Player) Username() string {
 	return p.username
 }
