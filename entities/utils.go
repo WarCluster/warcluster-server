@@ -20,27 +20,23 @@ type Color struct {
 }
 
 func Construct(key string, data []byte) Entity {
+	var entity Entity
 	entityType := strings.Split(key, ".")[0]
 
 	switch entityType {
 	case "player":
-		player := new(Player)
-		json.Unmarshal(data, player)
-		return player
+		entity = new(Player)
 	case "planet":
-		planet := new(Planet)
-		json.Unmarshal(data, planet)
-		return planet
+		entity = new(Planet)
 	case "mission":
-		mission := new(Mission)
-		json.Unmarshal(data, mission)
-		return mission
+		entity = new(Mission)
 	case "sun":
-		sun := new(Sun)
-		json.Unmarshal(data, sun)
-		return sun
+		entity = new(Sun)
+	default:
+		return nil
 	}
-	return nil
+	json.Unmarshal(data, entity)
+	return entity
 }
 
 func generateHash(username string) string {
