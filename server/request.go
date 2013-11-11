@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"github.com/Vladimiroff/vec2d"
 	"log"
 )
 
@@ -18,7 +19,7 @@ type Request struct {
 	Client      *Client
 	Command     string
 	Type        string
-	Position    []int64
+	Position    *vec2d.Vector
 	Resolution  []uint16
 	StartPlanet string
 	EndPlanet   string
@@ -55,7 +56,7 @@ func ParseRequest(request *Request) (func(*Request) error, error) {
 			return nil, errors.New("Not enough arguments")
 		}
 	case "scope_of_view":
-		if len(request.Position) > 0 && len(request.Resolution) > 0 {
+		if request.Position != nil && len(request.Resolution) > 0 {
 			return scopeOfView, nil
 		} else {
 			return nil, errors.New("Not enough arguments")
