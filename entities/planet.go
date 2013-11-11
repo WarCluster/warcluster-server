@@ -58,12 +58,16 @@ func (p *Planet) SetShipCount(count int) {
 
 // Updates the ship count based on last time this count has
 // been updated and of course the planet size.
+// NOTE: If the planet is somebody's home we set a static increasion rate.
 func (p *Planet) UpdateShipCount() {
+	var timeModifier int64
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
-		timeModifier := int64(p.Size/3) + 1
-		//TODO: To be completed for all planet size types
-		//if getobject(Owner.getkey).gethomeplanet == p.getkey
+		if p.IsHome {
+			timeModifier = 4
+		} else {
+			timeModifier = int64(p.Size/3) + 1
+		}
 		p.ShipCount += int(passedTime / (timeModifier * 10))
 		p.LastShipCountUpdate = time.Now().Unix()
 	}
