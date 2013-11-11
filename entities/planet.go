@@ -64,9 +64,9 @@ func (p *Planet) UpdateShipCount() {
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
 		if p.IsHome {
-			timeModifier = 4
+			timeModifier = 2
 		} else {
-			timeModifier = int64(p.Size/3) + 1
+			timeModifier = 6 - int64(p.Size/3)
 		}
 		p.ShipCount += int32(passedTime / (timeModifier * 10))
 		p.LastShipCountUpdate = time.Now().Unix()
