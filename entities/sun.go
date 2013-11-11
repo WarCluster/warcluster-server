@@ -66,11 +66,9 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 	targetPosition := vec2d.New(0, 0)
 
 	for _, friend := range friends {
-		targetPosition.X += friend.Position.X
-		targetPosition.Y += friend.Position.Y
+		targetPosition.Collect(friend.Position)
 	}
-	targetPosition.X /= float64(len(friends))
-	targetPosition.Y /= float64(len(friends))
+	targetPosition.DivToFloat64(float64(len(friends)))
 
 	noChange := false
 
