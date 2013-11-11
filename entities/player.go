@@ -14,11 +14,14 @@ type Player struct {
 	ScreenPosition []int
 }
 
+// Database key.
 func (p *Player) Key() string {
 	return fmt.Sprintf("player.%s", p.Username)
 }
 
-func (p *Player) StartMission(source *Planet, target *Planet, fleet int, missionType string) *Mission {
+// Starts missions to one of the players planet to some other. Each mission have type
+// and the user decides which part of the planet's fleet he would like to send.
+func (p *Player) StartMission(source, target *Planet, fleet int, missionType string) *Mission {
 	if fleet > 100 {
 		fleet = 100
 	} else if fleet <= 0 {
@@ -42,6 +45,7 @@ func (p *Player) StartMission(source *Planet, target *Planet, fleet int, mission
 	return &mission
 }
 
+// Creates new player after the authentication and generates color based on the unique hash
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 

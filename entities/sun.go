@@ -16,10 +16,12 @@ type Sun struct {
 	Position *vec2d.Vector
 }
 
+// Database key.
 func (s *Sun) Key() string {
 	return fmt.Sprintf("sun.%s", s.Name)
 }
 
+// Updates the sun position while doing this nasty placing the sun
 func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
 	if int(direction.Length()) >= s.speed {
@@ -28,6 +30,7 @@ func (s *Sun) update() {
 	}
 }
 
+// Handles the collisions while moving the sun
 func (s *Sun) collider(staticSun *Sun) {
 	distance := vec2d.GetDistance(s.Position, staticSun.Position)
 	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
@@ -40,13 +43,18 @@ func (s *Sun) collider(staticSun *Sun) {
 
 // Generate sun's name out of user's initials and 3-digit random number
 func (s *Sun) generateName(nickname string) {
-	hash, _ := strconv.ParseInt(generateHash(nickname)[0:18], 10, 64)
+	hash, _ := strconv.ParseInt(GenerateHash(nickname)[0:18], 10, 64)
 	random := rand.New(rand.NewSource(hash))
 	initials := extractUsernameInitials(nickname)
 	number := random.Int31n(899) + 100 // we need a 3-digit number
 	s.Name = fmt.Sprintf("%s%v", initials, number)
 }
 
+// Uses all player's twitter friends and tries to place the sun as
+// close as possible to all of them. This of course could cause tons of
+// overlapping. To solve this, we simply throw the sun somewhere far away
+// from the desired point and start to move it to THE POINT, but carefully
+// watching for collisions.
 func GenerateSun(username string, friends, others []Sun) *Sun {
 	newSun := Sun{
 		Username: username,

@@ -21,33 +21,43 @@ type Planet struct {
 	Owner               string
 }
 
-// This type is used as a proxy type while marshaling Planet
+// This type is used as a proxy type while marshaling Planet.
 type planetMarshalHook Planet
 
+// Database key.
 func (p *Planet) Key() string {
 	return fmt.Sprintf("planet.%s", p.Name)
 }
 
+// Checks if the planet has an owner or not.
 func (p *Planet) HasOwner() bool {
 	return len(p.Owner) > 0
 }
 
+// We need to define the MarshalJSON in order to automatically
+// update the ship count right before sending this entity to
+// the client or to the database.
 func (p *Planet) MarshalJSON() ([]byte, error) {
 	p.UpdateShipCount()
 	return json.Marshal((*planetMarshalHook)(p))
 }
 
+// Returns the ship count right after the ship count update.
 func (p *Planet) GetShipCount() int {
 	p.UpdateShipCount()
 	return p.ShipCount
 }
 
+// Changes the ship count right after the ship count update.
+// NOTE: I'm still not sure if we need a mutex here...
 func (p *Planet) SetShipCount(count int) {
 	p.UpdateShipCount()
 	p.ShipCount = count
 	p.LastShipCountUpdate = time.Now().Unix()
 }
 
+// Updates the ship count based on last time this count has
+// been updated and of course the planet size.
 func (p *Planet) UpdateShipCount() {
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
@@ -59,13 +69,13 @@ func (p *Planet) UpdateShipCount() {
 	}
 }
 
-/*
-TODO: We need to add ship count on new planet creation
-TODO: Put all funny numbers in a constans in our config file
-NOTE: 5 in ring_offset is the distance between planets
-*/
+// Generates all planets in a solar system, based on the user's hash.
+//
+// TODO: We need to add ship count on new planet creation
+// TODO: Put all funny numbers in a constans in our config file
+// NOTE: 5 in ring_offset is the distance between planets
 func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
-	hash := generateHash(nickname)
+	hash := GenerateHash(nickname)
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48 // The offset of simbol "1" in the ascii table
 	}

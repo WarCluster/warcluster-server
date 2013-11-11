@@ -16,6 +16,7 @@ const (
 	SUNS_SOLAR_SYSTEM_RADIUS      = 9000
 )
 
+// Entity interface is implemented by all entity types here
 type Entity interface {
 	Key() string
 }

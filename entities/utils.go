@@ -13,12 +13,15 @@ import (
 	"unicode"
 )
 
+// Simple RGB color struct
 type Color struct {
 	R int
 	G int
 	B int
 }
 
+// Creates an entity via unmarshaling a json.
+// The concrete entity type is given by the user as `key`
 func Construct(key string, data []byte) Entity {
 	var entity Entity
 	entityType := strings.Split(key, ".")[0]
@@ -39,16 +42,19 @@ func Construct(key string, data []byte) Entity {
 	return entity
 }
 
-func generateHash(username string) string {
+// Generates unique digit-only hash, based on the username.
+func GenerateHash(username string) string {
 	return simplifyHash(usernameHash(username))
 }
 
+// Returns the username, hashed with sha256.
 func usernameHash(username string) []byte {
 	hash := sha512.New()
 	io.WriteString(hash, username)
 	return hash.Sum(nil)
 }
 
+// Converts sha512 hash to a digits-only one.
 func simplifyHash(hash []byte) string {
 	result := ""
 	for ix := 0; ix < len(hash); ix++ {
@@ -58,12 +64,17 @@ func simplifyHash(hash []byte) string {
 	return result
 }
 
+// Returns some random start position for a sun, before starting
+// to move it over the galaxy
 func getRandomStartPosition(scope int) *vec2d.Vector {
 	xSeed := time.Now().UTC().UnixNano()
 	ySeed := time.Now().UTC().UnixNano()
 	xGenerator := rand.New(rand.NewSource(xSeed))
 	yGenerator := rand.New(rand.NewSource(ySeed))
-	return vec2d.New(float64(xGenerator.Intn(scope)-scope/2), float64(yGenerator.Intn(scope)-scope/2))
+	return vec2d.New(
+		float64(xGenerator.Intn(scope)-scope/2),
+		float64(yGenerator.Intn(scope)-scope/2),
+	)
 }
 
 // Gets the first three letters from twitter's username
