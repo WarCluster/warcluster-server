@@ -39,7 +39,7 @@ func StartMissionary(mission *entities.Mission) {
 	}
 }
 
-func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, ships int) {
+func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, ships int32) {
 	newTargetKey := fmt.Sprintf("planet.%d_%d", mission.Source[0], mission.Source[1])
 	newTargetEntity, err := entities.Get(newTargetKey)
 	if err != nil {

@@ -13,13 +13,6 @@ import (
 	"unicode"
 )
 
-// Simple RGB color struct
-type Color struct {
-	R int
-	G int
-	B int
-}
-
 // Creates an entity via unmarshaling a json.
 // The concrete entity type is given by the user as `key`
 func Construct(key string, data []byte) Entity {

@@ -16,6 +16,7 @@ const (
 
 // calculateCanvasSize is used to determine how big of an area(information about an area)
 // do we need to send to the user to eleminate traces of lag.
+// TODO: Totally re(write|think) this one
 func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
 	step := int(WORST_PING - BEST_PING/STEPS)
 	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1

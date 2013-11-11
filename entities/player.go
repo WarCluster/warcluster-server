@@ -10,8 +10,8 @@ type Player struct {
 	Color          Color
 	TwitterID      string
 	HomePlanet     string
-	ScreenSize     []int
-	ScreenPosition []int
+	ScreenSize     []uint16
+	ScreenPosition []int64
 }
 
 // Database key.
@@ -21,7 +21,7 @@ func (p *Player) Key() string {
 
 // Starts missions to one of the players planet to some other. Each mission have type
 // and the user decides which part of the planet's fleet he would like to send.
-func (p *Player) StartMission(source, target *Planet, fleet int, missionType string) *Mission {
+func (p *Player) StartMission(source, target *Planet, fleet int32, missionType string) *Mission {
 	if fleet > 100 {
 		fleet = 100
 	} else if fleet <= 0 {
@@ -29,7 +29,7 @@ func (p *Player) StartMission(source, target *Planet, fleet int, missionType str
 	}
 	currentTime := time.Now().UnixNano() / 1e6
 	baseShipCount := source.GetShipCount()
-	shipCount := int(baseShipCount * fleet / 100)
+	shipCount := int32(baseShipCount * fleet / 100)
 	source.SetShipCount(baseShipCount - shipCount)
 
 	mission := Mission{
@@ -49,15 +49,15 @@ func (p *Player) StartMission(source, target *Planet, fleet int, missionType str
 func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 
-	red := []int{151, 218, 233, 72, 245, 84}
-	green := []int{8, 75, 177, 140, 105, 146}
-	blue := []int{14, 15, 4, 19, 145, 219}
-	hashValue := func(index int) int {
-		return int((userhash[0] - 48) / 2)
+	red := []uint8{151, 218, 233, 72, 245, 84}
+	green := []uint8{8, 75, 177, 140, 105, 146}
+	blue := []uint8{14, 15, 4, 19, 145, 219}
+	hashValue := func(index uint8) uint8 {
+		return uint8((userhash[0] - 48) / 2)
 	}
 
 	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
-	player := Player{username, color, TwitterID, HomePlanet.Key(), []int{0, 0}, []int{0, 0}}
+	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, []int64{0, 0}}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
 	return &player

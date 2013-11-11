@@ -13,11 +13,11 @@ type Planet struct {
 	Color               Color
 	Position            *vec2d.Vector
 	IsHome              bool
-	Texture             int
-	Size                int
+	Texture             int8
+	Size                int8
 	LastShipCountUpdate int64
-	ShipCount           int
-	MaxShipCount        int
+	ShipCount           int32
+	MaxShipCount        int32
 	Owner               string
 }
 
@@ -43,14 +43,14 @@ func (p *Planet) MarshalJSON() ([]byte, error) {
 }
 
 // Returns the ship count right after the ship count update.
-func (p *Planet) GetShipCount() int {
+func (p *Planet) GetShipCount() int32 {
 	p.UpdateShipCount()
 	return p.ShipCount
 }
 
 // Changes the ship count right after the ship count update.
 // NOTE: I'm still not sure if we need a mutex here...
-func (p *Planet) SetShipCount(count int) {
+func (p *Planet) SetShipCount(count int32) {
 	p.UpdateShipCount()
 	p.ShipCount = count
 	p.LastShipCountUpdate = time.Now().Unix()
@@ -68,7 +68,7 @@ func (p *Planet) UpdateShipCount() {
 		} else {
 			timeModifier = int64(p.Size/3) + 1
 		}
-		p.ShipCount += int(passedTime / (timeModifier * 10))
+		p.ShipCount += int32(passedTime / (timeModifier * 10))
 		p.LastShipCountUpdate = time.Now().Unix()
 	}
 }
@@ -102,13 +102,13 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		planet.Name = fmt.Sprintf("%s%v", sun.Name, ix)
 		planet.Position.X = math.Floor(sun.Position.X + ringOffset*math.Cos(hashElement(4*ix+1)*40))
 		planet.Position.Y = math.Floor(sun.Position.Y + ringOffset*math.Sin(hashElement(4*ix+1)*40))
-		planet.Texture = int(hashElement(4*ix + 2))
-		planet.Size = 1 + int(hashElement(4*ix+3))
+		planet.Texture = int8(hashElement(4*ix + 2))
+		planet.Size = 1 + int8(hashElement(4*ix+3))
 		planet.LastShipCountUpdate = time.Now().Unix()
 		result = append(result, &planet)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
+	homePlanetIdx := int8(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
 	result[homePlanetIdx].IsHome = true
 	return result, result[homePlanetIdx]
 }

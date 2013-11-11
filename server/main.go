@@ -22,7 +22,7 @@ var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs 
 
 // This function goes trough all the procedurs needed for the werver to be initialized.
 // Create an empty connections pool and start the listening foe messages loop.
-func Start(host string, port int) error {
+func Start(host string, port uint16) error {
 	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", host, port))
 	log.Print("Quit the server with Ctrl-C.")
 

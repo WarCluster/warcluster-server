@@ -13,7 +13,7 @@ type Mission struct {
 	StartTime  int64
 	TravelTime int64
 	Player     string
-	ShipCount  int
+	ShipCount  int32
 }
 
 // Database key.
@@ -45,7 +45,7 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {
 // In case of Supply: We simply increase the ship count and we're done :P
 //
 // In case of Spy: TODO
-func EndMission(target *Planet, missionInfo *Mission) (excessShips int) {
+func EndMission(target *Planet, missionInfo *Mission) (excessShips int32) {
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {

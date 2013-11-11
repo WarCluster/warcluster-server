@@ -11,7 +11,7 @@ import (
 type Sun struct {
 	Username string
 	Name     string
-	speed    int
+	speed    int32
 	target   *vec2d.Vector
 	Position *vec2d.Vector
 }
@@ -24,7 +24,7 @@ func (s *Sun) Key() string {
 // Updates the sun position while doing this nasty placing the sun
 func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
-	if int(direction.Length()) >= s.speed {
+	if int32(direction.Length()) >= s.speed {
 		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
 		s.Position = vec2d.New(s.Position.X+direction.X, s.Position.Y+direction.Y)
 	}
@@ -58,7 +58,6 @@ func (s *Sun) generateName(nickname string) {
 func GenerateSun(username string, friends, others []Sun) *Sun {
 	newSun := Sun{
 		Username: username,
-		Name:     "",
 		speed:    5,
 		target:   vec2d.New(0, 0),
 		Position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
@@ -83,7 +82,7 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 			newSun.collider(&sunEntity)
 		}
 
-		if int64(newSun.Position.X) == int64(oldPos.X) && int64(newSun.Position.Y) == int64(oldPos.Y) {
+		if newSun.Position.X == oldPos.X && newSun.Position.Y == oldPos.Y {
 			noChange = true
 		}
 	}
@@ -91,5 +90,4 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 	newSun.Position.X = math.Floor(newSun.Position.X)
 	newSun.Position.Y = math.Floor(newSun.Position.Y)
 	return &newSun
-	//Base player placement on worker movement from BotWars
 }

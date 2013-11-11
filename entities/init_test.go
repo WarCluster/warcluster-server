@@ -34,8 +34,8 @@ var (
 		Color:          Color{22, 22, 22},
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.271_203",
-		ScreenSize:     []int{1, 1},
-		ScreenPosition: []int{2, 2},
+		ScreenSize:     []uint16{1, 1},
+		ScreenPosition: []int64{2, 2},
 	}
 	sun Sun = Sun{
 		Name:     "GOP672",

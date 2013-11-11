@@ -21,6 +21,13 @@ type Entity interface {
 	Key() string
 }
 
+// Simple RGB color struct
+type Color struct {
+	R uint8
+	G uint8
+	B uint8
+}
+
 // Finds records in the database, by given key
 // All Redis wildcards are allowed.
 func Find(query string) []Entity {
