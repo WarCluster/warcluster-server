@@ -33,7 +33,7 @@ var (
 		Username:       "gophie",
 		Color:          Color{22, 22, 22},
 		TwitterID:      "asdf",
-		HomePlanet:     "planet.271_203",
+		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},
 		ScreenPosition: []int64{2, 2},
 	}

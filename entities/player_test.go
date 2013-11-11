@@ -38,7 +38,7 @@ func TestCreateMission(t *testing.T) {
 		Username:       "gophie",
 		Color:          Color{22, 22, 22},
 		TwitterID:      "asdf",
-		HomePlanet:     "planet.271_203",
+		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},
 		ScreenPosition: []int64{2, 2},
 	}
@@ -50,12 +50,12 @@ func TestCreateMission(t *testing.T) {
 
 	if validMission.Source != "GOP6720" {
 		t.Error(validMission.Source)
-		t.Error("Planet planet.271_203 was expected as start planet!")
+		t.Error("Planet planet.GOP6720 was expected as start planet!")
 	}
 
 	if validMission.Target != "GOP6721" {
 		t.Error(validMission.Target)
-		t.Error("Planet planet.471_403 was expected as end planet!")
+		t.Error("Planet planet.GOP6720 was expected as end planet!")
 	}
 
 	if validMission.ShipCount != 80 {
