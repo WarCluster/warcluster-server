@@ -13,63 +13,73 @@ type Planet struct {
 	Color               Color
 	Position            *vec2d.Vector
 	IsHome              bool
-	Texture             int
-	Size                int
+	Texture             int8
+	Size                int8
 	LastShipCountUpdate int64
-	ShipCount           int
-	MaxShipCount        int
+	ShipCount           int32
+	MaxShipCount        int32
 	Owner               string
 }
 
-// This type is used as a proxy type while marshaling Planet
+// This type is used as a proxy type while marshaling Planet.
 type planetMarshalHook Planet
 
-func (p *Planet) String() string {
-	return fmt.Sprintf("Planet %s", p.Name)
-}
-
-func (p *Planet) GetKey() string {
+// Database key.
+func (p *Planet) Key() string {
 	return fmt.Sprintf("planet.%s", p.Name)
 }
 
+// Checks if the planet has an owner or not.
 func (p *Planet) HasOwner() bool {
 	return len(p.Owner) > 0
 }
 
+// We need to define the MarshalJSON in order to automatically
+// update the ship count right before sending this entity to
+// the client or to the database.
 func (p *Planet) MarshalJSON() ([]byte, error) {
 	p.UpdateShipCount()
 	return json.Marshal((*planetMarshalHook)(p))
 }
 
-func (p *Planet) GetShipCount() int {
+// Returns the ship count right after the ship count update.
+func (p *Planet) GetShipCount() int32 {
 	p.UpdateShipCount()
 	return p.ShipCount
 }
 
-func (p *Planet) SetShipCount(count int) {
+// Changes the ship count right after the ship count update.
+// NOTE: I'm still not sure if we need a mutex here...
+func (p *Planet) SetShipCount(count int32) {
 	p.UpdateShipCount()
 	p.ShipCount = count
 	p.LastShipCountUpdate = time.Now().Unix()
 }
 
+// Updates the ship count based on last time this count has
+// been updated and of course the planet size.
+// NOTE: If the planet is somebody's home we set a static increasion rate.
 func (p *Planet) UpdateShipCount() {
+	var timeModifier int64
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
-		timeModifier := int64(p.Size/3) + 1
-		//TODO: To be completed for all planet size types
-		//if getobject(Owner.getkey).gethomeplanet == p.getkey
-		p.ShipCount += int(passedTime / (timeModifier * 10))
+		if p.IsHome {
+			timeModifier = 4
+		} else {
+			timeModifier = int64(p.Size/3) + 1
+		}
+		p.ShipCount += int32(passedTime / (timeModifier * 10))
 		p.LastShipCountUpdate = time.Now().Unix()
 	}
 }
 
-/*
-TODO: We need to add ship count on new planet creation
-TODO: Put all funny numbers in a constans in our config file
-NOTE: 5 in ring_offset is the distance between planets
-*/
+// Generates all planets in a solar system, based on the user's hash.
+//
+// TODO: We need to add ship count on new planet creation
+// TODO: Put all funny numbers in a constans in our config file
+// NOTE: 5 in ring_offset is the distance between planets
 func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
-	hash := generateHash(nickname)
+	hash := GenerateHash(nickname)
 	hashElement := func(index int) float64 {
 		return float64(hash[index]) - 48 // The offset of simbol "1" in the ascii table
 	}
@@ -80,29 +90,25 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 
 	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
 		planet := Planet{
-			Name:                "",
-			Color:               Color{200, 180, 140},
-			Position:            new(vec2d.Vector),
-			IsHome:              false,
-			Texture:             0,
-			Size:                0,
-			LastShipCountUpdate: time.Now().Unix(),
-			ShipCount:           10,
-			MaxShipCount:        0,
-			Owner:               "",
+			Color:        Color{200, 180, 140},
+			Position:     new(vec2d.Vector),
+			IsHome:       false,
+			ShipCount:    10,
+			MaxShipCount: 0,
+			Owner:        "",
 		}
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
 		planet.Name = fmt.Sprintf("%s%v", sun.Name, ix)
 		planet.Position.X = math.Floor(sun.Position.X + ringOffset*math.Cos(hashElement(4*ix+1)*40))
 		planet.Position.Y = math.Floor(sun.Position.Y + ringOffset*math.Sin(hashElement(4*ix+1)*40))
-		planet.Texture = int(hashElement(4*ix + 2))
-		planet.Size = 1 + int(hashElement(4*ix+3))
+		planet.Texture = int8(hashElement(4*ix + 2))
+		planet.Size = 1 + int8(hashElement(4*ix+3))
 		planet.LastShipCountUpdate = time.Now().Unix()
 		result = append(result, &planet)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	homePlanetIdx := int(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
+	homePlanetIdx := int8(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
 	result[homePlanetIdx].IsHome = true
 	return result, result[homePlanetIdx]
 }

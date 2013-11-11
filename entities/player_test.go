@@ -11,7 +11,7 @@ import (
 func TestCreateMission(t *testing.T) {
 	startTime := time.Now()
 	planetStart := Planet{
-		Name:                "GOP5610",
+		Name:                "GOP6720",
 		Color:               Color{22, 22, 22},
 		Position:            vec2d.New(271, 203),
 		IsHome:              true,
@@ -23,7 +23,7 @@ func TestCreateMission(t *testing.T) {
 		Owner:               "gophie",
 	}
 	planetEnd := Planet{
-		Name:                "GOP5611",
+		Name:                "GOP6721",
 		Color:               Color{22, 22, 22},
 		Position:            vec2d.New(471, 403),
 		IsHome:              false,
@@ -35,12 +35,12 @@ func TestCreateMission(t *testing.T) {
 		Owner:               "gophie",
 	}
 	player := Player{
-		username:       "gophie",
+		Username:       "gophie",
 		Color:          Color{22, 22, 22},
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.271_203",
-		ScreenSize:     []int{1, 1},
-		ScreenPosition: []int{2, 2},
+		ScreenSize:     []uint16{1, 1},
+		ScreenPosition: []int64{2, 2},
 	}
 
 	validMission := player.StartMission(&planetStart, &planetEnd, 80, "Attack")
@@ -48,12 +48,12 @@ func TestCreateMission(t *testing.T) {
 	planetStart.ShipCount = 100
 	invalidMission := player.StartMission(&planetStart, &planetEnd, 120, "Attack")
 
-	if validMission.Source != "GOP5610" {
+	if validMission.Source != "GOP6720" {
 		t.Error(validMission.Source)
 		t.Error("Planet planet.271_203 was expected as start planet!")
 	}
 
-	if validMission.Target != "GOP5611" {
+	if validMission.Target != "GOP6721" {
 		t.Error(validMission.Target)
 		t.Error("Planet planet.471_403 was expected as end planet!")
 	}
@@ -81,14 +81,14 @@ func TestPlayerMarshalling(t *testing.T) {
 	if err != nil {
 		t.Error("Player unmarshaling failed:", err)
 	}
-	uPlayer.username = player.username
+	uPlayer.Username = player.Username
 
-	if player.GetKey() != uPlayer.GetKey() {
+	if player.Key() != uPlayer.Key() {
 		t.Error(
 			"Keys of both players are different!\n",
-			player.GetKey(),
+			player.Key(),
 			"!=",
-			uPlayer.GetKey(),
+			uPlayer.Key(),
 		)
 	}
 

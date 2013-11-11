@@ -3,6 +3,7 @@ package entities
 import (
 	"fmt"
 	"github.com/Vladimiroff/vec2d"
+	"math"
 	"math/rand"
 	"strconv"
 )
@@ -10,27 +11,26 @@ import (
 type Sun struct {
 	Username string
 	Name     string
-	speed    int
+	speed    int32
 	target   *vec2d.Vector
 	Position *vec2d.Vector
 }
 
-func (s *Sun) GetKey() string {
+// Database key.
+func (s *Sun) Key() string {
 	return fmt.Sprintf("sun.%s", s.Name)
 }
 
-func (s *Sun) String() string {
-	return fmt.Sprintf("Sun %s", s.Name)
-}
-
+// Updates the sun position while doing this nasty placing the sun
 func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)
-	if int(direction.Length()) >= s.speed {
+	if int32(direction.Length()) >= s.speed {
 		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
-		s.Position = vec2d.New(float64(s.Position.X+direction.X), float64(s.Position.Y+direction.Y))
+		s.Position = vec2d.New(s.Position.X+direction.X, s.Position.Y+direction.Y)
 	}
 }
 
+// Handles the collisions while moving the sun
 func (s *Sun) collider(staticSun *Sun) {
 	distance := vec2d.GetDistance(s.Position, staticSun.Position)
 	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
@@ -43,17 +43,21 @@ func (s *Sun) collider(staticSun *Sun) {
 
 // Generate sun's name out of user's initials and 3-digit random number
 func (s *Sun) generateName(nickname string) {
-	hash, _ := strconv.ParseInt(generateHash(nickname), 10, 64)
+	hash, _ := strconv.ParseInt(GenerateHash(nickname)[0:18], 10, 64)
 	random := rand.New(rand.NewSource(hash))
 	initials := extractUsernameInitials(nickname)
 	number := random.Int31n(899) + 100 // we need a 3-digit number
 	s.Name = fmt.Sprintf("%s%v", initials, number)
 }
 
+// Uses all player's twitter friends and tries to place the sun as
+// close as possible to all of them. This of course could cause tons of
+// overlapping. To solve this, we simply throw the sun somewhere far away
+// from the desired point and start to move it to THE POINT, but carefully
+// watching for collisions.
 func GenerateSun(username string, friends, others []Sun) *Sun {
 	newSun := Sun{
 		Username: username,
-		Name:     "",
 		speed:    5,
 		target:   vec2d.New(0, 0),
 		Position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
@@ -78,10 +82,12 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 			newSun.collider(&sunEntity)
 		}
 
-		if int64(newSun.Position.X) == int64(oldPos.X) && int64(newSun.Position.Y) == int64(oldPos.Y) {
+		if newSun.Position.X == oldPos.X && newSun.Position.Y == oldPos.Y {
 			noChange = true
 		}
 	}
+
+	newSun.Position.X = math.Floor(newSun.Position.X)
+	newSun.Position.Y = math.Floor(newSun.Position.Y)
 	return &newSun
-	//Base player placement on worker movement from BotWars
 }

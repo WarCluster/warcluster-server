@@ -18,11 +18,11 @@ type Request struct {
 	Client      *Client
 	Command     string
 	Type        string
-	Position    []int
-	Resolution  []int
+	Position    []int64
+	Resolution  []uint16
 	StartPlanet string
 	EndPlanet   string
-	Fleet       int
+	Fleet       int32
 	Username    string
 	TwitterID   string
 }

@@ -11,11 +11,11 @@ import (
 type Config struct {
 	Server struct {
 		Host string
-		Port int
+		Port uint16
 	}
 	Database struct {
 		Host string
-		Port int
+		Port uint16
 	}
 }
 

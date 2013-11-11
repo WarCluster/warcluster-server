@@ -13,27 +13,39 @@ type Mission struct {
 	StartTime  int64
 	TravelTime int64
 	Player     string
-	ShipCount  int
+	ShipCount  int32
 }
 
-func (m *Mission) String() string {
-	return m.GetKey()
-}
-
-func (m *Mission) GetKey() string {
+// Database key.
+func (m *Mission) Key() string {
 	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
 }
 
+// We plan to tweak the missions' speed based on some game logic.
+// For now, 10 seems like a fair choice.
 func (m *Mission) GetSpeed() int64 {
 	return 10
 }
 
+// Calculates the travel time between two planets with given speed.
+// Traveling is implemented like a simple time.Sleep from our side.
 func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {
 	distance := vec2d.GetDistance(source, target)
 	return int64(distance / float64(speed) * 100)
 }
 
-func EndMission(target *Planet, missionInfo *Mission) (excessShips int) {
+// When the missionary is done traveling (a.k.a. sleeping) calls this in order
+// to calculate the outcome of the battle/suppliemnt/spying on target planet.
+//
+// In case of Attack: We have to check if the target planet is owned by the attacker.
+// If that's true we simply increment the ship count on that planet. If not we do the
+// math and decrease the count ship on the attacked planet. We should check if the attacker
+// should own that planet, which comes with all the changing colors and owner stuff.
+//
+// In case of Supply: We simply increase the ship count and we're done :P
+//
+// In case of Spy: TODO
+func EndMission(target *Planet, missionInfo *Mission) (excessShips int32) {
 	switch missionInfo.Type {
 	case "Attack":
 		if target.Owner == missionInfo.Player {

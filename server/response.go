@@ -16,6 +16,7 @@ const (
 
 // calculateCanvasSize is used to determine how big of an area(information about an area)
 // do we need to send to the user to eleminate traces of lag.
+// TODO: Totally re(write|think) this one
 func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
 	step := int(WORST_PING - BEST_PING/STEPS)
 	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
@@ -46,7 +47,7 @@ func scopeOfView(request *Request) error {
 		result := make(map[string]entities.Entity)
 		entities := entities.Find(query)
 		for _, entity := range entities {
-			result[entity.GetKey()] = entity
+			result[entity.Key()] = entity
 		}
 		return result
 	}
@@ -78,7 +79,7 @@ func parseAction(request *Request) error {
 		return errors.New("End planet does not exist")
 	}
 
-	if source.(*entities.Planet).Owner != request.Client.Player.String() {
+	if source.(*entities.Planet).Owner != request.Client.Player.Username {
 		return errors.New("This is not your home!")
 	}
 
@@ -105,7 +106,7 @@ func parseAction(request *Request) error {
 
 	stateChange := response.NewStateChange()
 	stateChange.Planets = map[string]entities.Entity{
-		source.GetKey(): source,
+		source.Key(): source,
 	}
 	return response.Send(stateChange, sessions.Broadcast)
 }
