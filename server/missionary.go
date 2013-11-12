@@ -13,7 +13,7 @@ import (
 // 2. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
 	targetKey := fmt.Sprintf("planet.%s", mission.Target)
-	time.Sleep(time.Duration(mission.TravelTime * 1e6))
+	time.Sleep(time.Duration(mission.TravelTime) * time.Millisecond)
 
 	targetEntity, err := entities.Get(targetKey)
 	if err != nil {

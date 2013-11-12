@@ -27,7 +27,7 @@ func (m *Mission) GetSpeed() int64 {
 	return 10
 }
 
-// Calculates the travel time between two planets with given speed.
+// Calculates the travel time in milliseconds between two planets with given speed.
 // Traveling is implemented like a simple time.Sleep from our side.
 func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {
 	distance := vec2d.GetDistance(source, target)
