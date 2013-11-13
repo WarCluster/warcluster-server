@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	ENTITIES_RANGE_SIZE           = 10000
 	PLANETS_RING_OFFSET           = 300
 	PLANETS_PLANET_RADIUS         = 300
 	PLANETS_PLANET_COUNT          = 10
@@ -18,6 +19,7 @@ const (
 
 // Entity interface is implemented by all entity types here
 type Entity interface {
+	SortedSet(string) (string, float64)
 	Key() string
 }
 
@@ -68,7 +70,12 @@ func Save(entity Entity) error {
 	if err != nil {
 		return err
 	}
-	return db.Save(key, value)
+	err = db.Save(key, value)
+	xSet, xWeight := entity.SortedSet("X")
+	ySet, yWeight := entity.SortedSet("Y")
+	db.Zadd(xSet, xWeight, key)
+	db.Zadd(ySet, yWeight, key)
+	return err
 }
 
 // Deletes a record by the given key

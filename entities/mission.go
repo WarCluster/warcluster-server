@@ -27,6 +27,12 @@ func (m *Mission) GetSpeed() int64 {
 	return 10
 }
 
+// Returns the sorted set by X or Y where this entity has to be put in
+func (m *Mission) SortedSet(axis string) (string, float64) {
+	source, _ := Get(m.Source)
+	return source.SortedSet(axis)
+}
+
 // Calculates the travel time in milliseconds between two planets with given speed.
 // Traveling is implemented like a simple time.Sleep from our side.
 func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {

@@ -21,6 +21,18 @@ func (s *Sun) Key() string {
 	return fmt.Sprintf("sun.%s", s.Name)
 }
 
+// Returns the sorted set by X or Y where this entity has to be put in
+func (s *Sun) SortedSet(axis string) (string, float64) {
+	var axisValue float64
+	switch(axis) {
+	case "X":
+		axisValue = s.Position.X
+	case"Y":
+		axisValue = s.Position.Y
+	}
+	return fmt.Sprintf("entities:%s:%d", axis, int64(axisValue / ENTITIES_RANGE_SIZE)), axisValue
+}
+
 // Updates the sun position while doing this nasty placing the sun
 func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)

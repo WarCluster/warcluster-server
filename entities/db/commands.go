@@ -40,3 +40,12 @@ func Delete(key string) error {
 	_, err := conn.Do("DEL", key)
 	return err
 }
+
+// Saves to a sorted set
+func Zadd(set string, weight float64, key string) error {
+	conn := pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("ZADD", set, weight, key)
+	return err
+}

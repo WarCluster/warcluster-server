@@ -19,6 +19,12 @@ func (p *Player) Key() string {
 	return fmt.Sprintf("player.%s", p.Username)
 }
 
+// Returns the sorted set by X or Y where this entity has to be put in
+func (p *Player) SortedSet(axis string) (string, float64) {
+	homePlanet, _ := Get(p.HomePlanet)
+	return homePlanet.SortedSet(axis)
+}
+
 // Starts missions to one of the players planet to some other. Each mission have type
 // and the user decides which part of the planet's fleet he would like to send.
 func (p *Player) StartMission(source, target *Planet, fleet int32, missionType string) *Mission {
