@@ -9,13 +9,35 @@ var (
 	timeStamp int64   = time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission   Mission = Mission{
 		Color:      Color{22, 22, 22},
-		Source:     "GOP6720",
-		Target:     "GOP6721",
+		Source:     embeddedPlanet{
+			Name: "GOP6720",
+			Position: vec2d.New(271, 203),
+		},
+		Target:     embeddedPlanet{
+			Name: "GOP6721",
+			Position: vec2d.New(2, 2),
+		},
 		Type:       "Attack",
 		StartTime:  timeStamp,
 		TravelTime: timeStamp,
 		Player:     "gophie",
 		ShipCount:  5,
+	}
+	secondMission = Mission{
+		Color:      Color{22, 22, 22},
+		Source:     embeddedPlanet{
+			Name: "GOP6720",
+			Position: vec2d.New(271, 203),
+		},
+		Target:     embeddedPlanet{
+			Name: "GOP6721",
+			Position: vec2d.New(2, 2),
+		},
+		Type:       "Attack",
+		StartTime:  time.Now().UnixNano() * 1e6,
+		TravelTime: time.Now().UnixNano() * 1e6,
+		Player:     "chochko",
+		ShipCount:  10,
 	}
 	planet Planet = Planet{
 		Name:                "GOP6720",

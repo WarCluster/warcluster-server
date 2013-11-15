@@ -7,8 +7,8 @@ import (
 
 type Mission struct {
 	Color      Color
-	Source     string
-	Target     string
+	Source     embeddedPlanet
+	Target     embeddedPlanet
 	Type       string
 	StartTime  int64
 	TravelTime int64
@@ -16,9 +16,15 @@ type Mission struct {
 	ShipCount  int32
 }
 
+// Just an internal type, used to embed source and target in Mission
+type embeddedPlanet struct {
+	Name     string
+	Position *vec2d.Vector
+}
+
 // Database key.
 func (m *Mission) Key() string {
-	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source)
+	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source.Name)
 }
 
 // We plan to tweak the missions' speed based on some game logic.
@@ -29,7 +35,7 @@ func (m *Mission) GetSpeed() int64 {
 
 // Returns the sorted set by X or Y where this entity has to be put in
 func (m *Mission) AreaSet() string {
-	source, _ := Get(m.Source)
+	source, _ := Get(fmt.Sprintf("planet.%s", m.Target.Name))
 	return source.AreaSet()
 }
 

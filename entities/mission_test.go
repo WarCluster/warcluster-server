@@ -11,7 +11,7 @@ import (
 func TestMissionKey(t *testing.T) {
 	startTime := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission := new(Mission)
-	mission.Source = "GOP6720"
+	mission.Source = embeddedPlanet{planet.Name, planet.Position}
 	mission.StartTime = startTime
 
 	if mission.Key() != "mission.1352588400000_GOP6720" {
@@ -49,14 +49,12 @@ func TestMissionMarshalling(t *testing.T) {
 //TODO: Test needs to be revised in order to handle calculation of ship count
 func TestEndMission(t *testing.T) {
 	var excessShips int32
-	secondMission := new(Mission)
 	endPlanet := new(Planet)
 	startTime := time.Now().UnixNano() * 1e6
-	*secondMission = Mission{Color{22, 22, 22}, "GOP6720", "GOP6721", "Attack", startTime, startTime, "chochko", 10}
 	*endPlanet = Planet{"", Color{22, 22, 22}, vec2d.New(2, 2), false, 6, 3, startTime, 2, 0, "chochko"}
 
 	t.Skip()
-	excessShips = EndMission(endPlanet, secondMission)
+	excessShips = EndMission(endPlanet, &secondMission)
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
 	}

@@ -12,7 +12,7 @@ import (
 // 1. When the delay ends the thread ends the mission calling EndMission
 // 2. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
-	targetKey := fmt.Sprintf("planet.%s", mission.Target)
+	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
 	time.Sleep(time.Duration(mission.TravelTime) * time.Millisecond)
 
 	targetEntity, err := entities.Get(targetKey)
@@ -40,7 +40,7 @@ func StartMissionary(mission *entities.Mission) {
 }
 
 func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, ships int32) {
-	newTargetKey := fmt.Sprintf("planet.%s", mission.Target)
+	newTargetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
 	newTargetEntity, err := entities.Get(newTargetKey)
 	if err != nil {
 		log.Print("Error in homePlanet planet fetch: ", err.Error())

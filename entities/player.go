@@ -40,8 +40,14 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 
 	mission := Mission{
 		Color:     p.Color,
-		Source:    source.Name,
-		Target:    target.Name,
+		Source:    embeddedPlanet{
+			Name:     source.Name,
+			Position: source.Position,
+		},
+		Target:    embeddedPlanet{
+			Name:     target.Name,
+			Position: target.Position,
+		},
 		Type:      missionType,
 		StartTime: currentTime,
 		Player:    p.Username,
