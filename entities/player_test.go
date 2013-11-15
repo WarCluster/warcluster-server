@@ -40,7 +40,7 @@ func TestCreateMission(t *testing.T) {
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},
-		ScreenPosition: []int64{2, 2},
+		ScreenPosition: &vec2d.Vector{2, 2},
 	}
 
 	validMission := player.StartMission(&planetStart, &planetEnd, 80, "Attack")

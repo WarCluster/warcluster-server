@@ -70,7 +70,7 @@ var (
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},
-		ScreenPosition: []int64{2, 2},
+		ScreenPosition: &vec2d.Vector{2, 2},
 	}
 	sun Sun = Sun{
 		Name:     "GOP672",

@@ -11,7 +11,6 @@ import (
 	"path"
 	"runtime"
 	"runtime/debug"
-	"warcluster/entities"
 	"warcluster/server/response"
 )
 
@@ -88,12 +87,9 @@ func login(session sockjs.Session) (*Client, error) {
 		Player:   player,
 	}
 
-	homePlanetEntity, _ := entities.Get(client.Player.HomePlanet)
-	homePlanet := homePlanetEntity.(*entities.Planet)
-
 	loginSuccess := response.NewLoginSuccess()
 	loginSuccess.Username = client.Nickname
-	loginSuccess.Position = homePlanet.Position
+	loginSuccess.Position = player.ScreenPosition
 	response.Send(loginSuccess, session.Send)
 	return client, nil
 }
