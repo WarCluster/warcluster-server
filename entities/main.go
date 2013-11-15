@@ -1,3 +1,4 @@
+// Package entities implements the core game logic
 package entities
 
 import (

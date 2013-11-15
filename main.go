@@ -1,3 +1,4 @@
+// Real-time massively multiplayer online space strategy arcade browser game!
 package main
 
 import (

@@ -1,3 +1,4 @@
+// Package response defines the messages we stream to users
 package response
 
 import (

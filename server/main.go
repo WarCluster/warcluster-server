@@ -1,5 +1,4 @@
-// This is the server package.
-// The purpouse of this package is to map a connection to each player(who is online) so we have a comunication chanel.
+// Package server maps a connection to each player(who is online) so we have a comunication chanel.
 package server
 
 import (

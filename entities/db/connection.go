@@ -1,4 +1,4 @@
-// db is the package responsible for database maintenence and managing DB I/O.
+// Package db is responsible for database maintenence and managing DB I/O.
 package db
 
 import (
