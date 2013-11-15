@@ -46,15 +46,9 @@ func TestMissionMarshalling(t *testing.T) {
 	}
 }
 
-//TODO: Test needs to be revised in order to handle calculation of ship count
 func TestEndMission(t *testing.T) {
 	var excessShips int32
-	endPlanet := new(Planet)
-	startTime := time.Now().UnixNano() * 1e6
-	*endPlanet = Planet{"", Color{22, 22, 22}, vec2d.New(2, 2), false, 6, 3, startTime, 2, 0, "chochko"}
-
-	t.Skip()
-	excessShips = EndMission(endPlanet, &secondMission)
+	excessShips = EndMission(&endPlanet, &secondMission)
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
 	}
@@ -63,7 +57,8 @@ func TestEndMission(t *testing.T) {
 		t.Error("End Planet owner was expected  to be chochko but is:", endPlanet.Owner)
 	}
 
-	excessShips = EndMission(endPlanet, &mission)
+	mission.ShipCount = 15
+	excessShips = EndMission(&endPlanet, &mission)
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
 	}
@@ -77,13 +72,12 @@ func TestEndMission(t *testing.T) {
 	}
 }
 
-//TODO: Test needs to be revised in order to handle calculation of ship count
-//TODO: Test needs to be revised in order to handle feedback mission with excess ships
 func TestEndMissionDenyTakeover(t *testing.T) {
 	var excessShips int32
 	endPlanet := new(Planet)
 	*endPlanet = Planet{"", Color{22, 22, 22}, vec2d.New(2, 2), true, 6, 3, timeStamp, 2, 0, "chochko"}
 
+	mission.ShipCount = 5
 	excessShips = EndMission(endPlanet, &mission)
 	if endPlanet.GetShipCount() != 0 {
 		t.Error("End Planet ship count was expected to be 0 but it is:", endPlanet.GetShipCount())
