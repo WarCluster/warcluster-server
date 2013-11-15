@@ -19,8 +19,8 @@ func Get(conn redis.Conn, key string) ([]byte, error) {
 
 // GetList operates as Get, but instead of an unique key it takes a patern
 // in order to return a list of keys that reflect the entered patern.
-func GetList(conn redis.Conn, pattern string) ([]interface{}, error) {
-	return redis.Values(conn.Do("KEYS", pattern))
+func GetList(conn redis.Conn, pattern string) ([]string, error) {
+	return redis.Strings(conn.Do("KEYS", pattern))
 }
 
 // Used to remove entrys from the DB.

@@ -3,8 +3,6 @@ package entities
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 	"warcluster/entities/db"
 )
 
@@ -37,8 +35,7 @@ func Find(query string) []Entity {
 	var entityList []Entity
 
 	if records, err := GetList(query); err == nil {
-		results := fmt.Sprintf("%s", records)
-		for _, key := range strings.Split(results[1:len(results)-1], " ") {
+		for _, key := range records {
 			if entity, err := Get(key); err == nil {
 				entityList = append(entityList, entity)
 			}
@@ -49,7 +46,7 @@ func Find(query string) []Entity {
 }
 
 // Returns keys of entities from the database
-func GetList(pattern string) ([]interface{}, error) {
+func GetList(pattern string) ([]string, error) {
 	conn := db.Pool.Get()
 	defer conn.Close()
 
