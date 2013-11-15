@@ -40,12 +40,12 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 	source.SetShipCount(baseShipCount - shipCount)
 
 	mission := Mission{
-		Color:     p.Color,
-		Source:    embeddedPlanet{
+		Color: p.Color,
+		Source: embeddedPlanet{
 			Name:     source.Name,
 			Position: source.Position,
 		},
-		Target:    embeddedPlanet{
+		Target: embeddedPlanet{
 			Name:     target.Name,
 			Position: target.Position,
 		},
