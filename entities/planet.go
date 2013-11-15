@@ -38,8 +38,8 @@ func (p *Planet) HasOwner() bool {
 func (p *Planet) AreaSet() string {
 	return fmt.Sprintf(
 		"entities:%d:%d",
-		int64(p.Position.X / ENTITIES_RANGE_SIZE),
-		int64(p.Position.Y / ENTITIES_RANGE_SIZE),
+		int64(p.Position.X/ENTITIES_RANGE_SIZE),
+		int64(p.Position.Y/ENTITIES_RANGE_SIZE),
 	)
 }
 

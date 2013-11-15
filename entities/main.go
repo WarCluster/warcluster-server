@@ -55,7 +55,6 @@ func GetList(pattern string) ([]interface{}, error) {
 	return db.GetList(conn, pattern)
 }
 
-
 // Fetches a single record in the database, by given concrete key.
 // If there is no entity with such key, returns error.
 func Get(key string) (Entity, error) {
