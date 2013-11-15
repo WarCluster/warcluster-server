@@ -19,7 +19,7 @@ const (
 
 // Entity interface is implemented by all entity types here
 type Entity interface {
-	SortedSet(string) (string, float64)
+	AreaSet() string
 	Key() string
 }
 
@@ -85,11 +85,9 @@ func Save(entity Entity) error {
 	if err != nil {
 		return err
 	}
-	err = db.Save(conn, key, value)
-	xSet, xWeight := entity.SortedSet("X")
-	ySet, yWeight := entity.SortedSet("Y")
-	db.Zadd(conn, xSet, xWeight, key)
-	db.Zadd(conn, ySet, yWeight, key)
+
+	setKey := entity.AreaSet()
+	err = db.Save(conn, key, setKey, value)
 	return err
 }
 

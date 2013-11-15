@@ -28,9 +28,9 @@ func (m *Mission) GetSpeed() int64 {
 }
 
 // Returns the sorted set by X or Y where this entity has to be put in
-func (m *Mission) SortedSet(axis string) (string, float64) {
+func (m *Mission) AreaSet() string {
 	source, _ := Get(m.Source)
-	return source.SortedSet(axis)
+	return source.AreaSet()
 }
 
 // Calculates the travel time in milliseconds between two planets with given speed.

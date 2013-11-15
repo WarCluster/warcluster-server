@@ -20,9 +20,9 @@ func (p *Player) Key() string {
 }
 
 // Returns the sorted set by X or Y where this entity has to be put in
-func (p *Player) SortedSet(axis string) (string, float64) {
+func (p *Player) AreaSet() string {
 	homePlanet, _ := Get(p.HomePlanet)
-	return homePlanet.SortedSet(axis)
+	return homePlanet.AreaSet()
 }
 
 // Starts missions to one of the players planet to some other. Each mission have type

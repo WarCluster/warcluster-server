@@ -4,10 +4,10 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-// Save takes a key (struct used as template for all data containers to ease the managing of the DB)
-// and generates an unique key in order to add the record to the DB.
-func Save(conn redis.Conn, key string, value []byte) error {
+// Save takes a key, name of the set and the marshaled record and writes it in.
+func Save(conn redis.Conn, key, setKey string, value []byte) error {
 	_, err := conn.Do("SET", key, value)
+	Sadd(conn, setKey, key)
 	return err
 }
 
@@ -17,20 +17,25 @@ func Get(conn redis.Conn, key string) ([]byte, error) {
 	return redis.Bytes(conn.Do("GET", key))
 }
 
-// GetList operates as Get, but instead of an unique key it takes a patern in order to return
-// a list of keys that reflect the entered patern.
+// GetList operates as Get, but instead of an unique key it takes a patern
+// in order to return a list of keys that reflect the entered patern.
 func GetList(conn redis.Conn, pattern string) ([]interface{}, error) {
 	return redis.Values(conn.Do("KEYS", pattern))
 }
 
-// I think Delete speaks for itself but still. This function is used to remove entrys from the DB.
+// Used to remove entrys from the DB.
 func Delete(conn redis.Conn, key string) error {
 	_, err := conn.Do("DEL", key)
 	return err
 }
 
-// Saves to a sorted set
-func Zadd(conn redis.Conn, set string, weight float64, key string) error {
-	_, err := conn.Do("ZADD", set, weight, key)
+// Saves to a redis set
+func Sadd(conn redis.Conn, set, key string) error {
+	_, err := conn.Do("SADD", set, key)
 	return err
+}
+
+// Takes all the members in a Redis set
+func Smembers(conn redis.Conn, set string) ([]interface{}, error) {
+	return redis.Values(conn.Do("SMEMBERS", set))
 }

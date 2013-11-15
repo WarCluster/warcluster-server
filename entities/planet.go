@@ -34,16 +34,13 @@ func (p *Planet) HasOwner() bool {
 	return len(p.Owner) > 0
 }
 
-// Returns the sorted set by X or Y where this entity has to be put in
-func (p *Planet) SortedSet(axis string) (string, float64) {
-	var axisValue float64
-	switch(axis) {
-	case "X":
-		axisValue = p.Position.X
-	case"Y":
-		axisValue = p.Position.Y
-	}
-	return fmt.Sprintf("entities:%s:%d", axis, int64(axisValue / ENTITIES_RANGE_SIZE)), axisValue
+// Returns the set by X or Y where this entity has to be put in
+func (p *Planet) AreaSet() string {
+	return fmt.Sprintf(
+		"entities:%d:%d",
+		int64(p.Position.X / ENTITIES_RANGE_SIZE),
+		int64(p.Position.Y / ENTITIES_RANGE_SIZE),
+	)
 }
 
 // We need to define the MarshalJSON in order to automatically
