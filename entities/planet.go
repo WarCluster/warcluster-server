@@ -83,10 +83,6 @@ func (p *Planet) UpdateShipCount() {
 }
 
 // Generates all planets in a solar system, based on the user's hash.
-//
-// TODO: We need to add ship count on new planet creation
-// TODO: Put all funny numbers in a constans in our config file
-// NOTE: 5 in ring_offset is the distance between planets
 func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	hash := GenerateHash(nickname)
 	hashElement := func(index int) float64 {
@@ -106,6 +102,7 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 			MaxShipCount: 0,
 			Owner:        "",
 		}
+		// NOTE: 5 is the distance between planets
 		ringOffset += planetRadius + hashElement(4*ix)*5
 
 		planet.Name = fmt.Sprintf("%s%v", sun.Name, ix)
@@ -119,5 +116,6 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
 	homePlanetIdx := int8(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
 	result[homePlanetIdx].IsHome = true
+	result[homePlanetIdx].ShipCount = 80
 	return result, result[homePlanetIdx]
 }
