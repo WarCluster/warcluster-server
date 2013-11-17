@@ -10,16 +10,16 @@ import (
 
 func TestGeneratePlanets(t *testing.T) {
 	expectedPlanets := []Planet{
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-77, 57), false, 6, 3, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(1470, 300), false, 8, 5, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-690, -201), false, 3, 1, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-1052, 648), false, 2, 8, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(1428, -1364), false, 3, 1, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(2735, 300), false, 6, 8, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(2818, -799), false, 9, 6, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-323, 3080), false, 5, 4, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(1547, 3339), false, 1, 1, timeStamp, 10, 0, "gophie"},
-		Planet{"ABC1234", Color{22, 22, 22}, vec2d.New(-2745, -1066), false, 4, 6, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(-77, 57), false, 6, 3, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(1470, 300), false, 8, 5, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(-690, -201), false, 3, 1, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(-1052, 648), false, 2, 8, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(1428, -1364), false, 3, 1, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(2735, 300), false, 6, 8, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(2818, -799), false, 9, 6, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(-323, 3080), false, 5, 4, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(1547, 3339), false, 1, 1, timeStamp, 10, 0, "gophie"},
+		{"ABC1234", Color{22, 22, 22}, vec2d.New(-2745, -1066), false, 4, 6, timeStamp, 10, 0, "gophie"},
 	}
 	sun.Position = vec2d.New(500, 300)
 	generatedPlanets, _ := GeneratePlanets("gophie", &sun)

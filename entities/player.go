@@ -2,6 +2,7 @@ package entities
 
 import (
 	"fmt"
+	"github.com/Vladimiroff/vec2d"
 	"time"
 )
 
@@ -11,12 +12,18 @@ type Player struct {
 	TwitterID      string
 	HomePlanet     string
 	ScreenSize     []uint16
-	ScreenPosition []int64
+	ScreenPosition *vec2d.Vector
 }
 
 // Database key.
 func (p *Player) Key() string {
 	return fmt.Sprintf("player.%s", p.Username)
+}
+
+// Returns the sorted set by X or Y where this entity has to be put in
+func (p *Player) AreaSet() string {
+	homePlanet, _ := Get(p.HomePlanet)
+	return homePlanet.AreaSet()
 }
 
 // Starts missions to one of the players planet to some other. Each mission have type
@@ -33,9 +40,15 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 	source.SetShipCount(baseShipCount - shipCount)
 
 	mission := Mission{
-		Color:     p.Color,
-		Source:    source.Name,
-		Target:    target.Name,
+		Color: p.Color,
+		Source: embeddedPlanet{
+			Name:     source.Name,
+			Position: source.Position,
+		},
+		Target: embeddedPlanet{
+			Name:     target.Name,
+			Position: target.Position,
+		},
 		Type:      missionType,
 		StartTime: currentTime,
 		Player:    p.Username,
@@ -57,7 +70,7 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	}
 
 	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
-	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, []int64{0, 0}}
+	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, &vec2d.Vector{2, 2}}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
 	return &player

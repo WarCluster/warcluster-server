@@ -21,6 +21,15 @@ func (s *Sun) Key() string {
 	return fmt.Sprintf("sun.%s", s.Name)
 }
 
+// Returns the set by X or Y where this entity has to be put in
+func (s *Sun) AreaSet() string {
+	return fmt.Sprintf(
+		"entities:%d:%d",
+		int64(s.Position.X/ENTITIES_RANGE_SIZE),
+		int64(s.Position.Y/ENTITIES_RANGE_SIZE),
+	)
+}
+
 // Updates the sun position while doing this nasty placing the sun
 func (s *Sun) update() {
 	direction := vec2d.Sub(s.target, s.Position)

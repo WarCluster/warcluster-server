@@ -1,4 +1,4 @@
-// Defines the structure of our configuration file
+// Package config defines the structure of our configuration file
 package config
 
 import (

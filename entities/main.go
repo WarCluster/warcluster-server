@@ -1,13 +1,13 @@
+// Package entities implements the core game logic
 package entities
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 	"warcluster/entities/db"
 )
 
 const (
+	ENTITIES_RANGE_SIZE           = 10000
 	PLANETS_RING_OFFSET           = 300
 	PLANETS_PLANET_RADIUS         = 300
 	PLANETS_PLANET_COUNT          = 10
@@ -18,6 +18,7 @@ const (
 
 // Entity interface is implemented by all entity types here
 type Entity interface {
+	AreaSet() string
 	Key() string
 }
 
@@ -33,9 +34,8 @@ type Color struct {
 func Find(query string) []Entity {
 	var entityList []Entity
 
-	if records, err := db.GetList(query); err == nil {
-		results := fmt.Sprintf("%s", records)
-		for _, key := range strings.Split(results[1:len(results)-1], " ") {
+	if records, err := GetList(query); err == nil {
+		for _, key := range records {
 			if entity, err := Get(key); err == nil {
 				entityList = append(entityList, entity)
 			}
@@ -45,10 +45,21 @@ func Find(query string) []Entity {
 	return entityList
 }
 
+// Returns keys of entities from the database
+func GetList(pattern string) ([]string, error) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.GetList(conn, pattern)
+}
+
 // Fetches a single record in the database, by given concrete key.
 // If there is no entity with such key, returns error.
 func Get(key string) (Entity, error) {
-	record, err := db.Get(key)
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	record, err := db.Get(conn, key)
 	if err != nil {
 		return nil, err
 	}
@@ -63,15 +74,24 @@ func Get(key string) (Entity, error) {
 // Failed marshaling of the given entity is pretty much the only
 // point of failure in this function... I supose.
 func Save(entity Entity) error {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
 	key := entity.Key()
 	value, err := json.Marshal(entity)
 	if err != nil {
 		return err
 	}
-	return db.Save(key, value)
+
+	setKey := entity.AreaSet()
+	err = db.Save(conn, key, setKey, value)
+	return err
 }
 
 // Deletes a record by the given key
 func Delete(key string) error {
-	return db.Delete(key)
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.Delete(conn, key)
 }

@@ -55,6 +55,9 @@ func scopeOfView(request *Request) error {
 	res.Missions = populateEntities("mission.*")
 	res.Planets = populateEntities("planet.*")
 	res.Suns = populateEntities("sun.*")
+	request.Client.Player.ScreenPosition = request.Position
+	go entities.Save(request.Client.Player)
+
 	return response.Send(res, request.Client.Session.Send)
 }
 

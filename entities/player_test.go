@@ -40,7 +40,7 @@ func TestCreateMission(t *testing.T) {
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},
-		ScreenPosition: []int64{2, 2},
+		ScreenPosition: &vec2d.Vector{2, 2},
 	}
 
 	validMission := player.StartMission(&planetStart, &planetEnd, 80, "Attack")
@@ -48,12 +48,12 @@ func TestCreateMission(t *testing.T) {
 	planetStart.ShipCount = 100
 	invalidMission := player.StartMission(&planetStart, &planetEnd, 120, "Attack")
 
-	if validMission.Source != "GOP6720" {
+	if validMission.Source.Name != "GOP6720" {
 		t.Error(validMission.Source)
 		t.Error("Planet planet.GOP6720 was expected as start planet!")
 	}
 
-	if validMission.Target != "GOP6721" {
+	if validMission.Target.Name != "GOP6721" {
 		t.Error(validMission.Target)
 		t.Error("Planet planet.GOP6720 was expected as end planet!")
 	}
