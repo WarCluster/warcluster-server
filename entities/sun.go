@@ -2,10 +2,11 @@ package entities
 
 import (
 	"fmt"
-	"github.com/Vladimiroff/vec2d"
 	"math"
 	"math/rand"
 	"strconv"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 type Sun struct {

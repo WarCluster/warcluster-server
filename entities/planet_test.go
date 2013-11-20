@@ -2,10 +2,11 @@ package entities
 
 import (
 	"encoding/json"
-	"github.com/Vladimiroff/vec2d"
 	"reflect"
 	"strconv"
 	"testing"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 func TestGeneratePlanets(t *testing.T) {

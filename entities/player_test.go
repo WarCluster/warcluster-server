@@ -2,10 +2,11 @@ package entities
 
 import (
 	"encoding/json"
-	"github.com/Vladimiroff/vec2d"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 func TestCreateMission(t *testing.T) {

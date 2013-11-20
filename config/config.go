@@ -2,10 +2,11 @@
 package config
 
 import (
-	"code.google.com/p/gcfg"
 	"log"
 	"path"
 	"runtime"
+
+	"code.google.com/p/gcfg"
 )
 
 type Config struct {

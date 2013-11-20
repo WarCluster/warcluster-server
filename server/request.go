@@ -3,8 +3,9 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Vladimiroff/vec2d"
 	"log"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 // The Request struct is used to created to make the request manipulation easyer by creating a template

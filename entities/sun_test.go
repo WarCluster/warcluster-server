@@ -2,9 +2,10 @@ package entities
 
 import (
 	"encoding/json"
-	"github.com/Vladimiroff/vec2d"
 	"reflect"
 	"testing"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 func TestSunMarshalling(t *testing.T) {
