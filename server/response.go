@@ -3,38 +3,23 @@ package server
 import (
 	"errors"
 
+	"github.com/Vladimiroff/vec2d"
+
 	"warcluster/entities"
 	"warcluster/server/response"
 )
 
-// The three constants bellow are used by calculateCanvasSize to determine
-//the size of the area for wich information will be sent to the user.
-const (
-	BEST_PING  = 150
-	WORST_PING = 1500
-	STEPS      = 10
-)
+// calculateCanvasSize is used to determine where is the viewable by client's area
+func calculateCanvasSize(position *vec2d.Vector, resolution []int) (*vec2d.Vector, *vec2d.Vector) {
+	topLeft := vec2d.New(
+		position.X - float64(resolution[0])/2,
+		position.Y + float64(resolution[1])/2,
+	)
 
-// calculateCanvasSize is used to determine how big of an area(information about an area)
-// do we need to send to the user to eleminate traces of lag.
-// TODO: Totally re(write|think) this one
-func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
-	step := int(WORST_PING - BEST_PING/STEPS)
-	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
-	endResolution := []int{
-		int(float32(resolution[0]) * multiply),
-		int(float32(resolution[1]) * multiply),
-	}
-
-	topLeft := []int{
-		position[0] - int((endResolution[0]-resolution[0])/2),
-		position[1] - int((endResolution[1]-resolution[1])/2),
-	}
-
-	bottomRight := []int{
-		position[0] + resolution[0] + int((endResolution[0]-resolution[0])/2),
-		position[1] + resolution[1] + int((endResolution[1]-resolution[1])/2),
-	}
+	bottomRight := vec2d.New(
+		position.X + float64(resolution[0])/2,
+		position.Y - float64(resolution[1])/2,
+	)
 	return topLeft, bottomRight
 }
 
