@@ -3,9 +3,10 @@ package entities
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Vladimiroff/vec2d"
 	"math"
 	"time"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 type Planet struct {

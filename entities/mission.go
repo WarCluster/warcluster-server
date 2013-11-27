@@ -2,6 +2,7 @@ package entities
 
 import (
 	"fmt"
+
 	"github.com/Vladimiroff/vec2d"
 )
 

@@ -3,9 +3,10 @@ package db
 
 import (
 	"fmt"
-	"github.com/garyburd/redigo/redis"
 	"log"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
 )
 
 // Pool maintains a pool of connections to the database

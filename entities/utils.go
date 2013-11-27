@@ -4,13 +4,14 @@ import (
 	"crypto/sha512"
 	"encoding/json"
 	"fmt"
-	"github.com/Vladimiroff/vec2d"
 	"io"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 // Creates an entity via unmarshaling a json.

@@ -4,13 +4,15 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/fzzy/sockjs-go/sockjs"
 	"log"
 	"net"
 	"net/http"
 	"path"
 	"runtime"
 	"runtime/debug"
+
+	"github.com/fzzy/sockjs-go/sockjs"
+
 	"warcluster/server/response"
 )
 

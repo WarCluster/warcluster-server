@@ -1,8 +1,9 @@
 package entities
 
 import (
-	"github.com/Vladimiroff/vec2d"
 	"time"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 var (

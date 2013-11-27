@@ -2,8 +2,9 @@ package entities
 
 import (
 	"fmt"
-	"github.com/Vladimiroff/vec2d"
 	"time"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 type Player struct {
