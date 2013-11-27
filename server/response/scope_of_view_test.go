@@ -15,3 +15,13 @@ func TestCalculateCanvasSize(t *testing.T) {
 		t.Errorf("bottomRight is %#v, expected: %#v", *bottomRight, *vec2d.New(5420, -5250))
 	}
 }
+
+func TestListAreas(t *testing.T) {
+	topLeft := vec2d.New(-5380, 5350)
+	bottomRight := vec2d.New(5420, -5250)
+
+	areas := listAreas(topLeft, bottomRight)
+	if areas[0] != "area:0:0" || areas[1] != "area:0:-1" {
+		t.Errorf("Areas turned out to be %#v", areas)
+	}
+}

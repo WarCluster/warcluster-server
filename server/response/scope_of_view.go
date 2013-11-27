@@ -2,6 +2,7 @@ package response
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/Vladimiroff/vec2d"
 
@@ -41,16 +42,16 @@ func calculateCanvasSize(position *vec2d.Vector, resolution []int) (*vec2d.Vecto
 }
 
 func listAreas(topLeft, bottomRight *vec2d.Vector) []string {
-	topLeft.X = Seil(topLeft.X)
-	topLeft.Y = Seil(topLeft.Y)
-	bottomRight.X = Seil(bottomRight.X)
-	bottomRight.Y = Seil(bottomRight.Y)
+	topLeft.X = math.Ceil(topLeft.X/entities.ENTITIES_AREA_SIZE)
+	topLeft.Y = math.Floor(topLeft.Y/entities.ENTITIES_AREA_SIZE)
+	bottomRight.X = math.Ceil(bottomRight.X/entities.ENTITIES_AREA_SIZE)
+	bottomRight.Y = math.Floor(bottomRight.Y/entities.ENTITIES_AREA_SIZE)
 
 	var output []string
 
-	for Xiter := topLeft.X; Xiter >= bottomRight.X; Xiter-- {
-		for Yiter := topLeft.Y; Xiter >= bottomRight.Y; Yiter-- {
-			output = append(output, fmt.Sprintf("area:%d:%d", Xiter, Yiter))
+	for xIter := topLeft.X; xIter < bottomRight.X; xIter++ {
+		for yIter := topLeft.Y; yIter >= bottomRight.Y; yIter-- {
+			output = append(output, fmt.Sprintf("area:%v:%v", int64(xIter), int64(yIter)))
 		}
 	}
 	return output
