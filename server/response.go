@@ -11,23 +11,8 @@ import (
 // to call calculateCanvasSize and give the player the information
 // contained in the given borders.
 func scopeOfView(request *Request) error {
-	res := response.NewScopeOfView()
-
-	populateEntities := func(query string) map[string]entities.Entity {
-		result := make(map[string]entities.Entity)
-		entities := entities.Find(query)
-		for _, entity := range entities {
-			result[entity.Key()] = entity
-		}
-		return result
-	}
-
-	res.Missions = populateEntities("mission.*")
-	res.Planets = populateEntities("planet.*")
-	res.Suns = populateEntities("sun.*")
-	request.Client.Player.ScreenPosition = request.Position
+	res := response.NewScopeOfView(request.Position, request.Resolution)
 	go entities.Save(request.Client.Player)
-
 	return response.Send(res, request.Client.Session.Send)
 }
 
