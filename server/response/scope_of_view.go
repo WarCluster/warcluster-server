@@ -1,9 +1,11 @@
 package response
 
 import (
-	"warcluster/entities"
+	"fmt"
 
 	"github.com/Vladimiroff/vec2d"
+
+	"warcluster/entities"
 )
 
 type ScopeOfView struct {
@@ -31,4 +33,20 @@ func calculateCanvasSize(position *vec2d.Vector, resolution []int) (*vec2d.Vecto
 		position.Y-float64(resolution[1])/2,
 	)
 	return topLeft, bottomRight
+}
+
+func listAreas(topLeft, bottomRight *vec2d.Vector) []string {
+	topLeft.X = Seil(topLeft.X)
+	topLeft.Y = Seil(topLeft.Y)
+	bottomRight.X = Seil(bottomRight.X)
+	bottomRight.Y = Seil(bottomRight.Y)
+
+	var output []string
+
+	for Xiter := topLeft.X; Xiter >= bottomRight.X; Xiter-- {
+		for Yiter := topLeft.Y; Xiter >= bottomRight.Y; Yiter-- {
+			output = append(output, fmt.Sprintf("area:%d:%d", Xiter, Yiter))
+		}
+	}
+	return output
 }
