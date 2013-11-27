@@ -97,3 +97,32 @@ func Delete(key string) error {
 
 	return db.Delete(conn, key)
 }
+
+// Get and serialize all members of a set
+func GetAreasMembers(areas []string) []Entity {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	keys := []string{}
+	entityList := []Entity{}
+
+	for _, area := range areas {
+		result, err := db.Smembers(conn, area)
+		if err != nil {
+			continue
+		}
+		keys = append(keys, result...)
+	}
+
+	for _, key := range keys {
+		record, err := db.Get(conn, key)
+		if err != nil {
+			continue
+		}
+
+		entityList = append(entityList, Construct(key, record))
+	}
+
+	return entityList
+}
+
