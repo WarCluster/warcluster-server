@@ -17,3 +17,6 @@ config/config.gcfg
 # Project binaries
 warcluster
 warcluster.exe
+
+# Test dump files
+*.test
