@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -95,4 +96,17 @@ func extractUsernameInitials(nickname string) string {
 		unicode.ToUpper(letters[1]),
 		unicode.ToUpper(letters[2]),
 	)
+}
+
+func roundCoordinateTo(coordinate float64) int64 {
+	value := coordinate/ENTITIES_AREA_SIZE
+	if value > 0 {
+		value = math.Ceil(value)
+	} else if value == 0 {
+		value = 1
+	}else {
+		value = math.Floor(value)
+	}
+
+	return int64(value)
 }
