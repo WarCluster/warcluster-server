@@ -27,7 +27,7 @@ type planetMarshalHook Planet
 
 // Database key.
 func (p *Planet) Key() string {
-	return fmt.Sprintf("planet.%s", p.Name)
+	return fmt.Sprintf(ENTITIES_AREA_TEMPLATE, p.Name)
 }
 
 // Checks if the planet has an owner or not.
@@ -38,7 +38,7 @@ func (p *Planet) HasOwner() bool {
 // Returns the set by X or Y where this entity has to be put in
 func (p *Planet) AreaSet() string {
 	return fmt.Sprintf(
-		"entities:%d:%d",
+		ENTITIES_AREA_TEMPLATE,
 		int64(p.Position.X/ENTITIES_RANGE_SIZE),
 		int64(p.Position.Y/ENTITIES_RANGE_SIZE),
 	)

@@ -25,7 +25,7 @@ func (s *Sun) Key() string {
 // Returns the set by X or Y where this entity has to be put in
 func (s *Sun) AreaSet() string {
 	return fmt.Sprintf(
-		"entities:%d:%d",
+		ENTITIES_AREA_TEMPLATE,
 		int64(s.Position.X/ENTITIES_RANGE_SIZE),
 		int64(s.Position.Y/ENTITIES_RANGE_SIZE),
 	)
