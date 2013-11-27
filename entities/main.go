@@ -125,4 +125,3 @@ func GetAreasMembers(areas []string) []Entity {
 
 	return entityList
 }
-

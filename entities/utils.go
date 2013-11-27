@@ -99,12 +99,12 @@ func extractUsernameInitials(nickname string) string {
 }
 
 func RoundCoordinateTo(coordinate float64) int64 {
-	value := coordinate/ENTITIES_AREA_SIZE
+	value := coordinate / ENTITIES_AREA_SIZE
 	if value > 0 {
 		value = math.Ceil(value)
 	} else if value == 0 {
 		value = 1
-	}else {
+	} else {
 		value = math.Floor(value)
 	}
 

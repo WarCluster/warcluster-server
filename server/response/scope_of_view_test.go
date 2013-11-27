@@ -21,7 +21,7 @@ func TestListAreas(t *testing.T) {
 	bottomRight := vec2d.New(5420, -5250)
 
 	areas := listAreas(topLeft, bottomRight)
-	if areas[0] != "area:0:0" || areas[1] != "area:0:-1" {
+	if len(areas) != 4 {
 		t.Errorf("Areas turned out to be %#v", areas)
 	}
 }
