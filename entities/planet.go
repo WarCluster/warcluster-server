@@ -39,8 +39,8 @@ func (p *Planet) HasOwner() bool {
 func (p *Planet) AreaSet() string {
 	return fmt.Sprintf(
 		ENTITIES_AREA_TEMPLATE,
-		roundCoordinateTo(p.Position.X),
-		roundCoordinateTo(p.Position.Y),
+		RoundCoordinateTo(p.Position.X),
+		RoundCoordinateTo(p.Position.Y),
 	)
 }
 
