@@ -12,13 +12,13 @@ import (
 // calculateCanvasSize is used to determine where is the viewable by client's area
 func calculateCanvasSize(position *vec2d.Vector, resolution []int) (*vec2d.Vector, *vec2d.Vector) {
 	topLeft := vec2d.New(
-		position.X - float64(resolution[0])/2,
-		position.Y + float64(resolution[1])/2,
+		position.X-float64(resolution[0])/2,
+		position.Y+float64(resolution[1])/2,
 	)
 
 	bottomRight := vec2d.New(
-		position.X + float64(resolution[0])/2,
-		position.Y - float64(resolution[1])/2,
+		position.X+float64(resolution[0])/2,
+		position.Y-float64(resolution[1])/2,
 	)
 	return topLeft, bottomRight
 }
@@ -82,6 +82,13 @@ func parseAction(request *Request) error {
 		request.Fleet,
 		request.Type,
 	)
+
+	if mission.ShipCount == 0 {
+		missionFailed := response.NewSendMissionFailed()
+		missionFailed.Error = "Not enough pilots on source planet!"
+		response.Send(missionFailed, request.Client.Session.Send)
+	}
+
 	go StartMissionary(mission)
 	entities.Save(mission)
 	entities.Save(source)
