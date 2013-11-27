@@ -36,6 +36,6 @@ func Sadd(conn redis.Conn, set, key string) error {
 }
 
 // Takes all the members in a Redis set
-func Smembers(conn redis.Conn, set string) ([]interface{}, error) {
-	return redis.Values(conn.Do("SMEMBERS", set))
+func Smembers(conn redis.Conn, set string) ([]string, error) {
+	return redis.Strings(conn.Do("SMEMBERS", set))
 }
