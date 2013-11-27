@@ -3,25 +3,9 @@ package server
 import (
 	"errors"
 
-	"github.com/Vladimiroff/vec2d"
-
 	"warcluster/entities"
 	"warcluster/server/response"
 )
-
-// calculateCanvasSize is used to determine where is the viewable by client's area
-func calculateCanvasSize(position *vec2d.Vector, resolution []int) (*vec2d.Vector, *vec2d.Vector) {
-	topLeft := vec2d.New(
-		position.X-float64(resolution[0])/2,
-		position.Y+float64(resolution[1])/2,
-	)
-
-	bottomRight := vec2d.New(
-		position.X+float64(resolution[0])/2,
-		position.Y-float64(resolution[1])/2,
-	)
-	return topLeft, bottomRight
-}
 
 // scopeOfView is not finished yet but the purpose of the function is
 // to call calculateCanvasSize and give the player the information

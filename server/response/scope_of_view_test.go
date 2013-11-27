@@ -1,4 +1,4 @@
-package server
+package response
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/Vladimiroff/vec2d"
 )
 
-func TestResponse(t *testing.T) {
+func TestCalculateCanvasSize(t *testing.T) {
 	topLeft, bottomRight := calculateCanvasSize(vec2d.New(20, 50), []int{800, 600})
 	if *topLeft != *vec2d.New(-380, 350) {
 		t.Errorf("topLeft is %#v, expected: %#v", *topLeft, *vec2d.New(-380, 350))
