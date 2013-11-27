@@ -26,8 +26,8 @@ func (s *Sun) Key() string {
 func (s *Sun) AreaSet() string {
 	return fmt.Sprintf(
 		ENTITIES_AREA_TEMPLATE,
-		int64(s.Position.X/ENTITIES_RANGE_SIZE),
-		int64(s.Position.Y/ENTITIES_RANGE_SIZE),
+		int64(s.Position.X/ENTITIES_AREA_SIZE),
+		int64(s.Position.Y/ENTITIES_AREA_SIZE),
 	)
 }
 

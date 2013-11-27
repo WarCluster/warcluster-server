@@ -9,7 +9,7 @@ import (
 
 const (
 	ENTITIES_AREA_TEMPLATE        = "area:%d:%d"
-	ENTITIES_RANGE_SIZE           = 10000
+	ENTITIES_AREA_SIZE            = 10000
 	PLANETS_RING_OFFSET           = 300
 	PLANETS_PLANET_RADIUS         = 300
 	PLANETS_PLANET_COUNT          = 10
