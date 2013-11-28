@@ -23,6 +23,13 @@ type embeddedPlanet struct {
 	Position *vec2d.Vector
 }
 
+// TODO
+type AreaTransferPoint struct {
+	TravelTime     int64
+	Direction      int8
+	CoordinateAxis rune
+}
+
 // Database key.
 func (m *Mission) Key() string {
 	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source.Name)
@@ -36,8 +43,70 @@ func (m *Mission) GetSpeed() int64 {
 
 // Returns the sorted set by X or Y where this entity has to be put in
 func (m *Mission) AreaSet() string {
-	source, _ := Get(fmt.Sprintf("planet.%s", m.Target.Name))
+	source, _ := Get(fmt.Sprintf("planet.%s", m.Source.Name))
 	return source.AreaSet()
+}
+
+// Returns all transfer points this mission will ever cross
+func (m *Mission) TransferPoints() []*AreaTransferPoint {
+	result := []*AreaTransferPoint{}
+
+	fillAxises := func(startPoint, endPoint float64) (container []int64) {
+		startAxis := RoundCoordinateTo(startPoint)
+		endAxis := RoundCoordinateTo(endPoint)
+		axises := []int64{startAxis, endAxis}
+		if endAxis > startAxis {
+			axises = []int64{endAxis, startAxis}
+		}
+
+		for i := axises[0] + 1; i < axises[1]; i += 1 {
+			container = append(container, i*ENTITIES_AREA_SIZE)
+		}
+		return
+	}
+
+	axisDirection := func(xA, xB float64) int8 {
+		if xB > xA {
+			return 1
+		} else if xB == xA {
+			return 0
+		} else {
+			return -1
+		}
+	}
+
+	xAxises := fillAxises(m.Source.Position.X, m.Target.Position.X)
+	yAxises := fillAxises(m.Source.Position.Y, m.Target.Position.Y)
+
+	missionVectorEquation := NewCartesianEquation(m.Source.Position, m.Target.Position)
+
+	direction := []int8{
+		axisDirection(m.Source.Position.X, m.Target.Position.X),
+		axisDirection(m.Source.Position.Y, m.Target.Position.Y),
+	}
+
+	for _, axis := range xAxises {
+		crossPoint := vec2d.New(float64(axis), missionVectorEquation.GetYByX(float64(axis)))
+		transferPoint := &AreaTransferPoint{
+			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, m.GetSpeed()),
+			Direction:      direction[0],
+			CoordinateAxis: 'X',
+		}
+		result = append(result, transferPoint)
+	}
+
+	for _, axis := range yAxises {
+		crossPoint := vec2d.New(missionVectorEquation.GetXByY(float64(axis)), float64(axis))
+		transferPoint := &AreaTransferPoint{
+			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, m.GetSpeed()),
+			Direction:      direction[1],
+			CoordinateAxis: 'Y',
+		}
+		result = append(result, transferPoint)
+	}
+
+	//TODO: Sort this by TravelTime
+	return result
 }
 
 // Calculates the travel time in milliseconds between two planets with given speed.
