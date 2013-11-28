@@ -15,6 +15,28 @@ import (
 	"github.com/Vladimiroff/vec2d"
 )
 
+type CartesianEquation struct {
+	a, b float64
+}
+
+func NewCartesianEquation(startPoint, endPoint *vec2d.Vector) *CartesianEquation {
+	ce := new(CartesianEquation)
+	ce.a = (endPoint.Y - startPoint.Y) / (startPoint.X - endPoint.X)
+	ce.b = startPoint.Y - ce.a * startPoint.X
+	return ce
+}
+
+func (ce *CartesianEquation) GetXByY(y float64) float64 {
+	if ce.a == 0 {
+		return 0
+	}
+	return y - ce.b / ce.a
+}
+
+func (ce *CartesianEquation) GetYByX(x float64) float64 {
+	return ce.a * x + ce.b
+}
+
 // Creates an entity via unmarshaling a json.
 // The concrete entity type is given by the user as `key`
 func Construct(key string, data []byte) Entity {
