@@ -1,8 +1,6 @@
 package db
 
-import (
-	"github.com/garyburd/redigo/redis"
-)
+import "github.com/garyburd/redigo/redis"
 
 // Save takes a key, name of the set and the marshaled record and writes it in.
 func Save(conn redis.Conn, key, setKey string, value []byte) error {
@@ -38,4 +36,10 @@ func Sadd(conn redis.Conn, set, key string) error {
 // Takes all the members in a Redis set
 func Smembers(conn redis.Conn, set string) ([]string, error) {
 	return redis.Strings(conn.Do("SMEMBERS", set))
+}
+
+// Remove a member from set
+func Srem(conn redis.Conn, set, key string) error {
+	_, err := conn.Do("SREM", set, key)
+	return err
 }

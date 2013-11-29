@@ -125,3 +125,11 @@ func GetAreasMembers(areas []string) []Entity {
 
 	return entityList
 }
+
+// Remove a member from set
+func RemoveFromArea(key, from string) error {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.Srem(conn, key, from)
+}
