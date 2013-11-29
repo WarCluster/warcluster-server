@@ -40,6 +40,7 @@ func StartMissionary(mission *entities.Mission) {
 	}
 	response.Send(stateChange, sessions.Broadcast)
 
+	entities.RemoveFromArea(mission.Key(), mission.AreaSet())
 	entities.Delete(mission.Key())
 
 	if excessShips > 0 {
