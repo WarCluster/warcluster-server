@@ -2,6 +2,10 @@ package entities
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/Vladimiroff/vec2d"
 )
@@ -12,22 +16,16 @@ type Mission struct {
 	Target     embeddedPlanet
 	Type       string
 	StartTime  int64
-	TravelTime int64
+	TravelTime time.Duration // in ms.
 	Player     string
 	ShipCount  int32
+	areaSet    string
 }
 
 // Just an internal type, used to embed source and target in Mission
 type embeddedPlanet struct {
 	Name     string
 	Position *vec2d.Vector
-}
-
-// TODO
-type AreaTransferPoint struct {
-	TravelTime     int64
-	Direction      int8
-	CoordinateAxis rune
 }
 
 // Database key.
@@ -43,19 +41,34 @@ func (m *Mission) GetSpeed() int64 {
 
 // Returns the sorted set by X or Y where this entity has to be put in
 func (m *Mission) AreaSet() string {
-	source, _ := Get(fmt.Sprintf("planet.%s", m.Source.Name))
-	return source.AreaSet()
+	return m.areaSet
+}
+
+// Changes its areaset based on axis and direction and updates the db
+func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
+	areaParts := strings.Split(m.areaSet, ":")
+	x, _ := strconv.ParseInt(areaParts[1], 10, 64)
+	y, _ := strconv.ParseInt(areaParts[2], 10, 64)
+
+	if axis == 'X' {
+		x += int64(direction)
+	} else if axis == 'Y' {
+		y += int64(direction)
+	}
+
+	m.areaSet = fmt.Sprintf("area:%d:%d", x, y)
+	RemoveFromArea(m.Key(), m.areaSet)
 }
 
 // Returns all transfer points this mission will ever cross
-func (m *Mission) TransferPoints() []*AreaTransferPoint {
-	result := []*AreaTransferPoint{}
+func (m *Mission) TransferPoints() AreaTransferPoints {
+	result := make(AreaTransferPoints, 0, 10)
 
 	fillAxises := func(startPoint, endPoint float64) (container []int64) {
 		startAxis := RoundCoordinateTo(startPoint)
 		endAxis := RoundCoordinateTo(endPoint)
 		axises := []int64{startAxis, endAxis}
-		if endAxis > startAxis {
+		if endAxis < startAxis {
 			axises = []int64{endAxis, startAxis}
 		}
 
@@ -105,15 +118,15 @@ func (m *Mission) TransferPoints() []*AreaTransferPoint {
 		result = append(result, transferPoint)
 	}
 
-	//TODO: Sort this by TravelTime
+	sort.Sort(result)
 	return result
 }
 
 // Calculates the travel time in milliseconds between two planets with given speed.
 // Traveling is implemented like a simple time.Sleep from our side.
-func calculateTravelTime(source, target *vec2d.Vector, speed int64) int64 {
+func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duration {
 	distance := vec2d.GetDistance(source, target)
-	return int64(distance / float64(speed) * 100)
+	return time.Duration(distance / float64(speed) * 100)
 }
 
 // When the missionary is done traveling (a.k.a. sleeping) calls this in order

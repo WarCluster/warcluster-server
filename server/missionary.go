@@ -17,11 +17,13 @@ func StartMissionary(mission *entities.Mission) {
 
 	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
 	for _, transferPoint := range mission.TransferPoints() {
-		timeToSleep := time.Duration(transferPoint.TravelTime) - timeSlept
+		timeToSleep := transferPoint.TravelTime - timeSlept
 		timeSlept += timeToSleep
 		time.Sleep(timeToSleep * time.Millisecond)
 		mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
 	}
+
+	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
 
 	targetEntity, err := entities.Get(targetKey)
 	if err != nil {

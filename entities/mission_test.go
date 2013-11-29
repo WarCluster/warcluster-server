@@ -96,7 +96,7 @@ func TestEndMissionDenyTakeover(t *testing.T) {
 func TestTravelTime(t *testing.T) {
 	source := vec2d.New(100, 200)
 	target := vec2d.New(800, 150)
-	expectedTime := int64(7017)
+	expectedTime := time.Duration(7017)
 	time := calculateTravelTime(source, target, 10)
 
 	if time != expectedTime {
