@@ -15,22 +15,12 @@ import (
 func StartMissionary(mission *entities.Mission) {
 	var timeSlept time.Duration = 0
 
-	areaSet = mission.AreaSet()
 	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
 	for _, transferPoint := range mission.TransferPoints() {
 		timeToSleep := time.Duration(transferPoint.TravelTime) - timeSlept
 		timeSlept += timeToSleep
 		time.Sleep(timeToSleep * time.Millisecond)
-		// TODO:
-		if transferPoint.CoordinateAxis == 'X' {
-			// area:x+transferPoint.Direction:y
-		} else {
-			// area:x:y+transferPoint.Direction
-		}
-		// Add mission to the new area
-		// Broadcast it to everybody
-		// Remove from the old one
-		// Update areaSet
+		mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
 	}
 
 	targetEntity, err := entities.Get(targetKey)
