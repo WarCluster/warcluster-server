@@ -21,6 +21,12 @@ func StartMissionary(mission *entities.Mission) {
 		timeSlept += timeToSleep
 		time.Sleep(timeToSleep * time.Millisecond)
 		mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
+
+		stateChange := response.NewStateChange()
+		stateChange.Missions = map[string]entities.Entity{
+			mission.Key(): mission,
+		}
+		response.Send(stateChange, sessions.Broadcast)
 	}
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
