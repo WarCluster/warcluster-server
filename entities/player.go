@@ -72,7 +72,7 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	}
 
 	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
-	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, &vec2d.Vector{2, 2}}
+	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, HomePlanet.Position}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
 	return &player
