@@ -31,7 +31,7 @@ type Client struct {
 // 3.1.Create a new sun with GenerateSun
 // 3.2.Choose home planet from the newly created solar sysitem.
 // 3.3.Create a reccord of the new player and start comunication.
-func authenticate(session sockjs.Session) (string, *entities.Player, error) {
+func authenticate(session sockjs.Session) (string, *entities.Player, bool, error) {
 	var player *entities.Player
 	var nickname string
 	var twitterId string
@@ -39,7 +39,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 
 	for {
 		if message := session.Receive(); message == nil {
-			return "", nil, errors.New("No credentials provided")
+			return "", nil, false, errors.New("No credentials provided")
 		} else {
 			if err := json.Unmarshal(message, request); err == nil {
 				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
@@ -54,7 +54,8 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 	}
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
-	if entity == nil {
+	justRegistered := entity == nil
+	if justRegistered {
 		allSunsEntities := entities.Find("sun.*")
 		allSuns := []entities.Sun{}
 		for _, entity := range allSunsEntities {
@@ -86,5 +87,5 @@ func authenticate(session sockjs.Session) (string, *entities.Player, error) {
 	} else {
 		player = entity.(*entities.Player)
 	}
-	return nickname, player, nil
+	return nickname, player, justRegistered, nil
 }

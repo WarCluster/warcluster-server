@@ -12,6 +12,7 @@ import (
 // contained in the given borders.
 func scopeOfView(request *Request) error {
 	res := response.NewScopeOfView(request.Position, request.Resolution)
+	request.Client.Player.ScreenPosition = request.Position
 	go entities.Save(request.Client.Player)
 	return response.Send(res, request.Client.Session.Send)
 }
