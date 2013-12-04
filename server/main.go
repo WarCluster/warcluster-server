@@ -78,7 +78,7 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 // It check for existing user in the DB and logs him if the password is correct.
 // If the user is new he is initiated and a new home planet nad solar system are generated.
 func login(session sockjs.Session) (*Client, error) {
-	nickname, player, justRegistered, err := authenticate(session)
+	player, justRegistered, err := authenticate(session)
 	if err != nil {
 		response.Send(response.NewLoginFailed(), session.Send)
 		log.Println(err)
@@ -86,9 +86,8 @@ func login(session sockjs.Session) (*Client, error) {
 	}
 
 	client := &Client{
-		Session:  session,
-		Nickname: nickname,
-		Player:   player,
+		Session: session,
+		Player:  player,
 	}
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {

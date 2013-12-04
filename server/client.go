@@ -15,12 +15,10 @@ import (
 // The information for each person is stored in two seperate structures. Player and Client.
 // This is one of them. The purpouse of the Client struct is to hold the server(connection) information.
 // 1.Session holds the curent player session socket for comunication.
-// 2.Nickname is used as a key because its the common data between the two structures and the database.
-// 3.This is a pointer to the player struct for easy acsess.
+// 2.Player is a pointer to the player struct for easy access.
 type Client struct {
-	Session  sockjs.Session
-	Nickname string
-	Player   *entities.Player
+	Session sockjs.Session
+	Player  *entities.Player
 }
 
 // Authenticate is a function called for every client's new session.
@@ -31,7 +29,7 @@ type Client struct {
 // 3.1.Create a new sun with GenerateSun
 // 3.2.Choose home planet from the newly created solar sysitem.
 // 3.3.Create a reccord of the new player and start comunication.
-func authenticate(session sockjs.Session) (string, *entities.Player, bool, error) {
+func authenticate(session sockjs.Session) (*entities.Player, bool, error) {
 	var player *entities.Player
 	var nickname string
 	var twitterId string
@@ -39,7 +37,7 @@ func authenticate(session sockjs.Session) (string, *entities.Player, bool, error
 
 	for {
 		if message := session.Receive(); message == nil {
-			return "", nil, false, errors.New("No credentials provided")
+			return nil, false, errors.New("No credentials provided")
 		} else {
 			if err := json.Unmarshal(message, request); err == nil {
 				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
@@ -87,5 +85,5 @@ func authenticate(session sockjs.Session) (string, *entities.Player, bool, error
 	} else {
 		player = entity.(*entities.Player)
 	}
-	return nickname, player, justRegistered, nil
+	return player, justRegistered, nil
 }
