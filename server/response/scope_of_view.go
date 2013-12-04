@@ -15,19 +15,27 @@ const (
 
 type ScopeOfView struct {
 	baseResponse
-	Missions map[string]*entities.Mission
-	Planets  map[string]*entities.Planet
-	Suns     map[string]*entities.Sun
+	Missions     map[string]*entities.Mission
+	Planets      map[string]*entities.Planet
+	Suns         map[string]*entities.Sun
+	CanvasPoints struct {
+		TopLeft     *vec2d.Vector
+		BottomRight *vec2d.Vector
+	}
 }
 
 func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
+	topLeft, bottomRight := calculateCanvasSize(position, resolution)
+
 	s := new(ScopeOfView)
 	s.Command = "scope_of_view_result"
 	s.Missions = make(map[string]*entities.Mission)
 	s.Planets = make(map[string]*entities.Planet)
 	s.Suns = make(map[string]*entities.Sun)
+	s.CanvasPoints.TopLeft = topLeft
+	s.CanvasPoints.BottomRight = bottomRight
 
-	areas := listAreas(calculateCanvasSize(position, resolution))
+	areas := listAreas(topLeft, bottomRight)
 	entityList := entities.GetAreasMembers(areas)
 	for _, entity := range entityList {
 		switch entity.(type) {
