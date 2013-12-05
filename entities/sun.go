@@ -31,26 +31,6 @@ func (s *Sun) AreaSet() string {
 	)
 }
 
-// Updates the sun position while doing this nasty placing the sun
-func (s *Sun) update() {
-	direction := vec2d.Sub(s.target, s.Position)
-	if int32(direction.Length()) >= s.speed {
-		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
-		s.Position = vec2d.New(s.Position.X+direction.X, s.Position.Y+direction.Y)
-	}
-}
-
-// Handles the collisions while moving the sun
-func (s *Sun) collider(staticSun *Sun) {
-	distance := vec2d.GetDistance(s.Position, staticSun.Position)
-	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
-		overlap := SUNS_SOLAR_SYSTEM_RADIUS - distance
-		ndir := vec2d.Sub(staticSun.Position, s.Position)
-		ndir.SetLength(overlap)
-		s.Position.Sub(ndir)
-	}
-}
-
 // Generate sun's name out of user's initials and 3-digit random number
 func (s *Sun) generateName(nickname string) {
 	hash, _ := strconv.ParseInt(GenerateHash(nickname)[0:18], 10, 64)
@@ -58,6 +38,83 @@ func (s *Sun) generateName(nickname string) {
 	initials := extractUsernameInitials(nickname)
 	number := random.Int31n(899) + 100 // we need a 3-digit number
 	s.Name = fmt.Sprintf("%s%v", initials, number)
+}
+
+// Generates the key of the start position node
+func (s *Sun) getStartPosNode(friends *[]Sun) *Node {
+	targetPosition := vec2d.New(0, 0)
+
+	//Find best position between all friends
+	for _, friend := range friends {
+		targetPosition.Collect(friend.Position)
+	}
+	targetPosition.DivToFloat64(float64(len(friends)))
+
+	//Approximate target to nearest node
+	targetPosition.X = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((2*targetPosition.X/SUNS_SOLAR_SYSTEM_RADIUS)+0.5)
+	targetPosition.Y = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((2*targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*math.Sqrt(3))+0.5)
+
+	return newNode(targetPosition.X, targetPosition.Y)
+
+}
+
+func (s *Sun) fetchNodesLayer(rootNode *Node, zLevel uint32) (results []*Node) {
+	horizontalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS / 2) + 0.5)
+	verticalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
+
+	results = append(results, newNode(rootNodeX-SUNS_SOLAR_SYSTEM_RADIUS*zLevel, rootNodeY))
+	results = append(results, newNode(rootNodeX+SUNS_SOLAR_SYSTEM_RADIUS*zLevel, rootNodeY))
+	results = append(results, newNode(rootNodeX-horizontalOffset*zLevel, rootNodeY+verticalOffset*zLevel))
+	results = append(results, newNode(rootNodeX-horizontalOffset*zLevel, rootNodeY-verticalOffset*zLevel))
+	results = append(results, newNode(rootNodeX+horizontalOffset*zLevel, rootNodeY+verticalOffset*zLevel))
+	results = append(results, newNode(rootNodeX+horizontalOffset*zLevel, rootNodeY-verticalOffset*zLevel))
+
+	for i := 1; i < zLevel; i++ {
+		results = append(results, newNode(rootNodeX-SUNS_SOLAR_SYSTEM_RADIUS*zLevel+horizontalOffset*i, rootNodeY+verticalOffset*i))
+		results = append(results, newNode(rootNodeX-SUNS_SOLAR_SYSTEM_RADIUS*zLevel+horizontalOffset*i, rootNodeY-verticalOffset*i))
+		results = append(results, newNode(rootNodeX+SUNS_SOLAR_SYSTEM_RADIUS*zLevel-horizontalOffset*i, rootNodeY+verticalOffset*i))
+		results = append(results, newNode(rootNodeX+SUNS_SOLAR_SYSTEM_RADIUS*zLevel-horizontalOffset*i, rootNodeY-verticalOffset*i))
+		results = append(results, newNode(rootNodeX-horizontalOffset*zLevel+SUNS_SOLAR_SYSTEM_RADIUS*i, rootNodeY+verticalOffset*zLevel))
+		results = append(results, newNode(rootNodeX-horizontalOffset*zLevel+SUNS_SOLAR_SYSTEM_RADIUS*i, rootNodeY-verticalOffset*zLevel))
+	}
+	return results
+}
+
+type Node struct {
+	Data     string
+	Position *vec2d.Vector
+}
+
+func newNode(x, y float64) *Node {
+	n := new(Node)
+	n.Position = vec2d.New(x, y)
+	return n
+}
+
+func (n *Node) Key() string {
+	return fmt.Sprintf("Node:%d_%d", n.Position.X, n.Position.Y)
+}
+
+// TODO: This node thing should be a type
+func (s *Sun) findHomeNode(rootNode *Node) *Node {
+	var zLevel uint32 = 1
+
+	rootNodeEntity, _ := Get(rootNode.Key())
+
+	if rootNodeEntity.(*Node).Data == "" {
+		return rootNode
+	}
+
+	for {
+		nodes := fetchNodesLayer(rootNodeEntity.(*Node), zLevel)
+		nodesEntities := FindList(nodes)
+		for _, nodeEntity := range nodesEntities {
+			if nodeEntity.Data == "" {
+				return nodeEntity
+			}
+		}
+		zLevel++
+	}
 }
 
 // Uses all player's twitter friends and tries to place the sun as
@@ -73,29 +130,12 @@ func GenerateSun(username string, friends, others []Sun) *Sun {
 		Position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
 	}
 	newSun.generateName(username)
-	targetPosition := vec2d.New(0, 0)
 
-	for _, friend := range friends {
-		targetPosition.Collect(friend.Position)
-	}
-	targetPosition.DivToFloat64(float64(len(friends)))
+	node := findHomeNode(getStartPosNode(friends))
+	node.Data = newSun.Key()
+	Save(node)
 
-	noChange := false
-
-	var oldPos *vec2d.Vector
-	for noChange != true {
-		oldPos = newSun.Position
-		newSun.update()
-		for _, sunEntity := range append(friends, others...) {
-			newSun.collider(&sunEntity)
-		}
-
-		if newSun.Position.X == oldPos.X && newSun.Position.Y == oldPos.Y {
-			noChange = true
-		}
-	}
-
-	newSun.Position.X = math.Floor(newSun.Position.X)
-	newSun.Position.Y = math.Floor(newSun.Position.Y)
+	newSun.Position.X = node.Position.X
+	newSun.Position.Y = node.Position.Y
 	return &newSun
 }
