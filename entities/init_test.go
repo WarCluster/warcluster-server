@@ -21,7 +21,7 @@ var (
 		},
 		Type:       "Attack",
 		StartTime:  timeStamp,
-		TravelTime: timeStamp,
+		TravelTime: time.Duration(timeStamp),
 		Player:     "gophie",
 		ShipCount:  5,
 	}
@@ -37,7 +37,7 @@ var (
 		},
 		Type:       "Attack",
 		StartTime:  now,
-		TravelTime: now,
+		TravelTime: time.Duration(now),
 		Player:     "chochko",
 		ShipCount:  10,
 	}

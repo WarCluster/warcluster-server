@@ -13,6 +13,7 @@ import (
 
 	"github.com/fzzy/sockjs-go/sockjs"
 
+	"warcluster/entities"
 	"warcluster/server/response"
 )
 
@@ -77,21 +78,24 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 // It check for existing user in the DB and logs him if the password is correct.
 // If the user is new he is initiated and a new home planet nad solar system are generated.
 func login(session sockjs.Session) (*Client, error) {
-	nickname, player, err := authenticate(session)
+	player, justRegistered, err := authenticate(session)
 	if err != nil {
 		response.Send(response.NewLoginFailed(), session.Send)
+		log.Println(err)
 		return nil, errors.New("Login failed")
 	}
 
 	client := &Client{
-		Session:  session,
-		Nickname: nickname,
-		Player:   player,
+		Session: session,
+		Player:  player,
 	}
+	homePlanetEntity, err := entities.Get(player.HomePlanet)
+	if err != nil {
+		return nil, errors.New("Your home planet is missing!")
+	}
+	homePlanet := homePlanetEntity.(*entities.Planet)
 
-	loginSuccess := response.NewLoginSuccess()
-	loginSuccess.Username = client.Nickname
-	loginSuccess.Position = player.ScreenPosition
+	loginSuccess := response.NewLoginSuccess(player, homePlanet, justRegistered)
 	response.Send(loginSuccess, session.Send)
 	return client, nil
 }
@@ -131,6 +135,7 @@ func handler(session sockjs.Session) {
 			}
 		}
 	} else {
+		log.Println(err)
 		session.End()
 	}
 }

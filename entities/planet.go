@@ -38,9 +38,9 @@ func (p *Planet) HasOwner() bool {
 // Returns the set by X or Y where this entity has to be put in
 func (p *Planet) AreaSet() string {
 	return fmt.Sprintf(
-		"entities:%d:%d",
-		int64(p.Position.X/ENTITIES_RANGE_SIZE),
-		int64(p.Position.Y/ENTITIES_RANGE_SIZE),
+		ENTITIES_AREA_TEMPLATE,
+		RoundCoordinateTo(p.Position.X),
+		RoundCoordinateTo(p.Position.Y),
 	)
 }
 

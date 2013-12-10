@@ -7,58 +7,13 @@ import (
 	"warcluster/server/response"
 )
 
-// The three constants bellow are used by calculateCanvasSize to determine
-//the size of the area for wich information will be sent to the user.
-const (
-	BEST_PING  = 150
-	WORST_PING = 1500
-	STEPS      = 10
-)
-
-// calculateCanvasSize is used to determine how big of an area(information about an area)
-// do we need to send to the user to eleminate traces of lag.
-// TODO: Totally re(write|think) this one
-func calculateCanvasSize(position []int, resolution []int, lag int) ([]int, []int) {
-	step := int(WORST_PING - BEST_PING/STEPS)
-	multiply := 1.1 + float32((lag-BEST_PING)/step)*0.1
-	endResolution := []int{
-		int(float32(resolution[0]) * multiply),
-		int(float32(resolution[1]) * multiply),
-	}
-
-	topLeft := []int{
-		position[0] - int((endResolution[0]-resolution[0])/2),
-		position[1] - int((endResolution[1]-resolution[1])/2),
-	}
-
-	bottomRight := []int{
-		position[0] + resolution[0] + int((endResolution[0]-resolution[0])/2),
-		position[1] + resolution[1] + int((endResolution[1]-resolution[1])/2),
-	}
-	return topLeft, bottomRight
-}
-
 // scopeOfView is not finished yet but the purpose of the function is
 // to call calculateCanvasSize and give the player the information
 // contained in the given borders.
 func scopeOfView(request *Request) error {
-	res := response.NewScopeOfView()
-
-	populateEntities := func(query string) map[string]entities.Entity {
-		result := make(map[string]entities.Entity)
-		entities := entities.Find(query)
-		for _, entity := range entities {
-			result[entity.Key()] = entity
-		}
-		return result
-	}
-
-	res.Missions = populateEntities("mission.*")
-	res.Planets = populateEntities("planet.*")
-	res.Suns = populateEntities("sun.*")
+	res := response.NewScopeOfView(request.Position, request.Resolution)
 	request.Client.Player.ScreenPosition = request.Position
 	go entities.Save(request.Client.Player)
-
 	return response.Send(res, request.Client.Session.Send)
 }
 
@@ -97,6 +52,13 @@ func parseAction(request *Request) error {
 		request.Fleet,
 		request.Type,
 	)
+
+	if mission.ShipCount == 0 {
+		missionFailed := response.NewSendMissionFailed()
+		missionFailed.Error = "Not enough pilots on source planet!"
+		response.Send(missionFailed, request.Client.Session.Send)
+	}
+
 	go StartMissionary(mission)
 	entities.Save(mission)
 	entities.Save(source)

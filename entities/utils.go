@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -13,6 +14,28 @@ import (
 
 	"github.com/Vladimiroff/vec2d"
 )
+
+type CartesianEquation struct {
+	a, b float64
+}
+
+func NewCartesianEquation(startPoint, endPoint *vec2d.Vector) *CartesianEquation {
+	ce := new(CartesianEquation)
+	ce.a = (endPoint.Y - startPoint.Y) / (startPoint.X - endPoint.X)
+	ce.b = startPoint.Y - ce.a*startPoint.X
+	return ce
+}
+
+func (ce *CartesianEquation) GetXByY(y float64) float64 {
+	if ce.a == 0 {
+		return 0
+	}
+	return y - ce.b/ce.a
+}
+
+func (ce *CartesianEquation) GetYByX(x float64) float64 {
+	return ce.a*x + ce.b
+}
 
 // Creates an entity via unmarshaling a json.
 // The concrete entity type is given by the user as `key`
@@ -95,4 +118,17 @@ func extractUsernameInitials(nickname string) string {
 		unicode.ToUpper(letters[1]),
 		unicode.ToUpper(letters[2]),
 	)
+}
+
+func RoundCoordinateTo(coordinate float64) int64 {
+	value := coordinate / ENTITIES_AREA_SIZE
+	if value > 0 {
+		value = math.Ceil(value)
+	} else if value == 0 {
+		value = 1
+	} else {
+		value = math.Floor(value)
+	}
+
+	return int64(value)
 }

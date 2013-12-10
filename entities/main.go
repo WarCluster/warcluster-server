@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	ENTITIES_RANGE_SIZE           = 10000
+	ENTITIES_AREA_TEMPLATE        = "area:%d:%d"
+	ENTITIES_AREA_SIZE            = 10000
 	PLANETS_RING_OFFSET           = 300
 	PLANETS_PLANET_RADIUS         = 300
 	PLANETS_PLANET_COUNT          = 10
@@ -95,4 +96,40 @@ func Delete(key string) error {
 	defer conn.Close()
 
 	return db.Delete(conn, key)
+}
+
+// Get and serialize all members of a set
+func GetAreasMembers(areas []string) []Entity {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	keys := []string{}
+	entityList := []Entity{}
+
+	for _, area := range areas {
+		result, err := db.Smembers(conn, area)
+		if err != nil {
+			continue
+		}
+		keys = append(keys, result...)
+	}
+
+	for _, key := range keys {
+		record, err := db.Get(conn, key)
+		if err != nil {
+			continue
+		}
+
+		entityList = append(entityList, Construct(key, record))
+	}
+
+	return entityList
+}
+
+// Remove a member from set
+func RemoveFromArea(key, from string) error {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.Srem(conn, key, from)
 }

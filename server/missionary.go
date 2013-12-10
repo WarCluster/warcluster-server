@@ -13,8 +13,23 @@ import (
 // 1. When the delay ends the thread ends the mission calling EndMission
 // 2. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
+	var timeSlept time.Duration = 0
+
 	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
-	time.Sleep(time.Duration(mission.TravelTime) * time.Millisecond)
+	for _, transferPoint := range mission.TransferPoints() {
+		timeToSleep := transferPoint.TravelTime - timeSlept
+		timeSlept += timeToSleep
+		time.Sleep(timeToSleep * time.Millisecond)
+		mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
+
+		stateChange := response.NewStateChange()
+		stateChange.Missions = map[string]entities.Entity{
+			mission.Key(): mission,
+		}
+		response.Send(stateChange, sessions.Broadcast)
+	}
+
+	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
 
 	targetEntity, err := entities.Get(targetKey)
 	if err != nil {
@@ -33,6 +48,7 @@ func StartMissionary(mission *entities.Mission) {
 	}
 	response.Send(stateChange, sessions.Broadcast)
 
+	entities.RemoveFromArea(mission.Key(), mission.AreaSet())
 	entities.Delete(mission.Key())
 
 	if excessShips > 0 {
