@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strconv"
 
+	"github.com/garyburd/redigo/redis"
 	"github.com/Vladimiroff/vec2d"
 )
 
@@ -40,77 +41,80 @@ func (s *Sun) generateName(nickname string) {
 	s.Name = fmt.Sprintf("%s%v", initials, number)
 }
 
+func (ss *Sun) createAdjacentSlots() {
+	verticalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
+	angeledOffsetStepX := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS / 2) + 0.5)
+	horizontalOffsetStepX := float64(SUNS_SOLAR_SYSTEM_RADIUS)
+
+	slots := []*SolarSlot{
+		newSolarSlot(ss.Position.X-horizontalOffsetStepX, ss.Position.Y),
+		newSolarSlot(ss.Position.X+horizontalOffsetStepX, ss.Position.Y),
+		newSolarSlot(ss.Position.X-angeledOffsetStepX, ss.Position.Y+verticalOffset),
+		newSolarSlot(ss.Position.X-angeledOffsetStepX, ss.Position.Y-verticalOffset),
+		newSolarSlot(ss.Position.X+angeledOffsetStepX, ss.Position.Y+verticalOffset),
+		newSolarSlot(ss.Position.X+angeledOffsetStepX, ss.Position.Y-verticalOffset),
+	}
+
+	for _, slot := range slots {
+		entity, _ := Get(slot.Key()) 
+		if entity == nil {
+			Save(slot)
+		}
+	}
+}
+
 // Generates the key of the start position node
-func (s *Sun) getStartPosNode(friends *[]Sun) *Node {
+func getStartSolarSlotPosition(friends []*Sun) *SolarSlot {
 	targetPosition := vec2d.New(0, 0)
 
 	//Find best position between all friends
 	for _, friend := range friends {
 		targetPosition.Collect(friend.Position)
+		fmt.Printf("%#v\n", targetPosition)
 	}
-	targetPosition.DivToFloat64(float64(len(friends)))
+	if len(friends) > 0 {
+		targetPosition.DivToFloat64(float64(len(friends)))
+		fmt.Printf("%#v\n", targetPosition)
+	}
 
 	//Approximate target to nearest node
-	targetPosition.X = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((2*targetPosition.X/SUNS_SOLAR_SYSTEM_RADIUS)+0.5)
-	targetPosition.Y = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((2*targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*math.Sqrt(3))+0.5)
-
-	return newNode(targetPosition.X, targetPosition.Y)
-
-}
-
-func (s *Sun) fetchNodesLayer(rootNode *Node, zLevel uint32) (results []*Node) {
-	horizontalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS / 2) + 0.5)
-	verticalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
-
-	results = append(results, newNode(rootNodeX-SUNS_SOLAR_SYSTEM_RADIUS*zLevel, rootNodeY))
-	results = append(results, newNode(rootNodeX+SUNS_SOLAR_SYSTEM_RADIUS*zLevel, rootNodeY))
-	results = append(results, newNode(rootNodeX-horizontalOffset*zLevel, rootNodeY+verticalOffset*zLevel))
-	results = append(results, newNode(rootNodeX-horizontalOffset*zLevel, rootNodeY-verticalOffset*zLevel))
-	results = append(results, newNode(rootNodeX+horizontalOffset*zLevel, rootNodeY+verticalOffset*zLevel))
-	results = append(results, newNode(rootNodeX+horizontalOffset*zLevel, rootNodeY-verticalOffset*zLevel))
-
-	for i := 1; i < zLevel; i++ {
-		results = append(results, newNode(rootNodeX-SUNS_SOLAR_SYSTEM_RADIUS*zLevel+horizontalOffset*i, rootNodeY+verticalOffset*i))
-		results = append(results, newNode(rootNodeX-SUNS_SOLAR_SYSTEM_RADIUS*zLevel+horizontalOffset*i, rootNodeY-verticalOffset*i))
-		results = append(results, newNode(rootNodeX+SUNS_SOLAR_SYSTEM_RADIUS*zLevel-horizontalOffset*i, rootNodeY+verticalOffset*i))
-		results = append(results, newNode(rootNodeX+SUNS_SOLAR_SYSTEM_RADIUS*zLevel-horizontalOffset*i, rootNodeY-verticalOffset*i))
-		results = append(results, newNode(rootNodeX-horizontalOffset*zLevel+SUNS_SOLAR_SYSTEM_RADIUS*i, rootNodeY+verticalOffset*zLevel))
-		results = append(results, newNode(rootNodeX-horizontalOffset*zLevel+SUNS_SOLAR_SYSTEM_RADIUS*i, rootNodeY-verticalOffset*zLevel))
+	z := math.Floor((2*targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*math.Sqrt(3))+0.5)
+	if int64(z) % 2 != 0 {
+		targetPosition.X += SUNS_SOLAR_SYSTEM_RADIUS / 2
 	}
-	return results
+	targetPosition.X = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((targetPosition.X/SUNS_SOLAR_SYSTEM_RADIUS)+0.5)
+	targetPosition.Y = SUNS_SOLAR_SYSTEM_RADIUS * z
+	fmt.Printf("%#v\n", targetPosition)
+	return newSolarSlot(targetPosition.X, targetPosition.Y)
+
 }
 
-type Node struct {
-	Data     string
-	Position *vec2d.Vector
-}
-
-func newNode(x, y float64) *Node {
-	n := new(Node)
-	n.Position = vec2d.New(x, y)
-	return n
-}
-
-func (n *Node) Key() string {
-	return fmt.Sprintf("Node:%d_%d", n.Position.X, n.Position.Y)
-}
-
-// TODO: This node thing should be a type
-func (s *Sun) findHomeNode(rootNode *Node) *Node {
+func findHomeSolarSlot(rootSolarSlot *SolarSlot) *SolarSlot {
 	var zLevel uint32 = 1
 
-	rootNodeEntity, _ := Get(rootNode.Key())
+	rootSolarSlotEntity, err := Get(rootSolarSlot.Key())
+	if err != nil && err != redis.ErrNil {
+		panic(err)
+	}
 
-	if rootNodeEntity.(*Node).Data == "" {
-		return rootNode
+	if rootSolarSlotEntity == nil {
+		rootSolarSlot = newSolarSlot(rootSolarSlot.Position.X, rootSolarSlot.Position.Y)
+	} else {
+		rootSolarSlot = rootSolarSlotEntity.(*SolarSlot)
+	}
+	if rootSolarSlot.Data == "" {
+		return rootSolarSlot
 	}
 
 	for {
-		nodes := fetchNodesLayer(rootNodeEntity.(*Node), zLevel)
-		nodesEntities := FindList(nodes)
-		for _, nodeEntity := range nodesEntities {
-			if nodeEntity.Data == "" {
-				return nodeEntity
+		nodes := rootSolarSlot.fetchSolarSlotsLayer(zLevel)
+		for _, nodeKey := range nodes {
+			if node, err := Get(nodeKey); err == nil && node != nil {
+				nodeEntity, _ := node.(*SolarSlot)
+				if nodeEntity.Data == "" {
+					return nodeEntity
+				}
+
 			}
 		}
 		zLevel++
@@ -122,20 +126,21 @@ func (s *Sun) findHomeNode(rootNode *Node) *Node {
 // overlapping. To solve this, we simply throw the sun somewhere far away
 // from the desired point and start to move it to THE POINT, but carefully
 // watching for collisions.
-func GenerateSun(username string, friends, others []Sun) *Sun {
+func GenerateSun(username string, friends, others []*Sun) *Sun {
 	newSun := Sun{
 		Username: username,
 		speed:    5,
 		target:   vec2d.New(0, 0),
-		Position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
+		Position: vec2d.New(0, 0),
 	}
 	newSun.generateName(username)
 
-	node := findHomeNode(getStartPosNode(friends))
+	node := findHomeSolarSlot(getStartSolarSlotPosition(friends))
 	node.Data = newSun.Key()
 	Save(node)
 
 	newSun.Position.X = node.Position.X
 	newSun.Position.Y = node.Position.Y
+	newSun.createAdjacentSlots()
 	return &newSun
 }
