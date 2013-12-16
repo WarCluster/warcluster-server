@@ -139,6 +139,8 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 // should own that planet, which comes with all the changing colors and owner stuff.
 //
 // In case of Supply: We simply increase the ship count and we're done :P
+// If however the owner of the target planet has changed we change the mission type
+// to attack
 //
 // In case of Spy: TODO
 func EndMission(target *Planet, missionInfo *Mission) (excessShips int32) {
@@ -161,6 +163,11 @@ func EndMission(target *Planet, missionInfo *Mission) (excessShips int32) {
 			}
 		}
 	case "Supply":
+		if target.Owner != missionInfo.Target.Owner {
+			missionInfo.Type = "Attack"
+			return EndMission(target, missionInfo)
+		}
+
 		target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
 	case "Spy":
 	}
