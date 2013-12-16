@@ -25,6 +25,7 @@ type Mission struct {
 // Just an internal type, used to embed source and target in Mission
 type embeddedPlanet struct {
 	Name     string
+	Owner    string
 	Position *vec2d.Vector
 }
 
