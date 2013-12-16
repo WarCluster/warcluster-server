@@ -55,11 +55,11 @@ func authenticate(session sockjs.Session) (*entities.Player, bool, error) {
 	justRegistered := entity == nil
 	if justRegistered {
 		allSunsEntities := entities.Find("sun.*")
-		allSuns := []entities.Sun{}
+		allSuns := []*entities.Sun{}
 		for _, entity := range allSunsEntities {
-			allSuns = append(allSuns, *entity.(*entities.Sun))
+			allSuns = append(allSuns, entity.(*entities.Sun))
 		}
-		sun := entities.GenerateSun(nickname, allSuns, []entities.Sun{})
+		sun := entities.GenerateSun(nickname, allSuns, []*entities.Sun{})
 		planets, homePlanet := entities.GeneratePlanets(nickname, sun)
 		player = entities.CreatePlayer(nickname, twitterId, homePlanet)
 

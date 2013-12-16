@@ -52,6 +52,8 @@ func Construct(key string, data []byte) Entity {
 		entity = new(Mission)
 	case "sun":
 		entity = new(Sun)
+	case "ss":
+		entity = new(SolarSlot)
 	default:
 		return nil
 	}
