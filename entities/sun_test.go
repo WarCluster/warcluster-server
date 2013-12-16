@@ -123,7 +123,7 @@ func TestFindSolarSlotPosition(t *testing.T) {
 
 	targetSlot := getStartSolarSlotPosition(friends)
 
-	if targetSlot.Position.X != 0 || targetSlot.Position.Y != -7794 {
+	if targetSlot.Position.X != -9000 || targetSlot.Position.Y != 0 {
 		t.Error("Target solar slot out of place. Coordinates: ")
 		t.Error(targetSlot.Position)
 	}
