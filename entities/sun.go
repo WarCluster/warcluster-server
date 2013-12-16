@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/Vladimiroff/vec2d"
+	"github.com/garyburd/redigo/redis"
 )
 
 type Sun struct {
@@ -41,7 +41,7 @@ func (s *Sun) generateName(nickname string) {
 	s.Name = fmt.Sprintf("%s%v", initials, number)
 }
 
-func (ss *Sun) createAdjacentSlots() {
+func (ss *Sun) calculateAdjacentSlots() []*SolarSlot {
 	verticalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
 	angeledOffsetStepX := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS / 2) + 0.5)
 	horizontalOffsetStepX := float64(SUNS_SOLAR_SYSTEM_RADIUS)
@@ -54,9 +54,14 @@ func (ss *Sun) createAdjacentSlots() {
 		newSolarSlot(ss.Position.X+angeledOffsetStepX, ss.Position.Y+verticalOffset),
 		newSolarSlot(ss.Position.X+angeledOffsetStepX, ss.Position.Y-verticalOffset),
 	}
+	return slots
+}
+
+func (ss *Sun) createAdjacentSlots() {
+	slots := ss.calculateAdjacentSlots()
 
 	for _, slot := range slots {
-		entity, _ := Get(slot.Key()) 
+		entity, _ := Get(slot.Key())
 		if entity == nil {
 			Save(slot)
 		}
@@ -70,22 +75,26 @@ func getStartSolarSlotPosition(friends []*Sun) *SolarSlot {
 	//Find best position between all friends
 	for _, friend := range friends {
 		targetPosition.Collect(friend.Position)
-		fmt.Printf("%#v\n", targetPosition)
 	}
 	if len(friends) > 0 {
 		targetPosition.DivToFloat64(float64(len(friends)))
-		fmt.Printf("%#v\n", targetPosition)
 	}
 
+	//math.Floor(targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*(math.Sqrt(3)/2) + 0.5)
+
 	//Approximate target to nearest node
-	z := math.Floor((2*targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*math.Sqrt(3))+0.5)
-	if int64(z) % 2 != 0 {
+	z := math.Floor((2 * targetPosition.Y / SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3)) + 0.5)
+	if int64(z)%2 != 0 {
 		targetPosition.X += SUNS_SOLAR_SYSTEM_RADIUS / 2
 	}
 	targetPosition.X = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((targetPosition.X/SUNS_SOLAR_SYSTEM_RADIUS)+0.5)
-	targetPosition.Y = SUNS_SOLAR_SYSTEM_RADIUS * z
+	targetPosition.Y = math.Floor(SUNS_SOLAR_SYSTEM_RADIUS*(math.Sqrt(3)/2)) * z
 	fmt.Printf("%#v\n", targetPosition)
 	return newSolarSlot(targetPosition.X, targetPosition.Y)
+
+}
+
+func checkForSuitableSlot() {
 
 }
 
