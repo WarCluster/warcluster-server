@@ -57,14 +57,14 @@ func StartMissionary(mission *entities.Mission) {
 }
 
 func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, ships int32) {
-	newTargetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
+	newTargetKey := fmt.Sprintf("planet.%s", mission.Source.Name)
 	newTargetEntity, err := entities.Get(newTargetKey)
 	if err != nil {
 		log.Print("Error in homePlanet planet fetch: ", err.Error())
 		return
 	}
 
-	playerEntity, err := entities.Get(mission.Player)
+	playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Player))
 	player := playerEntity.(*entities.Player)
 
 	excessMission := player.StartMission(homePlanet, newTargetEntity.(*entities.Planet), 100, "Attack")
