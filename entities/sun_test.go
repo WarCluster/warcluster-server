@@ -42,47 +42,32 @@ func TestAdjacentSlotsCalculation(t *testing.T) {
 		Position: vec2d.New(0, 0),
 	}
 
+	testData := [][2]float64{
+		{-9000, 0},
+		{9000, 0},
+		{-4500, 7794},
+		{-4500, -7794},
+		{4500, 7794},
+		{4500, -7794},
+	}
+
 	testSlots := testSun.calculateAdjacentSlots()
 
-	if testSlots[0].Position.X != -9000 || testSlots[0].Position.Y != 0 {
-		t.Error("Left solar slot out of place. Coordinates: ")
-		t.Error(testSlots[0].Position)
-	}
-
-	if testSlots[1].Position.X != 9000 || testSlots[1].Position.Y != 0 {
-		t.Error("Right solar slot out of place. Coordinates: ")
-		t.Error(testSlots[1].Position)
-	}
-
-	if testSlots[2].Position.X != -4500 || testSlots[2].Position.Y != 7794 {
-		t.Error("Left Top solar slot out of place. Coordinates: ")
-		t.Error(testSlots[2].Position)
-	}
-
-	if testSlots[3].Position.X != -4500 || testSlots[3].Position.Y != -7794 {
-		t.Error("Left Bottom solar slot out of place. Coordinates: ")
-		t.Error(testSlots[3].Position)
-	}
-
-	if testSlots[4].Position.X != 4500 || testSlots[4].Position.Y != 7794 {
-		t.Error("Right Top solar slot out of place. Coordinates: ")
-		t.Error(testSlots[4].Position)
-	}
-
-	if testSlots[5].Position.X != 4500 || testSlots[5].Position.Y != -7794 {
-		t.Error("Right Bottom solar slot out of place. Coordinates: ")
-		t.Error(testSlots[5].Position)
+	for i := 0; i < len(testData); i++ {
+		if testSlots[i].Position.X != testData[i][0] || testSlots[i].Position.Y != testData[i][1] {
+			t.Errorf("Left solar slot out of place. Coordinates: %s\n", testSlots[0].Position)
+		}
 	}
 }
 
 func TestBasicFindSolarSlotPosition(t *testing.T) {
 	friends := []*Sun{
-		&Sun{
+		{
 			Username: "MOR001",
 			Name:     "MORS01",
 			Position: vec2d.New(0, 0),
 		},
-		&Sun{
+		{
 			Username: "MOR002",
 			Name:     "MORS02",
 			Position: vec2d.New(200, 200),
@@ -99,22 +84,22 @@ func TestBasicFindSolarSlotPosition(t *testing.T) {
 
 func TestFindSolarSlotPosition(t *testing.T) {
 	friends := []*Sun{
-		&Sun{
+		{
 			Username: "MOR001",
 			Name:     "MORS01",
 			Position: vec2d.New(0, 0),
 		},
-		&Sun{
+		{
 			Username: "MOR002",
 			Name:     "MORS02",
 			Position: vec2d.New(-9000, 0),
 		},
-		&Sun{
+		{
 			Username: "MOR003",
 			Name:     "MORS03",
 			Position: vec2d.New(-18000, 0),
 		},
-		&Sun{
+		{
 			Username: "MOR004",
 			Name:     "MORS04",
 			Position: vec2d.New(-4500, -7794),

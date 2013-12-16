@@ -85,18 +85,13 @@ func getStartSolarSlotPosition(friends []*Sun) *SolarSlot {
 	//math.Floor(targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*(math.Sqrt(3)/2) + 0.5)
 
 	//Approximate target to nearest node
-	z := math.Floor((targetPosition.Y / verticalOffset) + 0.5)
-	if int64(z)%2 != 0 {
+	verticalOffsetCoefficent := math.Floor((targetPosition.Y / verticalOffset) + 0.5)
+	if int64(verticalOffsetCoefficent)%2 != 0 {
 		targetPosition.X += SUNS_SOLAR_SYSTEM_RADIUS / 2
 	}
 	targetPosition.X = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((targetPosition.X/SUNS_SOLAR_SYSTEM_RADIUS)+0.5)
-	targetPosition.Y = verticalOffset * z
-	fmt.Printf("%#v\n", targetPosition)
+	targetPosition.Y = verticalOffset * verticalOffsetCoefficent
 	return newSolarSlot(targetPosition.X, targetPosition.Y)
-
-}
-
-func checkForSuitableSlot() {
 
 }
 
