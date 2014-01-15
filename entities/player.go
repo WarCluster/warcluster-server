@@ -49,7 +49,7 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 		},
 		Target: embeddedPlanet{
 			Name:     target.Name,
-			Owner:    source.Owner,
+			Owner:    target.Owner,
 			Position: target.Position,
 		},
 		Type:      missionType,
