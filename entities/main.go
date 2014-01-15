@@ -2,7 +2,8 @@
 package entities
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
 	"strings"
 
 	"warcluster/entities/db"
@@ -34,7 +35,13 @@ type Color struct {
 // Creates an entity via unmarshaling a json.
 // The concrete entity type is given by the user as `key`
 func Load(key string, data []byte) Entity {
-	var entity Entity
+	var (
+		buffer bytes.Buffer
+		entity Entity
+	)
+
+	buffer.Write(data)
+	decoder := gob.NewDecoder(&buffer)
 	entityType := strings.Split(key, ".")[0]
 
 	switch entityType {
@@ -51,7 +58,7 @@ func Load(key string, data []byte) Entity {
 	default:
 		return nil
 	}
-	json.Unmarshal(data, entity)
+	decoder.Decode(entity)
 	return entity
 }
 
@@ -100,18 +107,21 @@ func Get(key string) (Entity, error) {
 // Failed marshaling of the given entity is pretty much the only
 // point of failure in this function... I supose.
 func Save(entity Entity) error {
-	conn := db.Pool.Get()
-	defer conn.Close()
+	var buffer bytes.Buffer
 
+	encoder := gob.NewEncoder(&buffer)
 	key := entity.Key()
-	value, err := json.Marshal(entity)
+	err := encoder.Encode(entity)
 	if err != nil {
 		return err
 	}
 
 	setKey := entity.AreaSet()
-	err = db.Save(conn, key, setKey, value)
-	return err
+
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.Save(conn, key, setKey, buffer.Bytes())
 }
 
 // Deletes a record by the given key
