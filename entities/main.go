@@ -3,6 +3,7 @@ package entities
 
 import (
 	"encoding/json"
+	"strings"
 
 	"warcluster/entities/db"
 )
@@ -28,6 +29,30 @@ type Color struct {
 	R uint8
 	G uint8
 	B uint8
+}
+
+// Creates an entity via unmarshaling a json.
+// The concrete entity type is given by the user as `key`
+func Load(key string, data []byte) Entity {
+	var entity Entity
+	entityType := strings.Split(key, ".")[0]
+
+	switch entityType {
+	case "player":
+		entity = new(Player)
+	case "planet":
+		entity = new(Planet)
+	case "mission":
+		entity = new(Mission)
+	case "sun":
+		entity = new(Sun)
+	case "ss":
+		entity = new(SolarSlot)
+	default:
+		return nil
+	}
+	json.Unmarshal(data, entity)
+	return entity
 }
 
 // Finds records in the database, by given key
@@ -65,7 +90,7 @@ func Get(key string) (Entity, error) {
 		return nil, err
 	}
 
-	return Construct(key, record), nil
+	return Load(key, record), nil
 }
 
 // Saves an entity to the database. Records' key is entity.Key()
@@ -119,7 +144,7 @@ func GetAreasMembers(areas []string) []Entity {
 			continue
 		}
 
-		entityList = append(entityList, Construct(key, record))
+		entityList = append(entityList, Load(key, record))
 	}
 
 	return entityList
