@@ -143,33 +143,38 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 // to attack
 //
 // In case of Spy: TODO
-func EndMission(target *Planet, missionInfo *Mission) (excessShips int32) {
-	switch missionInfo.Type {
+func EndMission(target *Planet, mission *Mission) (excessShips int32) {
+	switch mission.Type {
 	case "Attack":
-		if target.Owner == missionInfo.Player {
-			target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
+		if target.Owner == mission.Player {
+			target.SetShipCount(target.ShipCount + mission.ShipCount)
 		} else {
-			if missionInfo.ShipCount < target.ShipCount {
-				target.SetShipCount(target.ShipCount - missionInfo.ShipCount)
+			if mission.ShipCount < target.ShipCount {
+				target.SetShipCount(target.ShipCount - mission.ShipCount)
 			} else {
 				if target.IsHome {
 					target.SetShipCount(0)
-					excessShips = missionInfo.ShipCount - target.ShipCount
+					excessShips = mission.ShipCount - target.ShipCount
 				} else {
-					target.SetShipCount(missionInfo.ShipCount - target.ShipCount)
-					target.Owner = missionInfo.Player
-					target.Color = missionInfo.Color
+					target.SetShipCount(mission.ShipCount - target.ShipCount)
+					target.Owner = mission.Player
+					target.Color = mission.Color
 				}
 			}
 		}
 	case "Supply":
-		if target.Owner != missionInfo.Target.Owner {
-			missionInfo.Type = "Attack"
-			return EndMission(target, missionInfo)
+		if target.Owner != mission.Target.Owner {
+			mission.Type = "Attack"
+			return EndMission(target, mission)
 		}
 
-		target.SetShipCount(target.ShipCount + missionInfo.ShipCount)
+		target.SetShipCount(target.ShipCount + mission.ShipCount)
 	case "Spy":
+		if target.Owner == mission.Player {
+			target.SetShipCount(target.ShipCount + mission.ShipCount)
+			return
+		}
+		CreateSpyReport(target, mission)
 	}
 
 	return
