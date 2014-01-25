@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -22,8 +21,11 @@ type Planet struct {
 	Owner               string
 }
 
-// This type is used as a proxy type while marshaling Planet.
-type planetMarshalHook Planet
+// Used only when a planet is being marshalled
+type PlanetPacket struct {
+	Planet
+	IsSpied bool `json:",omitempty"`
+}
 
 // Database key.
 func (p *Planet) Key() string {
@@ -44,12 +46,23 @@ func (p *Planet) AreaSet() string {
 	)
 }
 
-// We need to define the MarshalJSON in order to automatically
-// update the ship count right before sending this entity to
-// the client or to the database.
-func (p *Planet) MarshalJSON() ([]byte, error) {
+// Checks what the player could see and strips it if not
+// Also updates the ship count right before marshaling
+func (p *Planet) Sanitize(player *Player) *PlanetPacket {
 	p.UpdateShipCount()
-	return json.Marshal((*planetMarshalHook)(p))
+	packet := PlanetPacket{Planet: *p}
+
+	if p.Owner != player.Username {
+		packet.ShipCount = -1
+	}
+
+	for _, spyReport := range player.SpyReports {
+		if spyReport.Name == p.Name && spyReport.IsValid() {
+			packet.ShipCount = spyReport.ShipCount
+			packet.IsSpied = true
+		}
+	}
+	return &packet
 }
 
 // Returns the ship count right after the ship count update.

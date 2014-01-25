@@ -16,12 +16,20 @@ const (
 type ScopeOfView struct {
 	baseResponse
 	Missions     map[string]*entities.Mission
-	Planets      map[string]*entities.Planet
+	planets      map[string]*entities.Planet
+	Planets      map[string]*entities.PlanetPacket
 	Suns         map[string]*entities.Sun
 	CanvasPoints struct {
 		TopLeft     *vec2d.Vector
 		BottomRight *vec2d.Vector
 	}
+}
+
+func (s *ScopeOfView) Send(player *entities.Player, sender func([]byte)) error {
+	for name, planet := range s.planets {
+		s.Planets[name] = planet.Sanitize(player)
+	}
+	return Send(s, sender)
 }
 
 func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
@@ -30,7 +38,8 @@ func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
 	s := new(ScopeOfView)
 	s.Command = "scope_of_view_result"
 	s.Missions = make(map[string]*entities.Mission)
-	s.Planets = make(map[string]*entities.Planet)
+	s.planets = make(map[string]*entities.Planet)
+	s.Planets = make(map[string]*entities.PlanetPacket)
 	s.Suns = make(map[string]*entities.Sun)
 	s.CanvasPoints.TopLeft = topLeft
 	s.CanvasPoints.BottomRight = bottomRight
@@ -42,7 +51,7 @@ func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
 		case *entities.Mission:
 			s.Missions[entity.Key()] = entity.(*entities.Mission)
 		case *entities.Planet:
-			s.Planets[entity.Key()] = entity.(*entities.Planet)
+			s.planets[entity.Key()] = entity.(*entities.Planet)
 		case *entities.Sun:
 			s.Suns[entity.Key()] = entity.(*entities.Sun)
 		default:

@@ -14,7 +14,7 @@ func scopeOfView(request *Request) error {
 	res := response.NewScopeOfView(request.Position, request.Resolution)
 	request.Client.Player.ScreenPosition = request.Position
 	go entities.Save(request.Client.Player)
-	return response.Send(res, request.Client.Session.Send)
+	return res.Send(request.Client.Player, request.Client.Session.Send)
 }
 
 // This function makes all the checks needed for creation of a new mission.

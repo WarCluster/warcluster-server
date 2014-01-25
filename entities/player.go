@@ -14,6 +14,7 @@ type Player struct {
 	HomePlanet     string
 	ScreenSize     []uint16
 	ScreenPosition *vec2d.Vector
+	SpyReports     []*SpyReport `json:"-" bson:"-"`
 }
 
 // Database key.
@@ -74,7 +75,7 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	}
 
 	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
-	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, HomePlanet.Position}
+	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, HomePlanet.Position, nil}
 	HomePlanet.Owner = username
 	HomePlanet.Color = color
 	return &player
