@@ -140,9 +140,11 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 //
 // In case of Supply: We simply increase the ship count and we're done :P
 // If however the owner of the target planet has changed we change the mission type
-// to attack
+// to attack.
 //
-// In case of Spy: TODO
+// In case of Spy: Create a spy report for that planet and find a way to notify the logged in
+// instances of the user who sent this mission.
+// TODO: Find a way to use redis' sub/pub
 func EndMission(target *Planet, mission *Mission) (excessShips int32) {
 	switch mission.Type {
 	case "Attack":
