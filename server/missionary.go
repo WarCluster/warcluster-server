@@ -26,7 +26,7 @@ func StartMissionary(mission *entities.Mission) {
 		stateChange.Missions = map[string]entities.Entity{
 			mission.Key(): mission,
 		}
-		response.Send(stateChange, sessions.Broadcast)
+		response.Send(stateChange, clients.Broadcast)
 	}
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
@@ -40,17 +40,21 @@ func StartMissionary(mission *entities.Mission) {
 	target.UpdateShipCount()
 
 	excessShips := entities.EndMission(target, mission)
-	entities.Save(target)
+	entities.RemoveFromArea(mission.Key(), mission.AreaSet())
+	entities.Delete(mission.Key())
 
 	stateChange := response.NewStateChange()
 	stateChange.Planets = map[string]entities.Entity{
 		target.Key(): target,
 	}
-	response.Send(stateChange, sessions.Broadcast)
 
-	entities.RemoveFromArea(mission.Key(), mission.AreaSet())
-	entities.Delete(mission.Key())
+	if mission.Type == "Spy" {
+		activateSpyMission(mission, target, excessShips, stateChange)
+		return
+	}
 
+	entities.Save(target)
+	response.Send(stateChange, clients.Broadcast)
 	if excessShips > 0 {
 		startExcessMission(mission, target, excessShips)
 	}
@@ -60,7 +64,7 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 	newTargetKey := fmt.Sprintf("planet.%s", mission.Source.Name)
 	newTargetEntity, err := entities.Get(newTargetKey)
 	if err != nil {
-		log.Print("Error in homePlanet planet fetch: ", err.Error())
+		log.Print("Error in newTarget planet fetch: ", err.Error())
 		return
 	}
 
@@ -74,5 +78,14 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 
 	sendMission := response.NewSendMission()
 	sendMission.Mission = excessMission
-	response.Send(sendMission, sessions.Broadcast)
+	response.Send(sendMission, clients.Broadcast)
+}
+
+func activateSpyMission(mission *entities.Mission, target *entities.Planet, spies int32, state *response.StateChange) {
+	for client := range clients.pool {
+		if client.Player.Username == mission.Player {
+			client.Player.UpdateSpyReports()
+			state.Send(client.Player, client.Session.Send)
+		}
+	}
 }
