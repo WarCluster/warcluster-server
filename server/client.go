@@ -22,26 +22,43 @@ type Client struct {
 	Player  *entities.Player
 }
 
-// Thread-safe pool of all clients, with opened sockets
+// Thread-safe pool of all clients, with opened sockets.
 type ClientPool struct {
-	mutex   sync.Mutex
-	clients map[*Client]struct{}
+	mutex sync.RWMutex
+	pool  map[*Client]struct{}
 }
 
-// Add client to the pool
+func NewClientPool() *ClientPool {
+	cp := new(ClientPool)
+	cp.pool = make(map[*Client]struct{})
+	return cp
+}
+
+// Adds the given client to the pool.
 func (cp *ClientPool) Add(c *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	cp.clients[c] = struct{}{}
+	cp.pool[c] = struct{}{}
 }
 
-// Remove client to the pool
+// Remove the client to the pool.
+// It is safe to remove non-existing client.
 func (cp *ClientPool) Remove(c *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	delete(cp.clients, c)
+	delete(cp.pool, c)
+}
+
+// Broadcast sends the given message to every session in the pool.
+func (cp *ClientPool) Broadcast(m []byte) {
+	cp.mutex.RLock()
+	defer cp.mutex.RUnlock()
+
+	for client := range cp.pool {
+		client.Session.Send(m)
+	}
 }
 
 // This function is called from the message handler to parse the first message for every new connection.
@@ -120,7 +137,7 @@ func authenticate(session sockjs.Session) (*entities.Player, bool, error) {
 			stateChange.Planets = map[string]entities.Entity{
 				planet.Key(): planet,
 			}
-			response.Send(stateChange, sessions.Broadcast)
+			response.Send(stateChange, clients.Broadcast)
 		}
 
 		entities.Save(player)
@@ -130,7 +147,7 @@ func authenticate(session sockjs.Session) (*entities.Player, bool, error) {
 		stateChange.Suns = map[string]entities.Entity{
 			sun.Key(): sun,
 		}
-		response.Send(stateChange, sessions.Broadcast)
+		response.Send(stateChange, clients.Broadcast)
 	} else {
 		player = entity.(*entities.Player)
 	}

@@ -43,6 +43,7 @@ func parseAction(request *Request) error {
 		return errors.New("This is not your home!")
 	}
 
+	// FIXME: Why not a simple list with the possible attacks?
 	if request.Type != "Attack" && request.Type != "Supply" && request.Type != "Spy" {
 		return errors.New("Invalid mission type!")
 	}
@@ -66,7 +67,7 @@ func parseAction(request *Request) error {
 
 	sendMission := response.NewSendMission()
 	sendMission.Mission = mission
-	err = response.Send(sendMission, sessions.Broadcast)
+	err = response.Send(sendMission, clients.Broadcast)
 	if err != nil {
 		return err
 	}
@@ -75,5 +76,5 @@ func parseAction(request *Request) error {
 	stateChange.Planets = map[string]entities.Entity{
 		source.Key(): source,
 	}
-	return response.Send(stateChange, sessions.Broadcast)
+	return response.Send(stateChange, clients.Broadcast)
 }

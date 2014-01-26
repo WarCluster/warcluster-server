@@ -2,7 +2,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -12,14 +11,12 @@ import (
 	"runtime/debug"
 
 	"github.com/fzzy/sockjs-go/sockjs"
-
-	"warcluster/entities"
-	"warcluster/server/response"
 )
 
-var listener net.Listener
-
-var sessions *sockjs.SessionPool = sockjs.NewSessionPool() //This is the SockJs sessions pull (a list of all the currently active client's sessions).
+var (
+	listener net.Listener
+	clients  *ClientPool = NewClientPool()
+)
 
 // This function goes trough all the procedurs needed for the werver to be initialized.
 // Create an empty connections pool and start the listening foe messages loop.
@@ -74,32 +71,6 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path.Join(getStaticDir(), "/index.html"))
 }
 
-// This function is called from the message handler to parse the first message for every new connection.
-// It check for existing user in the DB and logs him if the password is correct.
-// If the user is new he is initiated and a new home planet nad solar system are generated.
-func login(session sockjs.Session) (*Client, error) {
-	player, justRegistered, err := authenticate(session)
-	if err != nil {
-		response.Send(response.NewLoginFailed(), session.Send)
-		log.Println(err)
-		return nil, errors.New("Login failed")
-	}
-
-	client := &Client{
-		Session: session,
-		Player:  player,
-	}
-	homePlanetEntity, err := entities.Get(player.HomePlanet)
-	if err != nil {
-		return nil, errors.New("Your home planet is missing!")
-	}
-	homePlanet := homePlanetEntity.(*entities.Planet)
-
-	loginSuccess := response.NewLoginSuccess(player, homePlanet, justRegistered)
-	response.Send(loginSuccess, session.Send)
-	return client, nil
-}
-
 // On the first received message from each connection the server will call the handler.
 // Add new session to the session pool, call the login func to validate the connection and
 // if the connection is valid enters "while true" state and uses ParseRequest to parse the requests.
@@ -112,31 +83,34 @@ func handler(session sockjs.Session) {
 			return
 		}
 	}()
-	defer sessions.Remove(session)
+	defer session.End()
 
-	if client, err := login(session); err == nil {
-		sessions.Add(session)
-		for {
-			message := session.Receive()
-			if message == nil {
-				break
-			}
+	client, err := login(session)
+	if err != nil {
+		log.Print("Error in server.main.handler.login:", err.Error())
+	}
+	clients.Add(client)
+	defer clients.Remove(client)
 
-			if request, err := UnmarshalRequest(message, client); err == nil {
-				if action, err := ParseRequest(request); err == nil {
-					if err := action(request); err != nil {
-						log.Println(err)
-					}
-				} else {
-					log.Println("Error in server.main.handler.ParseRequest:", err.Error())
-				}
-			} else {
-				log.Println("Error in server.main.handler.UnmarshalRequest:", err.Error())
-			}
+	for {
+		message := session.Receive()
+		if message == nil {
+			break
 		}
-	} else {
-		log.Println(err)
-		session.End()
+
+		request, err := UnmarshalRequest(message, client)
+		if err != nil {
+			log.Println("Error in server.main.handler.UnmarshalRequest:", err.Error())
+		}
+
+		action, err := ParseRequest(request)
+		if err != nil {
+			log.Println("Error in server.main.handler.ParseRequest:", err.Error())
+		}
+
+		if err := action(request); err != nil {
+			log.Println(err)
+		}
 	}
 }
 
