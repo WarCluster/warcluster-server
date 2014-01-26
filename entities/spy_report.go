@@ -28,7 +28,7 @@ func (s *SpyReport) AreaSet() string {
 }
 
 func (s *SpyReport) IsValid() bool {
-	return s.CreatedAt+SPY_REPORT_VALIDITY_SECONDS >= time.Now().UnixNano()/1e6
+	return s.ValidUntil > time.Now().UnixNano()/1e6
 }
 
 func CreateSpyReport(target *Planet, mission *Mission) *SpyReport {
