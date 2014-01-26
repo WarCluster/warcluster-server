@@ -2,6 +2,7 @@ package entities
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/Vladimiroff/vec2d"
@@ -15,6 +16,7 @@ type Player struct {
 	ScreenSize     []uint16
 	ScreenPosition *vec2d.Vector
 	SpyReports     []*SpyReport `json:"-" bson:"-"`
+	mutex          sync.Mutex
 }
 
 // Database key.
@@ -63,8 +65,25 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 	return &mission
 }
 
+func (p *Player) UpdateSpyReports() {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	playersReports := Find(fmt.Sprintf("spy_report.%s_*", p.Username))
+	spyReports := make([]*SpyReport, 0, len(playersReports))
+	for _, reportEntity := range playersReports {
+		report := reportEntity.(*SpyReport)
+		if report.IsValid() {
+			spyReports = append(spyReports, report)
+		} else {
+			Delete(report.Key())
+		}
+	}
+	p.SpyReports = spyReports
+}
+
 // Creates new player after the authentication and generates color based on the unique hash
-func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
+func CreatePlayer(username, TwitterID string, homePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 
 	red := []uint8{151, 218, 233, 72, 245, 84}
@@ -75,8 +94,15 @@ func CreatePlayer(username, TwitterID string, HomePlanet *Planet) *Player {
 	}
 
 	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
-	player := Player{username, color, TwitterID, HomePlanet.Key(), []uint16{0, 0}, HomePlanet.Position, nil}
-	HomePlanet.Owner = username
-	HomePlanet.Color = color
+	player := Player{
+		Username:       username,
+		Color:          color,
+		TwitterID:      TwitterID,
+		HomePlanet:     homePlanet.Key(),
+		ScreenSize:     []uint16{0, 0},
+		ScreenPosition: homePlanet.Position,
+	}
+	homePlanet.Owner = username
+	homePlanet.Color = color
 	return &player
 }

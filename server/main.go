@@ -92,6 +92,7 @@ func handler(session sockjs.Session) {
 	clients.Add(client)
 	defer clients.Remove(client)
 
+	client.Player.UpdateSpyReports()
 	for {
 		message := session.Receive()
 		if message == nil {
