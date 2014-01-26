@@ -40,7 +40,7 @@ func CreateSpyReport(target *Planet, mission *Mission) *SpyReport {
 		Position:   target.Position,
 		ShipCount:  target.ShipCount,
 		CreatedAt:  now,
-		ValidUntil: now + SPY_REPORT_VALIDITY_SECONDS*1000,
+		ValidUntil: now + SPY_REPORT_VALIDITY*1000,
 	}
 	Save(report)
 	return report

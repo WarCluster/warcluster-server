@@ -40,7 +40,7 @@ func (p *Planet) HasOwner() bool {
 // Returns the set by X or Y where this entity has to be put in
 func (p *Planet) AreaSet() string {
 	return fmt.Sprintf(
-		ENTITIES_AREA_TEMPLATE,
+		AREA_TEMPLATE,
 		RoundCoordinateTo(p.Position.X),
 		RoundCoordinateTo(p.Position.Y),
 	)
@@ -105,9 +105,9 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 
 	result := []*Planet{}
 	ringOffset := float64(PLANETS_RING_OFFSET)
-	planetRadius := float64(PLANETS_PLANET_RADIUS)
+	planetRadius := float64(PLANET_RADIUS)
 
-	for ix := 0; ix < PLANETS_PLANET_COUNT; ix++ {
+	for ix := 0; ix < PLANET_COUNT; ix++ {
 		planet := Planet{
 			Color:        Color{200, 180, 140},
 			Position:     new(vec2d.Vector),
@@ -128,7 +128,7 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		result = append(result, &planet)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	homePlanetIdx := int8(hashElement(PLANETS_PLANET_COUNT*PLANETS_PLANET_HASH_ARGS + 1))
+	homePlanetIdx := int8(hashElement(PLANET_COUNT*PLANET_HASH_ARGS + 1))
 	result[homePlanetIdx].IsHome = true
 	result[homePlanetIdx].ShipCount = 80
 	return result, result[homePlanetIdx]

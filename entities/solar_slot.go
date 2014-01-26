@@ -26,7 +26,7 @@ func (ss *SolarSlot) Key() string {
 // Returns the set by X or Y where this entity has to be put in
 func (ss *SolarSlot) AreaSet() string {
 	return fmt.Sprintf(
-		ENTITIES_AREA_TEMPLATE,
+		AREA_TEMPLATE,
 		RoundCoordinateTo(ss.Position.X),
 		RoundCoordinateTo(ss.Position.Y),
 	)
@@ -35,11 +35,11 @@ func (ss *SolarSlot) AreaSet() string {
 func (ss *SolarSlot) fetchSolarSlotsLayer(zuLevel uint32) (results []string) {
 	zLevel := float64(zuLevel)
 
-	angeledOffsetStepX := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS / 2) + 0.5)
-	verticalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
+	angeledOffsetStepX := math.Floor((SOLAR_SYSTEM_RADIUS / 2) + 0.5)
+	verticalOffset := math.Floor((SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
 	angeledOffsetX := angeledOffsetStepX * zLevel
 
-	horizontalOffsetStepX := float64(SUNS_SOLAR_SYSTEM_RADIUS)
+	horizontalOffsetStepX := float64(SOLAR_SYSTEM_RADIUS)
 	horizontalOffsetX := horizontalOffsetStepX * zLevel
 
 	results = append(results, newSolarSlot(ss.Position.X-horizontalOffsetX, ss.Position.Y).Key())

@@ -74,7 +74,7 @@ func (m *Mission) TransferPoints() AreaTransferPoints {
 		}
 
 		for i := axises[0] + 1; i < axises[1]; i += 1 {
-			container = append(container, i*ENTITIES_AREA_SIZE)
+			container = append(container, i*AREA_SIZE)
 		}
 		return
 	}
