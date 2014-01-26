@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/fzzy/sockjs-go/sockjs"
 
@@ -19,6 +20,54 @@ import (
 type Client struct {
 	Session sockjs.Session
 	Player  *entities.Player
+}
+
+// Thread-safe pool of all clients, with opened sockets
+type ClientPool struct {
+	mutex   sync.Mutex
+	clients map[*Client]struct{}
+}
+
+// Add client to the pool
+func (cp *ClientPool) Add(c *Client) {
+	cp.mutex.Lock()
+	defer cp.mutex.Unlock()
+
+	cp.clients[c] = struct{}{}
+}
+
+// Remove client to the pool
+func (cp *ClientPool) Remove(c *Client) {
+	cp.mutex.Lock()
+	defer cp.mutex.Unlock()
+
+	delete(cp.clients, c)
+}
+
+// This function is called from the message handler to parse the first message for every new connection.
+// It check for existing user in the DB and logs him if the password is correct.
+// If the user is new he is initiated and a new home planet nad solar system are generated.
+func login(session sockjs.Session) (*Client, error) {
+	player, justRegistered, err := authenticate(session)
+	if err != nil {
+		response.Send(response.NewLoginFailed(), session.Send)
+		log.Println(err)
+		return nil, errors.New("Login failed")
+	}
+
+	client := &Client{
+		Session: session,
+		Player:  player,
+	}
+	homePlanetEntity, err := entities.Get(player.HomePlanet)
+	if err != nil {
+		return nil, errors.New("Your home planet is missing!")
+	}
+	homePlanet := homePlanetEntity.(*entities.Planet)
+
+	loginSuccess := response.NewLoginSuccess(player, homePlanet, justRegistered)
+	response.Send(loginSuccess, session.Send)
+	return client, nil
 }
 
 // Authenticate is a function called for every client's new session.
