@@ -56,6 +56,8 @@ func Load(key string, data []byte) Entity {
 		entity = new(Sun)
 	case "ss":
 		entity = new(SolarSlot)
+	case "spy_report":
+		entity = new(SpyReport)
 	default:
 		return nil
 	}
