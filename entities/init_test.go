@@ -29,10 +29,12 @@ var (
 		Color: Color{22, 22, 22},
 		Source: embeddedPlanet{
 			Name:     "GOP6720",
+			Owner:    "gophie",
 			Position: vec2d.New(271, 203),
 		},
 		Target: embeddedPlanet{
 			Name:     "GOP6721",
+			Owner:    "chochko",
 			Position: vec2d.New(2, 2),
 		},
 		Type:       "Attack",

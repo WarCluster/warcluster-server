@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Vladimiroff/vec2d"
+	"github.com/garyburd/redigo/redis"
 )
 
 type Sun struct {
@@ -31,26 +32,6 @@ func (s *Sun) AreaSet() string {
 	)
 }
 
-// Updates the sun position while doing this nasty placing the sun
-func (s *Sun) update() {
-	direction := vec2d.Sub(s.target, s.Position)
-	if int32(direction.Length()) >= s.speed {
-		direction.SetLength(float64(s.speed) * ((direction.Length() / 50) + 1))
-		s.Position = vec2d.New(s.Position.X+direction.X, s.Position.Y+direction.Y)
-	}
-}
-
-// Handles the collisions while moving the sun
-func (s *Sun) collider(staticSun *Sun) {
-	distance := vec2d.GetDistance(s.Position, staticSun.Position)
-	if distance < SUNS_SOLAR_SYSTEM_RADIUS {
-		overlap := SUNS_SOLAR_SYSTEM_RADIUS - distance
-		ndir := vec2d.Sub(staticSun.Position, s.Position)
-		ndir.SetLength(overlap)
-		s.Position.Sub(ndir)
-	}
-}
-
 // Generate sun's name out of user's initials and 3-digit random number
 func (s *Sun) generateName(nickname string) {
 	hash, _ := strconv.ParseInt(GenerateHash(nickname)[0:18], 10, 64)
@@ -60,42 +41,111 @@ func (s *Sun) generateName(nickname string) {
 	s.Name = fmt.Sprintf("%s%v", initials, number)
 }
 
+func (ss *Sun) calculateAdjacentSlots() []*SolarSlot {
+	verticalOffset := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
+	angeledOffsetStepX := math.Floor((SUNS_SOLAR_SYSTEM_RADIUS / 2) + 0.5)
+	horizontalOffsetStepX := float64(SUNS_SOLAR_SYSTEM_RADIUS)
+
+	slots := []*SolarSlot{
+		newSolarSlot(ss.Position.X-horizontalOffsetStepX, ss.Position.Y),
+		newSolarSlot(ss.Position.X+horizontalOffsetStepX, ss.Position.Y),
+		newSolarSlot(ss.Position.X-angeledOffsetStepX, ss.Position.Y+verticalOffset),
+		newSolarSlot(ss.Position.X-angeledOffsetStepX, ss.Position.Y-verticalOffset),
+		newSolarSlot(ss.Position.X+angeledOffsetStepX, ss.Position.Y+verticalOffset),
+		newSolarSlot(ss.Position.X+angeledOffsetStepX, ss.Position.Y-verticalOffset),
+	}
+	return slots
+}
+
+func (ss *Sun) createAdjacentSlots() {
+	slots := ss.calculateAdjacentSlots()
+
+	for _, slot := range slots {
+		entity, _ := Get(slot.Key())
+		if entity == nil {
+			Save(slot)
+		}
+	}
+}
+
+// Generates the key of the start position node
+func getStartSolarSlotPosition(friends []*Sun) *SolarSlot {
+	targetPosition := vec2d.New(0, 0)
+
+	verticalOffset := math.Floor(SUNS_SOLAR_SYSTEM_RADIUS * (math.Sqrt(3) / 2))
+
+	//Find best position between all friends
+	for _, friend := range friends {
+		targetPosition.Collect(friend.Position)
+	}
+	if len(friends) > 0 {
+		targetPosition.DivToFloat64(float64(len(friends)))
+	}
+
+	//math.Floor(targetPosition.Y/SUNS_SOLAR_SYSTEM_RADIUS*(math.Sqrt(3)/2) + 0.5)
+
+	//Approximate target to nearest node
+	verticalOffsetCoefficent := math.Floor((targetPosition.Y / verticalOffset) + 0.5)
+	if int64(verticalOffsetCoefficent)%2 != 0 {
+		targetPosition.X += SUNS_SOLAR_SYSTEM_RADIUS / 2
+	}
+	targetPosition.X = SUNS_SOLAR_SYSTEM_RADIUS * math.Floor((targetPosition.X/SUNS_SOLAR_SYSTEM_RADIUS)+0.5)
+	targetPosition.Y = verticalOffset * verticalOffsetCoefficent
+	return newSolarSlot(targetPosition.X, targetPosition.Y)
+
+}
+
+func findHomeSolarSlot(rootSolarSlot *SolarSlot) *SolarSlot {
+	var zLevel uint32 = 1
+
+	rootSolarSlotEntity, err := Get(rootSolarSlot.Key())
+	if err != nil && err != redis.ErrNil {
+		panic(err)
+	}
+
+	if rootSolarSlotEntity == nil {
+		rootSolarSlot = newSolarSlot(rootSolarSlot.Position.X, rootSolarSlot.Position.Y)
+	} else {
+		rootSolarSlot = rootSolarSlotEntity.(*SolarSlot)
+	}
+	if rootSolarSlot.Data == "" {
+		return rootSolarSlot
+	}
+
+	for {
+		nodes := rootSolarSlot.fetchSolarSlotsLayer(zLevel)
+		for _, nodeKey := range nodes {
+			if node, err := Get(nodeKey); err == nil && node != nil {
+				nodeEntity, _ := node.(*SolarSlot)
+				if nodeEntity.Data == "" {
+					return nodeEntity
+				}
+			}
+		}
+		zLevel++
+	}
+}
+
 // Uses all player's twitter friends and tries to place the sun as
 // close as possible to all of them. This of course could cause tons of
 // overlapping. To solve this, we simply throw the sun somewhere far away
 // from the desired point and start to move it to THE POINT, but carefully
 // watching for collisions.
-func GenerateSun(username string, friends, others []Sun) *Sun {
+func GenerateSun(username string, friends, others []*Sun) *Sun {
 	newSun := Sun{
 		Username: username,
 		speed:    5,
 		target:   vec2d.New(0, 0),
-		Position: getRandomStartPosition(SUNS_RANDOM_SPAWN_ZONE_RADIUS),
+		Position: vec2d.New(0, 0),
 	}
 	newSun.generateName(username)
-	targetPosition := vec2d.New(0, 0)
 
-	for _, friend := range friends {
-		targetPosition.Collect(friend.Position)
-	}
-	targetPosition.DivToFloat64(float64(len(friends)))
+	node := findHomeSolarSlot(getStartSolarSlotPosition(friends))
+	node.Data = newSun.Key()
+	Save(node)
 
-	noChange := false
-
-	var oldPos *vec2d.Vector
-	for noChange != true {
-		oldPos = newSun.Position
-		newSun.update()
-		for _, sunEntity := range append(friends, others...) {
-			newSun.collider(&sunEntity)
-		}
-
-		if newSun.Position.X == oldPos.X && newSun.Position.Y == oldPos.Y {
-			noChange = true
-		}
-	}
-
-	newSun.Position.X = math.Floor(newSun.Position.X)
-	newSun.Position.Y = math.Floor(newSun.Position.Y)
+	newSun.Position.X = node.Position.X
+	newSun.Position.Y = node.Position.Y
+	newSun.createAdjacentSlots()
 	return &newSun
 }

@@ -2,13 +2,11 @@ package entities
 
 import (
 	"crypto/sha512"
-	"encoding/json"
 	"fmt"
 	"io"
 	"math"
 	"math/rand"
 	"strconv"
-	"strings"
 	"time"
 	"unicode"
 
@@ -35,28 +33,6 @@ func (ce *CartesianEquation) GetXByY(y float64) float64 {
 
 func (ce *CartesianEquation) GetYByX(x float64) float64 {
 	return ce.a*x + ce.b
-}
-
-// Creates an entity via unmarshaling a json.
-// The concrete entity type is given by the user as `key`
-func Construct(key string, data []byte) Entity {
-	var entity Entity
-	entityType := strings.Split(key, ".")[0]
-
-	switch entityType {
-	case "player":
-		entity = new(Player)
-	case "planet":
-		entity = new(Planet)
-	case "mission":
-		entity = new(Mission)
-	case "sun":
-		entity = new(Sun)
-	default:
-		return nil
-	}
-	json.Unmarshal(data, entity)
-	return entity
 }
 
 // Generates unique digit-only hash, based on the username.

@@ -12,7 +12,7 @@ import (
 func TestMissionKey(t *testing.T) {
 	startTime := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
 	mission := new(Mission)
-	mission.Source = embeddedPlanet{planet.Name, planet.Position}
+	mission.Source = embeddedPlanet{planet.Name, planet.Owner, planet.Position}
 	mission.StartTime = startTime
 
 	if mission.Key() != "mission.1352588400000_GOP6720" {

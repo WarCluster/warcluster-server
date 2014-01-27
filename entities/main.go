@@ -2,20 +2,21 @@
 package entities
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
+	"strings"
 
 	"warcluster/entities/db"
 )
 
 const (
-	ENTITIES_AREA_TEMPLATE        = "area:%d:%d"
-	ENTITIES_AREA_SIZE            = 10000
-	PLANETS_RING_OFFSET           = 300
-	PLANETS_PLANET_RADIUS         = 300
-	PLANETS_PLANET_COUNT          = 10
-	PLANETS_PLANET_HASH_ARGS      = 4
-	SUNS_RANDOM_SPAWN_ZONE_RADIUS = 50000
-	SUNS_SOLAR_SYSTEM_RADIUS      = 9000
+	ENTITIES_AREA_TEMPLATE   = "area:%d:%d"
+	ENTITIES_AREA_SIZE       = 10000
+	PLANETS_RING_OFFSET      = 300
+	PLANETS_PLANET_RADIUS    = 300
+	PLANETS_PLANET_COUNT     = 10
+	PLANETS_PLANET_HASH_ARGS = 4
+	SUNS_SOLAR_SYSTEM_RADIUS = 9000
 )
 
 // Entity interface is implemented by all entity types here
@@ -29,6 +30,36 @@ type Color struct {
 	R uint8
 	G uint8
 	B uint8
+}
+
+// Creates an entity via unmarshaling a json.
+// The concrete entity type is given by the user as `key`
+func Load(key string, data []byte) Entity {
+	var (
+		buffer bytes.Buffer
+		entity Entity
+	)
+
+	buffer.Write(data)
+	decoder := gob.NewDecoder(&buffer)
+	entityType := strings.Split(key, ".")[0]
+
+	switch entityType {
+	case "player":
+		entity = new(Player)
+	case "planet":
+		entity = new(Planet)
+	case "mission":
+		entity = new(Mission)
+	case "sun":
+		entity = new(Sun)
+	case "ss":
+		entity = new(SolarSlot)
+	default:
+		return nil
+	}
+	decoder.Decode(entity)
+	return entity
 }
 
 // Finds records in the database, by given key
@@ -66,7 +97,7 @@ func Get(key string) (Entity, error) {
 		return nil, err
 	}
 
-	return Construct(key, record), nil
+	return Load(key, record), nil
 }
 
 // Saves an entity to the database. Records' key is entity.Key()
@@ -76,18 +107,21 @@ func Get(key string) (Entity, error) {
 // Failed marshaling of the given entity is pretty much the only
 // point of failure in this function... I supose.
 func Save(entity Entity) error {
-	conn := db.Pool.Get()
-	defer conn.Close()
+	var buffer bytes.Buffer
 
+	encoder := gob.NewEncoder(&buffer)
 	key := entity.Key()
-	value, err := json.Marshal(entity)
+	err := encoder.Encode(entity)
 	if err != nil {
 		return err
 	}
 
 	setKey := entity.AreaSet()
-	err = db.Save(conn, key, setKey, value)
-	return err
+
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.Save(conn, key, setKey, buffer.Bytes())
 }
 
 // Deletes a record by the given key
@@ -120,7 +154,7 @@ func GetAreasMembers(areas []string) []Entity {
 			continue
 		}
 
-		entityList = append(entityList, Construct(key, record))
+		entityList = append(entityList, Load(key, record))
 	}
 
 	return entityList

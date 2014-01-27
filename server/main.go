@@ -108,7 +108,7 @@ func login(session sockjs.Session) (*Client, error) {
 func handler(session sockjs.Session) {
 	defer func() {
 		if panicked := recover(); panicked != nil {
-			log.Println(string(debug.Stack()))
+			log.Println(fmt.Sprintf("%s\n\nStacktrace:\n\n%s", panicked, debug.Stack()))
 			return
 		}
 	}()
