@@ -1,6 +1,7 @@
 package server
 
 import (
+	"container/list"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,30 +26,43 @@ type Client struct {
 // Thread-safe pool of all clients, with opened sockets.
 type ClientPool struct {
 	mutex sync.RWMutex
-	pool  map[*Client]struct{}
+	pool  map[string]*list.List
 }
 
 func NewClientPool() *ClientPool {
 	cp := new(ClientPool)
-	cp.pool = make(map[*Client]struct{})
+	cp.pool = make(map[string]*list.List)
 	return cp
 }
 
 // Adds the given client to the pool.
-func (cp *ClientPool) Add(c *Client) {
+func (cp *ClientPool) Add(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	cp.pool[c] = struct{}{}
+	element := new(list.Element)
+	element.Value = client
+
+	_, ok := cp.pool[client.Player.Username]
+	if !ok {
+		cp.pool[client.Player.Username] = list.New()
+	}
+	cp.pool[client.Player.Username].PushBack(element)
 }
 
 // Remove the client to the pool.
 // It is safe to remove non-existing client.
-func (cp *ClientPool) Remove(c *Client) {
+func (cp *ClientPool) Remove(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	delete(cp.pool, c)
+	element := new(list.Element)
+	element.Value = client
+	cp.pool[client.Player.Username].Remove(element)
+
+	if cp.pool[client.Player.Username].Len() == 0 {
+		delete(cp.pool, client.Player.Username)
+	}
 }
 
 // Broadcast sends the given message to every session in the pool.
@@ -56,8 +70,11 @@ func (cp *ClientPool) Broadcast(m []byte) {
 	cp.mutex.RLock()
 	defer cp.mutex.RUnlock()
 
-	for client := range cp.pool {
-		client.Session.Send(m)
+	for username := range cp.pool {
+		for element := cp.pool[username].Front(); element != nil; element = element.Next() {
+			client := element.Value.(*Client)
+			client.Session.Send(m)
+		}
 	}
 }
 
