@@ -90,9 +90,9 @@ func (p *Player) UpdateSpyReports() {
 func CreatePlayer(username, TwitterID string, homePlanet *Planet) *Player {
 	userhash := simplifyHash(usernameHash(username))
 
-	red := []uint8{151, 218, 233, 72, 245, 84}
-	green := []uint8{8, 75, 177, 140, 105, 146}
-	blue := []uint8{14, 15, 4, 19, 145, 219}
+	red := []float32{0.59215686, 0.85490196, 0.91372549, 0.28235294, 0.96078431, 0.32941176}
+	green := []float32{0.031372549, 0.29411765, 0.69411765, 0.54901961, 0.41176471, 0.57254902}
+	blue := []float32{0.054901961, 0.058823529, 0.015686275, 0.074509804, 0.56862745, 0.85882353}
 	hashValue := func(index uint8) uint8 {
 		return uint8((userhash[0] - 48) / 2)
 	}

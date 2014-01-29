@@ -2,7 +2,8 @@ package entities
 
 import "time"
 
-// Area transfer points are the points between the areasets
+// Area transfer points are the points between the area sets
+//Used to note all the points in a mission trip that the missions will be transfered in a different DB sector.
 type AreaTransferPoint struct {
 	TravelTime     time.Duration
 	Direction      int8

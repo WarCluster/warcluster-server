@@ -28,9 +28,9 @@ type Entity interface {
 
 // Simple RGB color struct
 type Color struct {
-	R uint8
-	G uint8
-	B uint8
+	R float32
+	G float32
+	B float32
 }
 
 // Creates an entity via unmarshaling a json.

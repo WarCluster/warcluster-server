@@ -13,7 +13,7 @@ func TestCreateMission(t *testing.T) {
 	startTime := time.Now()
 	planetStart := Planet{
 		Name:                "GOP6720",
-		Color:               Color{22, 22, 22},
+		Color:               Color{0.59215686, 0.59215686, 0.59215686},
 		Position:            vec2d.New(271, 203),
 		IsHome:              true,
 		Texture:             3,
@@ -25,7 +25,7 @@ func TestCreateMission(t *testing.T) {
 	}
 	planetEnd := Planet{
 		Name:                "GOP6721",
-		Color:               Color{22, 22, 22},
+		Color:               Color{0.59215686, 0.59215686, 0.59215686},
 		Position:            vec2d.New(471, 403),
 		IsHome:              false,
 		Texture:             3,
@@ -37,7 +37,7 @@ func TestCreateMission(t *testing.T) {
 	}
 	player := Player{
 		Username:       "gophie",
-		Color:          Color{22, 22, 22},
+		Color:          Color{0.59215686, 0.59215686, 0.59215686},
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},
