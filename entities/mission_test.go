@@ -47,9 +47,9 @@ func TestMissionMarshalling(t *testing.T) {
 	}
 }
 
-func TestEndMission(t *testing.T) {
+func TestEndAttackMission(t *testing.T) {
 	var excessShips int32
-	excessShips = EndMission(&endPlanet, &secondMission)
+	excessShips = secondMission.EndAttackMission(&endPlanet)
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
 	}
@@ -59,7 +59,7 @@ func TestEndMission(t *testing.T) {
 	}
 
 	mission.ShipCount = 15
-	excessShips = EndMission(&endPlanet, &mission)
+	excessShips = mission.EndAttackMission(&endPlanet)
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
 	}
@@ -73,13 +73,13 @@ func TestEndMission(t *testing.T) {
 	}
 }
 
-func TestEndMissionDenyTakeover(t *testing.T) {
+func TestEndAttackMissionDenyTakeover(t *testing.T) {
 	var excessShips int32
 	endPlanet := new(Planet)
 	*endPlanet = Planet{"", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(2, 2), true, 6, 3, timeStamp, 2, 0, "chochko"}
 
 	mission.ShipCount = 5
-	excessShips = EndMission(endPlanet, &mission)
+	excessShips = mission.EndAttackMission(endPlanet)
 	if endPlanet.GetShipCount() != 0 {
 		t.Error("End Planet ship count was expected to be 0 but it is:", endPlanet.GetShipCount())
 	}

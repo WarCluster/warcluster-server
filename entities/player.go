@@ -43,10 +43,6 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 	shipCount := int32(baseShipCount * fleet / 100)
 	source.SetShipCount(baseShipCount - shipCount)
 
-	if missionType == "Spy" {
-		shipCount = 1
-	}
-
 	mission := Mission{
 		Color: p.Color,
 		Source: embeddedPlanet{

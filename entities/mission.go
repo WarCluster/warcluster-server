@@ -132,52 +132,52 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 
 // When the missionary is done traveling (a.k.a. sleeping) calls this in order
 // to calculate the outcome of the battle/suppliemnt/spying on target planet.
-//
-// In case of Attack: We have to check if the target planet is owned by the attacker.
+
+// EndAttackMission: We have to check if the target planet is owned by the attacker.
 // If that's true we simply increment the ship count on that planet. If not we do the
 // math and decrease the count ship on the attacked planet. We should check if the attacker
 // should own that planet, which comes with all the changing colors and owner stuff.
-//
-// In case of Supply: We simply increase the ship count and we're done :P
-// If however the owner of the target planet has changed we change the mission type
-// to attack.
-//
-// In case of Spy: Create a spy report for that planet and find a way to notify the logged in
-// instances of the user who sent this mission.
-func EndMission(target *Planet, mission *Mission) (excessShips int32) {
-	switch mission.Type {
-	case "Attack":
-		if target.Owner == mission.Player {
-			target.SetShipCount(target.ShipCount + mission.ShipCount)
+func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
+	if target.Owner == m.Player {
+		m.Type = "Supply"
+		return m.EndSupplyMission(target)
+	} else {
+		if m.ShipCount < target.ShipCount {
+			target.SetShipCount(target.ShipCount - m.ShipCount)
 		} else {
-			if mission.ShipCount < target.ShipCount {
-				target.SetShipCount(target.ShipCount - mission.ShipCount)
+			if target.IsHome {
+				target.SetShipCount(0)
+				excessShips = m.ShipCount - target.ShipCount
 			} else {
-				if target.IsHome {
-					target.SetShipCount(0)
-					excessShips = mission.ShipCount - target.ShipCount
-				} else {
-					target.SetShipCount(mission.ShipCount - target.ShipCount)
-					target.Owner = mission.Player
-					target.Color = mission.Color
-				}
+				target.SetShipCount(m.ShipCount - target.ShipCount)
+				target.Owner = m.Player
+				target.Color = m.Color
 			}
 		}
-	case "Supply":
-		if target.Owner != mission.Target.Owner {
-			mission.Type = "Attack"
-			return EndMission(target, mission)
-		}
+	}
+	return
+}
 
-		target.SetShipCount(target.ShipCount + mission.ShipCount)
-	case "Spy":
-		if target.Owner == mission.Player {
-			target.SetShipCount(target.ShipCount + mission.ShipCount)
-			return
-		}
-		CreateSpyReport(target, mission)
-		excessShips = mission.ShipCount - 1
+// End Supply Mission: We simply increase the ship count and we're done :P
+// If however the owner of the target planet has changed we change the mission type
+// to attack.
+func (m *Mission) EndSupplyMission(target *Planet) int32 {
+	if target.Owner != m.Target.Owner {
+		m.Type = "Attack"
+		return m.EndAttackMission(target)
 	}
 
-	return
+	target.SetShipCount(target.ShipCount + m.ShipCount)
+	return 0
+}
+
+// End Spy Mission: Create a spy report for that planet and find a way to notify the logged in
+// instances of the user who sent this mission.
+func (m *Mission) EndSpyMission(target *Planet) int32 {
+	if target.Owner == m.Player {
+		return m.EndSupplyMission(target)
+	}
+	CreateSpyReport(target, m)
+	m.ShipCount -= 1
+	return 0
 }
