@@ -11,10 +11,11 @@ import (
 // to call calculateCanvasSize and give the player the information
 // contained in the given borders.
 func scopeOfView(request *Request) error {
-	res := response.NewScopeOfView(request.Position, request.Resolution)
+	response := response.NewScopeOfView(request.Position, request.Resolution)
 	request.Client.Player.ScreenPosition = request.Position
 	go entities.Save(request.Client.Player)
-	return res.Send(request.Client.Player, request.Client.Session.Send)
+	clients.Send(request.Client.Player, response)
+	return nil
 }
 
 // This function makes all the checks needed for creation of a new mission.
@@ -29,17 +30,18 @@ func parseAction(request *Request) error {
 		return nil
 	}()
 
-	source, err := entities.Get(request.StartPlanet)
+	sourceEntity, err := entities.Get(request.StartPlanet)
 	if err != nil {
 		return errors.New("Start planet does not exist")
 	}
+	source := sourceEntity.(*entities.Planet)
 
 	target, err := entities.Get(request.EndPlanet)
 	if err != nil {
 		return errors.New("End planet does not exist")
 	}
 
-	if source.(*entities.Planet).Owner != request.Client.Player.Username {
+	if source.Owner != request.Client.Player.Username {
 		return errors.New("This is not your home!")
 	}
 
@@ -49,7 +51,7 @@ func parseAction(request *Request) error {
 	}
 
 	mission := request.Client.Player.StartMission(
-		source.(*entities.Planet),
+		source,
 		target.(*entities.Planet),
 		request.Fleet,
 		request.Type,
@@ -58,7 +60,7 @@ func parseAction(request *Request) error {
 	if mission.ShipCount == 0 {
 		missionFailed := response.NewSendMissionFailed()
 		missionFailed.Error = "Not enough pilots on source planet!"
-		response.Send(missionFailed, request.Client.Session.Send)
+		clients.Send(request.Client.Player, missionFailed)
 	}
 
 	go StartMissionary(mission)
@@ -67,14 +69,12 @@ func parseAction(request *Request) error {
 
 	sendMission := response.NewSendMission()
 	sendMission.Mission = mission
-	err = response.Send(sendMission, clients.Broadcast)
-	if err != nil {
-		return err
-	}
+	clients.BroadcastToAll(sendMission)
 
 	stateChange := response.NewStateChange()
-	stateChange.Planets = map[string]entities.Entity{
+	stateChange.RawPlanets = map[string]*entities.Planet{
 		source.Key(): source,
 	}
-	return response.Send(stateChange, clients.Broadcast)
+	clients.BroadcastToAll(stateChange)
+	return nil
 }

@@ -16,7 +16,7 @@ const (
 type ScopeOfView struct {
 	baseResponse
 	Missions     map[string]*entities.Mission
-	planets      map[string]*entities.Planet
+	rawPlanets   map[string]*entities.Planet
 	Planets      map[string]*entities.PlanetPacket
 	Suns         map[string]*entities.Sun
 	CanvasPoints struct {
@@ -25,33 +25,31 @@ type ScopeOfView struct {
 	}
 }
 
-func (s *ScopeOfView) Send(player *entities.Player, sender func([]byte)) error {
-	for name, planet := range s.planets {
-		s.Planets[name] = planet.Sanitize(player)
-	}
-	return Send(s, sender)
+func (s *ScopeOfView) Sanitize(player *entities.Player) {
+	s.Planets = SanitizePlanets(player, s.rawPlanets)
 }
 
+// TODO: Use vector for rawPlanets
 func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
 	topLeft, bottomRight := calculateCanvasSize(position, resolution)
+	areas := listAreas(topLeft, bottomRight)
+	entityList := entities.GetAreasMembers(areas)
 
 	s := new(ScopeOfView)
 	s.Command = "scope_of_view_result"
 	s.Missions = make(map[string]*entities.Mission)
-	s.planets = make(map[string]*entities.Planet)
+	s.rawPlanets = make(map[string]*entities.Planet)
 	s.Planets = make(map[string]*entities.PlanetPacket)
 	s.Suns = make(map[string]*entities.Sun)
 	s.CanvasPoints.TopLeft = topLeft
 	s.CanvasPoints.BottomRight = bottomRight
 
-	areas := listAreas(topLeft, bottomRight)
-	entityList := entities.GetAreasMembers(areas)
 	for _, entity := range entityList {
 		switch entity.(type) {
 		case *entities.Mission:
 			s.Missions[entity.Key()] = entity.(*entities.Mission)
 		case *entities.Planet:
-			s.planets[entity.Key()] = entity.(*entities.Planet)
+			s.rawPlanets[entity.Key()] = entity.(*entities.Planet)
 		case *entities.Sun:
 			s.Suns[entity.Key()] = entity.(*entities.Sun)
 		default:

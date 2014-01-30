@@ -1,12 +1,10 @@
 package server
 
 import (
-	"container/list"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"sync"
 
 	"github.com/fzzy/sockjs-go/sockjs"
 
@@ -23,70 +21,14 @@ type Client struct {
 	Player  *entities.Player
 }
 
-// Thread-safe pool of all clients, with opened sockets.
-type ClientPool struct {
-	mutex sync.RWMutex
-	pool  map[string]*list.List
-}
-
-func NewClientPool() *ClientPool {
-	cp := new(ClientPool)
-	cp.pool = make(map[string]*list.List)
-	return cp
-}
-
-// Adds the given client to the pool.
-func (cp *ClientPool) Add(client *Client) {
-	cp.mutex.Lock()
-	defer cp.mutex.Unlock()
-
-	element := new(list.Element)
-	element.Value = client
-
-	_, ok := cp.pool[client.Player.Username]
-	if !ok {
-		cp.pool[client.Player.Username] = list.New()
-	}
-	cp.pool[client.Player.Username].PushBack(element)
-}
-
-// Remove the client to the pool.
-// It is safe to remove non-existing client.
-func (cp *ClientPool) Remove(client *Client) {
-	cp.mutex.Lock()
-	defer cp.mutex.Unlock()
-
-	element := new(list.Element)
-	element.Value = client
-	cp.pool[client.Player.Username].Remove(element)
-
-	if cp.pool[client.Player.Username].Len() == 0 {
-		delete(cp.pool, client.Player.Username)
-	}
-}
-
-// Broadcast sends the given message to every session in the pool.
-func (cp *ClientPool) Broadcast(m []byte) {
-	cp.mutex.RLock()
-	defer cp.mutex.RUnlock()
-
-	for username := range cp.pool {
-		for element := cp.pool[username].Front(); element != nil; element = element.Next() {
-			client := element.Value.(*Client)
-			client.Session.Send(m)
-		}
-	}
-}
-
 // This function is called from the message handler to parse the first message for every new connection.
 // It check for existing user in the DB and logs him if the password is correct.
 // If the user is new he is initiated and a new home planet nad solar system are generated.
-func login(session sockjs.Session) (*Client, error) {
+func login(session sockjs.Session) (*Client, response.Responser, error) {
 	player, justRegistered, err := authenticate(session)
 	if err != nil {
-		response.Send(response.NewLoginFailed(), session.Send)
 		log.Println(err)
-		return nil, errors.New("Login failed")
+		return nil, response.NewLoginFailed(), errors.New("Login failed")
 	}
 
 	client := &Client{
@@ -95,13 +37,12 @@ func login(session sockjs.Session) (*Client, error) {
 	}
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
-		return nil, errors.New("Your home planet is missing!")
+		return nil, nil, errors.New("Your home planet is missing!")
 	}
 	homePlanet := homePlanetEntity.(*entities.Planet)
 
 	loginSuccess := response.NewLoginSuccess(player, homePlanet, justRegistered)
-	response.Send(loginSuccess, session.Send)
-	return client, nil
+	return client, loginSuccess, nil
 }
 
 // Authenticate is a function called for every client's new session.
@@ -151,20 +92,20 @@ func authenticate(session sockjs.Session) (*entities.Player, bool, error) {
 		for _, planet := range planets {
 			entities.Save(planet)
 			stateChange := response.NewStateChange()
-			stateChange.Planets = map[string]entities.Entity{
+			stateChange.RawPlanets = map[string]*entities.Planet{
 				planet.Key(): planet,
 			}
-			response.Send(stateChange, clients.Broadcast)
+			clients.BroadcastToAll(stateChange)
 		}
 
 		entities.Save(player)
 		entities.Save(sun)
 
 		stateChange := response.NewStateChange()
-		stateChange.Suns = map[string]entities.Entity{
+		stateChange.Suns = map[string]*entities.Sun{
 			sun.Key(): sun,
 		}
-		response.Send(stateChange, clients.Broadcast)
+		clients.BroadcastToAll(stateChange)
 	} else {
 		player = entity.(*entities.Player)
 	}

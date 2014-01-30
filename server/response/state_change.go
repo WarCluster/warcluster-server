@@ -6,9 +6,10 @@ import (
 
 type StateChange struct {
 	baseResponse
-	Missions map[string]entities.Entity `json:",omitempty"`
-	Planets  map[string]entities.Entity `json:",omitempty"`
-	Suns     map[string]entities.Entity `json:",omitempty"`
+	Missions   map[string]*entities.Mission      `json:",omitempty"`
+	RawPlanets map[string]*entities.Planet       `json:"-"`
+	Planets    map[string]*entities.PlanetPacket `json:",omitempty"`
+	Suns       map[string]*entities.Sun          `json:",omitempty"`
 }
 
 func NewStateChange() *StateChange {
@@ -17,11 +18,6 @@ func NewStateChange() *StateChange {
 	return r
 }
 
-func (s *StateChange) Send(player *entities.Player, sender func([]byte)) error {
-	for name, entity := range s.Planets {
-		if planet, ok := entity.(*entities.Planet); ok {
-			s.Planets[name] = planet.Sanitize(player)
-		}
-	}
-	return Send(s, sender)
+func (s *StateChange) Sanitize(player *entities.Player) {
+	s.Planets = SanitizePlanets(player, s.RawPlanets)
 }

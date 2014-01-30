@@ -85,13 +85,14 @@ func handler(session sockjs.Session) {
 	}()
 	defer session.End()
 
-	client, err := login(session)
+	client, response, err := login(session)
 	if err != nil {
 		log.Print("Error in server.main.handler.login:", err.Error())
 	}
 	clients.Add(client)
 	defer clients.Remove(client)
 
+	clients.Send(client.Player, response)
 	client.Player.UpdateSpyReports()
 	for {
 		message := session.Receive()

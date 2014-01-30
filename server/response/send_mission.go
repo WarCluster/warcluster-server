@@ -14,3 +14,5 @@ func NewSendMission() *SendMission {
 	r.Command = "send_mission"
 	return r
 }
+
+func (m *SendMission) Sanitize(*entities.Player) {}
