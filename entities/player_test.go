@@ -47,7 +47,6 @@ func TestCreateMission(t *testing.T) {
 	validMission := player.StartMission(&planetStart, &planetEnd, 80, "Attack")
 
 	planetStart.ShipCount = 100
-	invalidMission := player.StartMission(&planetStart, &planetEnd, 120, "Attack")
 
 	if validMission.Source.Name != "GOP6720" {
 		t.Error(validMission.Source)
@@ -62,11 +61,6 @@ func TestCreateMission(t *testing.T) {
 	if validMission.ShipCount != 80 {
 		t.Error(validMission.ShipCount)
 		t.Error("Mission ShipCount was expected to be 80!")
-	}
-
-	if invalidMission.ShipCount != 100 {
-		t.Error(invalidMission.ShipCount)
-		t.Error("Mission ShipCount was expected to be 100!")
 	}
 }
 

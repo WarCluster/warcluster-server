@@ -33,11 +33,6 @@ func (p *Player) AreaSet() string {
 // Starts missions to one of the players planet to some other. Each mission have type
 // and the user decides which part of the planet's fleet he would like to send.
 func (p *Player) StartMission(source, target *Planet, fleet int32, missionType string) *Mission {
-	if fleet > 100 {
-		fleet = 100
-	} else if fleet <= 0 {
-		fleet = 10
-	}
 	currentTime := time.Now().UnixNano() / 1e6
 	baseShipCount := source.GetShipCount()
 	shipCount := int32(baseShipCount * fleet / 100)
