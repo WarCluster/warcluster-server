@@ -79,6 +79,8 @@ func StartMissionary(mission *entities.Mission) {
 				break
 			}
 		}
+		time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
+		clients.Send(player, stateChange)
 	}
 
 	entities.RemoveFromArea(mission.Key(), mission.AreaSet())
