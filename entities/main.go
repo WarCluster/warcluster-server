@@ -17,7 +17,7 @@ const (
 	PLANET_COUNT        = 10
 	PLANET_HASH_ARGS    = 4
 	SOLAR_SYSTEM_RADIUS = 9000
-	SPY_REPORT_VALIDITY = 300 // in seconds
+	SPY_REPORT_VALIDITY = 30 // in seconds
 )
 
 // Entity interface is implemented by all entity types here
