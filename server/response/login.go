@@ -37,3 +37,6 @@ func NewLoginFailed() *LoginFailed {
 	r.Command = "login_failed"
 	return r
 }
+
+func (l *LoginSuccess) Sanitize(*entities.Player) {}
+func (l *LoginFailed) Sanitize(*entities.Player)  {}

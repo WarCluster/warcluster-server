@@ -5,7 +5,9 @@ import "github.com/garyburd/redigo/redis"
 // Save takes a key, name of the set and the marshaled record and writes it in.
 func Save(conn redis.Conn, key, setKey string, value []byte) error {
 	_, err := conn.Do("SET", key, value)
-	Sadd(conn, setKey, key)
+	if len(setKey) > 0 {
+		Sadd(conn, setKey, key)
+	}
 	return err
 }
 

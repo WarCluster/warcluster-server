@@ -1,6 +1,7 @@
 package server
 
 import (
+	"container/list"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,8 +18,33 @@ import (
 // 1.Session holds the curent player session socket for comunication.
 // 2.Player is a pointer to the player struct for easy access.
 type Client struct {
-	Session sockjs.Session
-	Player  *entities.Player
+	Session     sockjs.Session
+	Player      *entities.Player
+	poolElement *list.Element
+}
+
+// This function is called from the message handler to parse the first message for every new connection.
+// It check for existing user in the DB and logs him if the password is correct.
+// If the user is new he is initiated and a new home planet nad solar system are generated.
+func login(session sockjs.Session) (*Client, response.Responser, error) {
+	player, justRegistered, err := authenticate(session)
+	if err != nil {
+		log.Println(err)
+		return nil, response.NewLoginFailed(), errors.New("Login failed")
+	}
+
+	client := &Client{
+		Session: session,
+		Player:  player,
+	}
+	homePlanetEntity, err := entities.Get(player.HomePlanet)
+	if err != nil {
+		return nil, nil, errors.New("Your home planet is missing!")
+	}
+	homePlanet := homePlanetEntity.(*entities.Planet)
+
+	loginSuccess := response.NewLoginSuccess(player, homePlanet, justRegistered)
+	return client, loginSuccess, nil
 }
 
 // Authenticate is a function called for every client's new session.
@@ -68,20 +94,20 @@ func authenticate(session sockjs.Session) (*entities.Player, bool, error) {
 		for _, planet := range planets {
 			entities.Save(planet)
 			stateChange := response.NewStateChange()
-			stateChange.Planets = map[string]entities.Entity{
+			stateChange.RawPlanets = map[string]*entities.Planet{
 				planet.Key(): planet,
 			}
-			response.Send(stateChange, sessions.Broadcast)
+			clients.BroadcastToAll(stateChange)
 		}
 
 		entities.Save(player)
 		entities.Save(sun)
 
 		stateChange := response.NewStateChange()
-		stateChange.Suns = map[string]entities.Entity{
+		stateChange.Suns = map[string]*entities.Sun{
 			sun.Key(): sun,
 		}
-		response.Send(stateChange, sessions.Broadcast)
+		clients.BroadcastToAll(stateChange)
 	} else {
 		player = entity.(*entities.Player)
 	}
