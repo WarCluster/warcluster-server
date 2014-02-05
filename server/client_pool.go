@@ -27,11 +27,11 @@ func (cp *ClientPool) Add(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	_, ok := cp.pool[client.Player]
-	if !ok {
+	if _, ok := cp.pool[client.Player]; !ok {
 		cp.pool[client.Player] = list.New()
 	}
-	cp.pool[client.Player].PushBack(client)
+	element := cp.pool[client.Player].PushBack(client)
+	client.poolElement = element
 }
 
 // Remove the client to the pool.
@@ -40,9 +40,7 @@ func (cp *ClientPool) Remove(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	element := new(list.Element)
-	element.Value = client
-	cp.pool[client.Player].Remove(element)
+	cp.pool[client.Player].Remove(client.poolElement)
 
 	if cp.pool[client.Player].Len() == 0 {
 		delete(cp.pool, client.Player)

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"container/list"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,8 +18,9 @@ import (
 // 1.Session holds the curent player session socket for comunication.
 // 2.Player is a pointer to the player struct for easy access.
 type Client struct {
-	Session sockjs.Session
-	Player  *entities.Player
+	Session     sockjs.Session
+	Player      *entities.Player
+	poolElement *list.Element
 }
 
 // This function is called from the message handler to parse the first message for every new connection.
