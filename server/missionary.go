@@ -42,12 +42,18 @@ func StartMissionary(mission *entities.Mission) {
 	target := targetEntity.(*entities.Planet)
 	target.UpdateShipCount()
 
-	playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Target.Owner))
-	if err != nil {
-		log.Println("Error in target planet owner fetch:", err.Error())
-		return
+	var player *entities.Player
+
+	if mission.Target.Owner == "" {
+		player = nil
+	} else {
+		playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Target.Owner))
+		if err != nil {
+			log.Println("Error in target planet owner fetch:", err.Error())
+			return
+		}
+		player = playerEntity.(*entities.Player)
 	}
-	player := playerEntity.(*entities.Player)
 
 	stateChange := response.NewStateChange()
 	stateChange.RawPlanets = map[string]*entities.Planet{
@@ -60,7 +66,9 @@ func StartMissionary(mission *entities.Mission) {
 		clients.BroadcastToAll(stateChange)
 	case "Supply":
 		excessShips = mission.EndSupplyMission(target)
-		clients.Send(player, stateChange)
+		if player != nil {
+			clients.Send(player, stateChange)
+		}
 	case "Spy":
 		for {
 			mission.EndSpyMission(target)
