@@ -72,7 +72,7 @@ func StartMissionary(mission *entities.Mission) {
 	case "Spy":
 		for {
 			mission.EndSpyMission(target)
-			updateSpyReports(player, mission, stateChange)
+			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
 				time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
 			} else {
@@ -111,7 +111,20 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 	clients.BroadcastToAll(sendMission)
 }
 
-func updateSpyReports(player *entities.Player, mission *entities.Mission, state *response.StateChange) {
+func updateSpyReports(mission *entities.Mission, state *response.StateChange) {
+	var player *entities.Player
+
+	if mission.Player == "" {
+		log.Print("Error! Found mission with empty owner.")
+	} else {
+		playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Player))
+		if err != nil {
+			log.Println("Error in mission owner fetch:", err.Error())
+			return
+		}
+		player = playerEntity.(*entities.Player)
+	}
+
 	for e := clients.pool[player].Front(); e != nil; e = e.Next() {
 		client := e.Value.(*Client)
 		if client.Player.Username == mission.Player {
