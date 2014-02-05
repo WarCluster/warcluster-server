@@ -13,12 +13,12 @@ import (
 // Thread-safe pool of all clients, with opened sockets.
 type ClientPool struct {
 	mutex sync.Mutex
-	pool  map[*entities.Player]*list.List
+	pool  map[string]*list.List
 }
 
 func NewClientPool() *ClientPool {
 	cp := new(ClientPool)
-	cp.pool = make(map[*entities.Player]*list.List)
+	cp.pool = make(map[string]*list.List)
 	return cp
 }
 
@@ -27,10 +27,10 @@ func (cp *ClientPool) Add(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	if _, ok := cp.pool[client.Player]; !ok {
-		cp.pool[client.Player] = list.New()
+	if _, ok := cp.pool[client.Player.Username]; !ok {
+		cp.pool[client.Player.Username] = list.New()
 	}
-	element := cp.pool[client.Player].PushBack(client)
+	element := cp.pool[client.Player.Username].PushBack(client)
 	client.poolElement = element
 }
 
@@ -40,18 +40,19 @@ func (cp *ClientPool) Remove(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	cp.pool[client.Player].Remove(client.poolElement)
+	cp.pool[client.Player.Username].Remove(client.poolElement)
 
-	if cp.pool[client.Player].Len() == 0 {
-		delete(cp.pool, client.Player)
+	if cp.pool[client.Player.Username].Len() == 0 {
+		delete(cp.pool, client.Player.Username)
 	}
 }
 
 // Broadcast sends the given message to every session in the pool.
 func (cp *ClientPool) BroadcastToAll(response response.Responser) {
-	for player, clients := range cp.pool {
+	for _, clients := range cp.pool {
 
-		response.Sanitize(player)
+		client := clients.Front().Value.(*Client)
+		response.Sanitize(client.Player)
 		message, err := json.Marshal(response)
 		if err != nil {
 			log.Println(err.Error())
@@ -74,7 +75,7 @@ func (cp *ClientPool) Send(player *entities.Player, response response.Responser)
 		log.Println(err.Error())
 	}
 
-	for element := cp.pool[player].Front(); element != nil; element = element.Next() {
+	for element := cp.pool[player.Username].Front(); element != nil; element = element.Next() {
 		client := element.Value.(*Client)
 		client.Session.Send(message)
 	}

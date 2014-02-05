@@ -126,11 +126,11 @@ func updateSpyReports(mission *entities.Mission, state *response.StateChange) {
 	}
 	player = playerEntity.(*entities.Player)
 
-	if _, ok := clients.pool[player]; !ok {
+	if _, ok := clients.pool[player.Username]; !ok {
 		return
 	}
 
-	for e := clients.pool[player].Front(); e != nil; e = e.Next() {
+	for e := clients.pool[player.Username].Front(); e != nil; e = e.Next() {
 		client := e.Value.(*Client)
 		if client.Player.Username == mission.Player {
 			client.Player.UpdateSpyReports()
