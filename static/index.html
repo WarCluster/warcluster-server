@@ -8,8 +8,13 @@
                 var conn = null;
 
                 function log(msg) {
-                    var control = $('#log');
-                    control.html(control.html() + msg + '<br/>');
+                    var control = $('#json');
+                    try {
+                        var prettyMessage = JSON.stringify(JSON.parse(msg), undefined, 2);
+                        control.html($("#json").html() + "<br/>" + prettyMessage + "<br/>-----------------------------------");
+                    } catch (e) {
+                        control.html(control.html() + msg + '<br/>');
+                    }
                     control.scrollTop(control.scrollTop() + 1000);
                 }
 
@@ -71,8 +76,8 @@
         <div>
             Status: <span id="status">disconnected</span>
         </div>
-        <div id="log" style="width: 90%; height: 30em; overflow:auto; border: 1px solid black">
-        </div>
+        <pre id="json" style="width: 90%; height: 30em; overflow:auto; border: 1px solid black">
+        </pre>
         <form id="chatform">
             <label for="message">Command:</label>
             <input id="message" type="text" style="width: 80%">

@@ -10,13 +10,14 @@ import (
 )
 
 const (
-	ENTITIES_AREA_TEMPLATE   = "area:%d:%d"
-	ENTITIES_AREA_SIZE       = 10000
-	PLANETS_RING_OFFSET      = 300
-	PLANETS_PLANET_RADIUS    = 300
-	PLANETS_PLANET_COUNT     = 10
-	PLANETS_PLANET_HASH_ARGS = 4
-	SUNS_SOLAR_SYSTEM_RADIUS = 9000
+	AREA_TEMPLATE       = "area:%d:%d"
+	AREA_SIZE           = 10000
+	PLANETS_RING_OFFSET = 300
+	PLANET_RADIUS       = 300
+	PLANET_COUNT        = 10
+	PLANET_HASH_ARGS    = 4
+	SOLAR_SYSTEM_RADIUS = 9000
+	SPY_REPORT_VALIDITY = 30 // in seconds
 )
 
 // Entity interface is implemented by all entity types here
@@ -27,9 +28,9 @@ type Entity interface {
 
 // Simple RGB color struct
 type Color struct {
-	R uint8
-	G uint8
-	B uint8
+	R float32
+	G float32
+	B float32
 }
 
 // Creates an entity via unmarshaling a json.
@@ -55,6 +56,8 @@ func Load(key string, data []byte) Entity {
 		entity = new(Sun)
 	case "ss":
 		entity = new(SolarSlot)
+	case "spy_report":
+		entity = new(SpyReport)
 	default:
 		return nil
 	}

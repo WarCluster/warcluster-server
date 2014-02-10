@@ -4,7 +4,13 @@ package response
 import (
 	"encoding/json"
 	"time"
+
+	"warcluster/entities"
 )
+
+type Responser interface {
+	Sanitize(*entities.Player)
+}
 
 type Timestamp int64
 
@@ -17,10 +23,19 @@ func (t *Timestamp) MarshalJSON() ([]byte, error) {
 	return json.Marshal(time.Now().UnixNano() / 1e6)
 }
 
-func Send(r interface{}, sender func([]byte)) error {
+// The sanitizer recieves raw planet and obscures hidden for the player information
+func SanitizePlanets(player *entities.Player, planets map[string]*entities.Planet) map[string]*entities.PlanetPacket {
+	packets := make(map[string]*entities.PlanetPacket)
+	for name, planet := range planets {
+		packets[name] = planet.Sanitize(player)
+	}
+	return packets
+}
+
+func Send(r interface{}, player string, sender func(string, []byte)) error {
 	serialized, err := json.Marshal(r)
 	if err == nil {
-		sender(serialized)
+		sender(player, serialized)
 	}
 	return err
 }
