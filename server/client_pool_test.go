@@ -1,15 +1,13 @@
 package server
 
 import (
-	"fmt"
+	"container/list"
 	"testing"
-	"math/rand"
-	"time"
 
-	"github.com/fzzy/sockjs-go/sockjs"
 	"github.com/Vladimiroff/vec2d"
 
 	"warcluster/entities"
+	"warcluster/server/response"
 )
 
 
@@ -33,40 +31,6 @@ var player2 = entities.Player{
 	ScreenPosition: &vec2d.Vector{2, 8},
 }
 
-type testSession struct {
-	session_id string
-}
-
-func (s *testSession) Receive() (m []byte) {
-	return []byte{}
-}
-
-func (s *testSession) Send(m []byte) {
-	return
-}
-
-func (s *testSession) Close(code int, reason string) {
-	return
-}
-
-func (s *testSession) End() {
-	return
-}
-
-func (s *testSession) Info() sockjs.RequestInfo {
-	return *new(sockjs.RequestInfo)
-}
-
-func (s *testSession) Protocol() sockjs.Protocol {
-	return *new(sockjs.Protocol)
-}
-
-func (s *testSession) String() string {
-	rand.Seed(time.Now().Unix())
-	return fmt.Sprintf("%d", rand.Int())
-	// return session_id
-}
-
 var client1 = Client{
 	Session: new(testSession),
 	Player:  &player1,
@@ -88,14 +52,19 @@ var client4 = Client{
 }
 
 func TestAddClientToClientPool(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+
 	l := len(cp.pool)
 	cp.Add(&client1)
 	if len(cp.pool) != l + 1 {
 		t.Fail()
 	}
+	cp.Remove(&client1)
 }
 
 func TestCloseClientSessionWithMoreThanOneSessions(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+
 	cp.Add(&client1)
 	cp.Add(&client2)
 	l := len(cp.pool)
@@ -104,14 +73,80 @@ func TestCloseClientSessionWithMoreThanOneSessions(t *testing.T) {
 	if len(cp.pool) != l {
 		t.Errorf("Expected %d received %d", l, len(cp.pool))
 	}
+	cp.Remove(&client2)
 }
 
 func TestCloseLastClientSessionAndRemoveIt(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+
 	cp.Add(&client3)
 	l := len(cp.pool)
 
 	cp.Remove(&client3)
 	if len(cp.pool) != l - 1 {
 		t.Errorf("Expected %d received %d", l - 1, len(cp.pool))
+	}
+}
+
+func TestRemoveUnexistingClient(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+
+	cp.Remove(&client1)
+	if len(cp.pool) != 0 {
+		t.Fail()
+	}
+}
+
+func TestSendMessageToSession(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+	resp := response.NewSendMission()
+	cp.Send(&player1, resp)
+
+	cp.Add(&client1)
+	cp.Add(&client2)
+	cp.Add(&client3)
+
+	l1 := len(client1.Session.(*testSession).Messages)
+	l2 := len(client2.Session.(*testSession).Messages)
+	l3 := len(client3.Session.(*testSession).Messages)
+	cp.Send(&player1, resp)
+
+	if len(client1.Session.(*testSession).Messages) != l1 + 1 {
+		t.Errorf("%d", len(client1.Session.(*testSession).Messages))
+	}
+
+	if len(client2.Session.(*testSession).Messages) != l2 + 1 {
+		t.Fail()
+	}
+
+	if len(client3.Session.(*testSession).Messages) != l3 {
+		t.Fail()
+	}
+
+}
+
+func TestBroadcastToAll(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+	resp := response.NewSendMission()
+	cp.BroadcastToAll(resp)
+
+	cp.Add(&client1)
+	cp.Add(&client2)
+	cp.Add(&client3)
+	l1 := len(client1.Session.(*testSession).Messages)
+	l2 := len(client2.Session.(*testSession).Messages)
+	l3 := len(client3.Session.(*testSession).Messages)
+	cp.BroadcastToAll(resp)
+
+	if len(client1.Session.(*testSession).Messages) != l1 + 1 {
+		t.Errorf("%d", len(client1.Session.(*testSession).Messages))
+	}
+
+	if len(client2.Session.(*testSession).Messages) != l2 + 1 {
+		t.Fail()
+	}
+
+	if len(client3.Session.(*testSession).Messages) != l3 + 1 {
+		t.Fail()
 	}
 }

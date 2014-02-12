@@ -40,10 +40,13 @@ func (cp *ClientPool) Remove(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
 
-	cp.pool[client.Player.Username].Remove(client.poolElement)
-
-	if cp.pool[client.Player.Username].Len() == 0 {
-		delete(cp.pool, client.Player.Username)
+	playerInPool, ok := cp.pool[client.Player.Username]
+	if ok {
+		playerInPool.Remove(client.poolElement)
+	
+		if playerInPool.Len() == 0 {
+			delete(cp.pool, client.Player.Username)
+		}
 	}
 }
 
@@ -68,13 +71,17 @@ func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 
 // Sanitizes given response and sends it to every player's session in the pool.
 func (cp *ClientPool) Send(player *entities.Player, response response.Responser) {
+	defer func() {
+		if panicked := recover(); panicked != nil {
+			return
+		}
+	}()
 	response.Sanitize(player)
 
 	message, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err.Error())
 	}
-
 	for element := cp.pool[player.Username].Front(); element != nil; element = element.Next() {
 		client := element.Value.(*Client)
 		client.Session.Send(message)
