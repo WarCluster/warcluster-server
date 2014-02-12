@@ -28,11 +28,11 @@ func (s *SpyReport) AreaSet() string {
 }
 
 func (s *SpyReport) IsValid() bool {
-	return s.ValidUntil > time.Now().UnixNano()/1e6
+	return s.ValidUntil > time.Now().Unix()
 }
 
 func CreateSpyReport(target *Planet, mission *Mission) *SpyReport {
-	now := time.Now().UnixNano() / 1e6
+	now := time.Now().Unix()
 	report := &SpyReport{
 		Player:     mission.Player,
 		Name:       target.Name,
@@ -40,7 +40,7 @@ func CreateSpyReport(target *Planet, mission *Mission) *SpyReport {
 		Position:   target.Position,
 		ShipCount:  target.ShipCount,
 		CreatedAt:  now,
-		ValidUntil: now + SPY_REPORT_VALIDITY*1000,
+		ValidUntil: now + SPY_REPORT_VALIDITY,
 	}
 	Save(report)
 	return report
