@@ -139,6 +139,7 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 // should own that planet, which comes with all the changing colors and owner stuff.
 func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
 	if target.Owner == m.Player {
+		m.Target.Owner = target.Owner
 		m.Type = "Supply"
 		return m.EndSupplyMission(target)
 	} else {
@@ -175,6 +176,7 @@ func (m *Mission) EndSupplyMission(target *Planet) int32 {
 // instances of the user who sent this mission.
 func (m *Mission) EndSpyMission(target *Planet) int32 {
 	if target.Owner == m.Player {
+		m.Target.Owner = target.Owner
 		return m.EndSupplyMission(target)
 	}
 	CreateSpyReport(target, m)

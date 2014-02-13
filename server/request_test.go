@@ -50,7 +50,7 @@ func TestStartMissionWithoutEnoughArguments(t *testing.T) {
 
 func TestScopeOfViewWithoutEnoughArguments(t *testing.T) {
 	request := new(Request)
-	request.Command = "skope_of_view"
+	request.Command = "scope_of_view"
 	request.Position = vec2d.New(2.0, 4.0)
 	result, _ := ParseRequest(request)
 
