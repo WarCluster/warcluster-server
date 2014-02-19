@@ -8,6 +8,7 @@ import (
 
 	"warcluster/config"
 	"warcluster/entities/db"
+	"warcluster/leaderboard"
 	"warcluster/server"
 )
 
