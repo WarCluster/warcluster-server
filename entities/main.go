@@ -4,6 +4,7 @@ package entities
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
 	"strings"
 
 	"warcluster/entities/db"
@@ -31,6 +32,20 @@ type Color struct {
 	R float32
 	G float32
 	B float32
+}
+
+//Validate if the color values are in range
+func (c *Color) Validate() error {
+	if c.R < 0 || c.R > 1 {
+		return errors.New("Color component red out of range.")
+	}
+	if c.G < 0 || c.G > 1 {
+		return errors.New("Color component green out of range.")
+	}
+	if c.B < 0 || c.B > 1 {
+		return errors.New("Color component blue out of range.")
+	}
+	return nil
 }
 
 // Creates an entity via unmarshaling a json.

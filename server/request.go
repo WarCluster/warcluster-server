@@ -10,7 +10,7 @@ import (
 
 // The Request struct is used to created to make the request manipulation easier by creating a template
 // that can hold the information needed by all request types.
-// 1. In client we keep the reference to the client struct to be able to edit data and return feedback 
+// 1. In client we keep the reference to the client struct to be able to edit data and return feedback
 // 	  to the connection.
 // 2. The command is the container for a key word used to swith between different input Request.
 // 3. The Position field is used as a general position container for the different requests.
@@ -18,16 +18,18 @@ import (
 // 5. Start and End plane are containers for general planet information(mostly used for mission requests).
 // 6. Fleet contains the percent of ships to be sent in the start mission requests.
 type Request struct {
-	Client      *Client
-	Command     string
-	Type        string
-	Position    *vec2d.Vector
-	Resolution  []uint16
-	StartPlanet string
-	EndPlanet   string
-	Fleet       int32
-	Username    string
-	TwitterID   string
+	Client       *Client
+	Command      string
+	Type         string
+	Position     *vec2d.Vector
+	Resolution   []uint16
+	StartPlanet  string
+	EndPlanet    string
+	Fleet        int32
+	Username     string
+	TwitterID    string
+	Fraction     uint16
+	SunTextureId uint16
 }
 
 // This function transfers the information of a new request from byte list
@@ -47,7 +49,7 @@ func UnmarshalRequest(message []byte, client *Client) (*Request, error) {
 
 // ParseRequest is serving the purpouse of a request manager.
 // After the request is parsed to the more usable Request struct
-// ParseRequest will determine the type of the request and will 
+// ParseRequest will determine the type of the request and will
 // return a function that will manage it.
 func ParseRequest(request *Request) (func(*Request) error, error) {
 	switch request.Command {

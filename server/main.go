@@ -2,6 +2,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -88,6 +89,14 @@ func handler(session sockjs.Session) {
 	client, response, err := login(session)
 	if err != nil {
 		log.Print("Error in server.main.handler.login:", err.Error())
+
+		message, err := json.Marshal(response)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		session.Send(message)
+
+		return
 	}
 	clients.Add(client)
 	defer clients.Remove(client)
