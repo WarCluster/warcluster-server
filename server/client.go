@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/fzzy/sockjs-go/sockjs"
 
@@ -29,7 +28,6 @@ type Client struct {
 func login(session sockjs.Session) (*Client, response.Responser, error) {
 	player, err := authenticate(session)
 	if err != nil {
-		log.Println(err)
 		return nil, response.NewLoginFailed(), errors.New("Login failed")
 	}
 
@@ -49,16 +47,16 @@ func login(session sockjs.Session) (*Client, response.Responser, error) {
 
 func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
 	messageStruct := response.NewLoginInformation()
-	message, err := json.Marshal(messageStruct)
+	marshalledMessage, err := json.Marshal(messageStruct)
 	if err != nil {
-		log.Println(err.Error())
+		return nil, err
 	}
-	session.Send(message)
+	session.Send(marshalledMessage)
 
 	request := new(Request)
-	message = session.Receive()
+	message := session.Receive()
 	if message == nil {
-		return nil, errors.New("No credentials provided")
+		return nil, errors.New("No credentials provided in setup data")
 	}
 
 	if err := json.Unmarshal(message, request); err != nil {
@@ -66,10 +64,12 @@ func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
 	}
 
 	accountData := new(entities.SetupData)
-	if request.Command == "SetupParameters" {
-		accountData.Fraction = request.Fraction
-		accountData.SunTextureId = request.SunTextureId
+	if request.Command != "SetupParameters" {
+		return nil, errors.New("Wrong command")
 	}
+
+	accountData.Fraction = request.Fraction
+	accountData.SunTextureId = request.SunTextureId
 
 	if err := accountData.Validate(); err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 	}
 
 	if err := json.Unmarshal(message, request); err != nil {
-		log.Print("Error in server.client.authenticate: ", err.Error())
+		return nil, err
 	}
 
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
@@ -113,7 +113,6 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 
 		setupInfo, err := FetchSetupData(session)
 		if err != nil {
-			log.Println(err)
 			return nil, errors.New("Reading client data failed.")
 		}
 

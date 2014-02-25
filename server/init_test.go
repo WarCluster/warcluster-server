@@ -11,18 +11,27 @@ import (
 	"warcluster/entities/db"
 	)
 
+func init() {
+	var cfg config.Config
+	cfg.Load("../config/config.gcfg")
+	db.InitPool(cfg.Database.Host, cfg.Database.Port)
+	conn := db.Pool.Get()
+	defer conn.Close()
+	conn.Do("FLUSHALL")
+}
+
 type testSession struct {
 	session_id string
 	Messages   [][]byte
 }
 
 func (s *testSession) Receive() (m []byte) {
-	defer func() {
-		if(len(s.Messages) == 0) {
-			s.Messages = s.Messages[1:]
-		}
-	}()
-	return s.Messages[0]
+	result := s.Messages[0]
+	if(len(s.Messages) > 0) {
+		s.Messages = s.Messages[1:]
+	}
+
+	return result
 }
 
 func (s *testSession) Send(m []byte) {
@@ -49,14 +58,4 @@ func (s *testSession) Protocol() sockjs.Protocol {
 func (s *testSession) String() string {
 	rand.Seed(time.Now().Unix())
 	return fmt.Sprintf("%d", rand.Int())
-	// return session_id
-}
-
-func init() {
-	var cfg config.Config
-	cfg.Load("../config/config.gcfg")
-	db.InitPool(cfg.Database.Host, cfg.Database.Port)
-	conn := db.Pool.Get()
-	defer conn.Close()
-	conn.Do("SELECT", 13)
 }

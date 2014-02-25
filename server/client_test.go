@@ -13,17 +13,21 @@ const (
 	setupParams = "{\"Command\": \"SetupParameters\", \"Fraction\": 0, \"SunTextureId\": 0}"
 )
 
-func TestLoginNewUser(t *testing.T) {
-	var session testSession
-	session.Send([]byte(user))
-	session.Send([]byte(setupParams))
+func TestRegisterNewUser(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
+	conn.Do("FLUSHALL")
+
+	session := new(testSession)
+	session.Send([]byte(user))
+	session.Send([]byte(setupParams))
 
 	players_before, err := redis.Strings(conn.Do("KEYS", "player.*"))
 	before := len(players_before)
 
-	authenticate(&session)
+	if _, err := authenticate(session); err != nil {
+		t.Errorf("authenticate() failed with %s", err.Error())
+	}
 
 	players_after, err := redis.Strings(conn.Do("KEYS", "player.*"))
 	after := len(players_after)
@@ -32,24 +36,27 @@ func TestLoginNewUser(t *testing.T) {
 		t.Error(err)
 	}
 
-	if after == before + 1 {
+	if after != before + 1 {
+		t.Errorf("%#s\n", players_after)
 		t.Fail()
 	}
 }
 
-func TestLoginExcistingUser(t *testing.T) {
-	var session testSession
+func TestAuthenticateExcistingUser(t *testing.T) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+	conn.Do("FLUSHALL")
+
+	session := new(testSession)
 	session.Send([]byte(user))
 	session.Send([]byte(setupParams))
 	session.Send([]byte(user))
-	conn := db.Pool.Get()
-	defer conn.Close()
 
 	players_before, err := redis.Strings(conn.Do("KEYS", "player.*"))
 	before := len(players_before)
 
-	authenticate(&session)
-	authenticate(&session)
+	authenticate(session)
+	authenticate(session)
 
 	players_after, err := redis.Strings(conn.Do("KEYS", "player.*"))
 	after := len(players_after)
@@ -58,16 +65,18 @@ func TestLoginExcistingUser(t *testing.T) {
 		t.Error(err)
 	}
 
-	if after == before + 1 {
+	if after != before + 1 {
 		t.Fail()
 	}
 }
 
-func TestLoginUserWithIncompleteData(t *testing.T) {
+func TestAuthenticateUserWithIncompleteData(t *testing.T) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+	conn.Do("FLUSHALL")
+
 	var session testSession
 	session.Send([]byte("{\"Command\": \"login\", \"TwitterId\": \"some twitter ID\"}"))
-	conn := db.Pool.Get()
-	defer conn.Close()
 
 	players_before, err := redis.Strings(conn.Do("KEYS", "player.*"))
 	before := len(players_before)
@@ -82,6 +91,49 @@ func TestLoginUserWithIncompleteData(t *testing.T) {
 	}
 
 	if before != after {
+		t.Fail()
+	}
+}
+
+func TestAuthenticateUserWithNilData(t *testing.T) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+	conn.Do("FLUSHALL")
+
+	session := new(testSession)
+	session.Send(nil)
+	_, err := authenticate(session)
+
+	if err == nil {
+		t.Fail()
+	}
+}
+
+func TestAuthenticateUserWithInvalidJSONData(t *testing.T) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+	conn.Do("FLUSHALL")
+
+	session := new(testSession)
+	session.Send([]byte("panda"))
+	_, err := authenticate(session)
+
+	if err == nil {
+		t.Fail()
+	}
+}
+
+func TestAuthenticateUserWithNilSetupData(t *testing.T) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+	conn.Do("FLUSHALL")
+
+	session := new(testSession)
+	session.Send([]byte(user))
+	session.Send(nil)
+	_, err := authenticate(session)
+
+	if err == nil {
 		t.Fail()
 	}
 }
