@@ -48,9 +48,6 @@ func login(session sockjs.Session) (*Client, response.Responser, error) {
 }
 
 func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
-	var accountData *entities.SetupData
-	accountData = new(entities.SetupData)
-
 	messageStruct := response.NewLoginInformation()
 	message, err := json.Marshal(messageStruct)
 	if err != nil {
@@ -59,26 +56,25 @@ func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
 	session.Send(message)
 
 	request := new(Request)
-
-	for {
-		if message := session.Receive(); message == nil {
-			return nil, errors.New("No credentials provided")
-		} else {
-			if err := json.Unmarshal(message, request); err == nil {
-				if len(request.Command) > 0 && request.Command == "SetupParameters" {
-					accountData.Fraction = request.Fraction
-					accountData.SunTextureId = request.SunTextureId
-					break
-				}
-			} else {
-				log.Print("Error in server.client.authenticate: ", err.Error())
-			}
-		}
+	message = session.Receive()
+	if message == nil {
+		return nil, errors.New("No credentials provided")
 	}
 
-	err = accountData.Validate()
+	if err := json.Unmarshal(message, request); err != nil {
+		return nil, err
+	}
 
-	return accountData, err
+	accountData := new(entities.SetupData)
+	if request.Command == "SetupParameters" {
+		accountData.Fraction = request.Fraction
+		accountData.SunTextureId = request.SunTextureId
+	}
+
+	if err := accountData.Validate(); err != nil {
+		return nil, err
+	}
+	return accountData, nil
 }
 
 // Authenticate is a function called for every client's new session.
@@ -95,21 +91,21 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 	var twitterId string
 	request := new(Request)
 
-	for {
-		if message := session.Receive(); message == nil {
-			return nil, errors.New("No credentials provided")
-		} else {
-			if err := json.Unmarshal(message, request); err == nil {
-				if len(request.Username) > 0 && len(request.TwitterID) > 0 {
-					nickname = request.Username
-					twitterId = request.TwitterID
-					break
-				}
-			} else {
-				log.Print("Error in server.client.authenticate: ", err.Error())
-			}
-		}
+	message := session.Receive()
+	if message == nil {
+		return nil, errors.New("No credentials provided")
 	}
+
+	if err := json.Unmarshal(message, request); err != nil {
+		log.Print("Error in server.client.authenticate: ", err.Error())
+	}
+
+	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
+		return nil, errors.New("Incomplete credentials")
+	}
+
+	nickname = request.Username
+	twitterId = request.TwitterID
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
 	justRegistered := entity == nil
