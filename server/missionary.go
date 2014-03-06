@@ -71,6 +71,11 @@ func StartMissionary(mission *entities.Mission) {
 		}
 	case "Spy":
 		for {
+			// All spy pilots die if planet is overtaken (they are killed)
+			// Other possible solution is to generate a supply mission back (they flee)
+			if target.Owner != mission.Target.Owner {
+				break
+			}
 			mission.EndSpyMission(target)
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
