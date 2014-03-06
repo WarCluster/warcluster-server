@@ -1,8 +1,8 @@
 package server
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 
 	"github.com/Vladimiroff/vec2d"
 )
@@ -10,19 +10,19 @@ import (
 func TestAllTypesOfMission(t *testing.T) {
 
 	var tableTests = []struct {
-		input   string
-		output  func(*Request) error
+		input  string
+		output func(*Request) error
 	}{
-		{"start_mission",  parseAction},
-		{"scope_of_view",  scopeOfView},
+		{"start_mission", parseAction},
+		{"scope_of_view", scopeOfView},
 		{"something_else", nil},
 	}
 
 	request := new(Request)
 	request.StartPlanet = "start"
-	request.EndPlanet   = "end"
-	request.Position    = vec2d.New(2.0, 4.0)
-	request.Resolution  = []uint16{1920, 1080}
+	request.EndPlanet = "end"
+	request.Position = vec2d.New(2.0, 4.0)
+	request.Resolution = []uint16{1920, 1080}
 
 	for _, test := range tableTests {
 		request.Command = test.input
@@ -63,7 +63,7 @@ func TestStartMissionWithNegativeFleet(t *testing.T) {
 	request := new(Request)
 	request.Command = "start_mission"
 	request.StartPlanet = "start"
-	request.EndPlanet   = "end"
+	request.EndPlanet = "end"
 	request.Fleet = -10
 	ParseRequest(request)
 
@@ -76,7 +76,7 @@ func TestStartMissionWithMoreThanHundredFleet(t *testing.T) {
 	request := new(Request)
 	request.Command = "start_mission"
 	request.StartPlanet = "start"
-	request.EndPlanet   = "end"
+	request.EndPlanet = "end"
 	request.Fleet = 150
 	ParseRequest(request)
 

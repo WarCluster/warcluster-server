@@ -3,6 +3,7 @@ package server
 import (
 	"container/list"
 	"encoding/json"
+	"errors"
 	"log"
 	"sync"
 
@@ -20,6 +21,14 @@ func NewClientPool() *ClientPool {
 	cp := new(ClientPool)
 	cp.pool = make(map[string]*list.List)
 	return cp
+}
+
+// Returns player's instance by username in order not to hit the database
+func (cp *ClientPool) Player(username string) (*entities.Player, error) {
+	if element, ok := cp.pool[username]; ok {
+		return element.Front().Value.(*Client).Player, nil
+	}
+	return nil, errors.New("Player not logged in")
 }
 
 // Adds the given client to the pool.
@@ -43,7 +52,7 @@ func (cp *ClientPool) Remove(client *Client) {
 	playerInPool, ok := cp.pool[client.Player.Username]
 	if ok {
 		playerInPool.Remove(client.poolElement)
-	
+
 		if playerInPool.Len() == 0 {
 			delete(cp.pool, client.Player.Username)
 		}

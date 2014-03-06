@@ -9,7 +9,7 @@ import (
 
 	"warcluster/config"
 	"warcluster/entities/db"
-	)
+)
 
 func init() {
 	var cfg config.Config
@@ -27,7 +27,7 @@ type testSession struct {
 
 func (s *testSession) Receive() (m []byte) {
 	result := s.Messages[0]
-	if(len(s.Messages) > 0) {
+	if len(s.Messages) > 0 {
 		s.Messages = s.Messages[1:]
 	}
 

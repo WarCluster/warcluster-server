@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	user = "{\"Command\": \"login\", \"Username\": \"JohnDoe\", \"TwitterId\": \"some twitter ID\"}"
+	user        = "{\"Command\": \"login\", \"Username\": \"JohnDoe\", \"TwitterId\": \"some twitter ID\"}"
 	setupParams = "{\"Command\": \"SetupParameters\", \"Fraction\": 0, \"SunTextureId\": 0}"
 )
 
@@ -36,7 +36,7 @@ func TestRegisterNewUser(t *testing.T) {
 		t.Error(err)
 	}
 
-	if after != before + 1 {
+	if after != before+1 {
 		t.Errorf("%#s\n", players_after)
 		t.Fail()
 	}
@@ -65,7 +65,7 @@ func TestAuthenticateExcistingUser(t *testing.T) {
 		t.Error(err)
 	}
 
-	if after != before + 1 {
+	if after != before+1 {
 		t.Fail()
 	}
 }
