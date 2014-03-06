@@ -21,3 +21,6 @@ warcluster.exe
 
 # Test dump files
 *.test
+
+# ctags file
+tags
