@@ -64,7 +64,7 @@ func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
 	}
 
 	accountData := new(entities.SetupData)
-	if request.Command != "SetupParameters" {
+	if request.Command != "setup_parameters" {
 		return nil, errors.New("Wrong command")
 	}
 

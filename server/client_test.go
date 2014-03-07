@@ -10,7 +10,7 @@ import (
 
 const (
 	user        = "{\"Command\": \"login\", \"Username\": \"JohnDoe\", \"TwitterId\": \"some twitter ID\"}"
-	setupParams = "{\"Command\": \"SetupParameters\", \"Fraction\": 0, \"SunTextureId\": 0}"
+	setupParams = "{\"Command\": \"setup_parameters\", \"Fraction\": 0, \"SunTextureId\": 0}"
 )
 
 func TestRegisterNewUser(t *testing.T) {
