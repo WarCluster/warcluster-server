@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"encoding/json"
 	"errors"
-	"log"
 	"sync"
 
 	"warcluster/entities"
@@ -65,10 +64,7 @@ func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 
 		client := clients.Front().Value.(*Client)
 		response.Sanitize(client.Player)
-		message, err := json.Marshal(response)
-		if err != nil {
-			log.Println(err.Error())
-		}
+		message, _ := json.Marshal(response)
 
 		for element := clients.Front(); element != nil; element = element.Next() {
 			value := element.Value
@@ -87,10 +83,8 @@ func (cp *ClientPool) Send(player *entities.Player, response response.Responser)
 	}()
 	response.Sanitize(player)
 
-	message, err := json.Marshal(response)
-	if err != nil {
-		log.Println(err.Error())
-	}
+	message, _ := json.Marshal(response)
+
 	for element := cp.pool[player.Username].Front(); element != nil; element = element.Next() {
 		client := element.Value.(*Client)
 		client.Session.Send(message)
