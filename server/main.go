@@ -142,7 +142,7 @@ func getStaticDir() string {
 }
 
 // Initialize the leaderboard
-func InitLeaderboard(board *leaderboard.Leaderboard) {
+func InitLeaderboard(board leaderboard.Leaderboard) {
 	log.Println("Initializing the leaderboard...")
 	allPlayers := make(map[string]*leaderboard.Player)
 	planetEntities := entities.Find("planet.*")
@@ -162,7 +162,7 @@ func InitLeaderboard(board *leaderboard.Leaderboard) {
 				Planets:  0,
 			}
 			allPlayers[planet.Owner] = player
-			*board = append(*board, player)
+			board = append(board, player)
 		}
 
 		if planet.IsHome {
@@ -173,7 +173,7 @@ func InitLeaderboard(board *leaderboard.Leaderboard) {
 	}
 	board.Sort()
 
-	for i, player := range *board {
+	for i, player := range board {
 		leaderboard.Places[player.Username] = i
 	}
 }
