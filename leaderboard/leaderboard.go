@@ -15,60 +15,61 @@ type Player struct {
 	HomePlanet string
 	Planets    uint32
 }
-type Leaderboard []*Player
 
-var (
-	Places map[string]int
-	Board  Leaderboard
-)
-
-func New() Leaderboard {
-	if Board != nil {
-		return Board
-	}
-
-	Places = make(map[string]int)
-	Board = make(Leaderboard, 0)
-	return Board
+type Leaderboard struct {
+	board  []*Player
+	places map[string]int
 }
 
-func (l Leaderboard) Len() int {
-	return len(l)
+func New() *Leaderboard {
+	l := new(Leaderboard)
+	l.places = make(map[string]int)
+	l.board = make([]*Player, 0)
+	return l
 }
 
-func (l Leaderboard) Swap(i, j int) {
-	l[i], l[j] = l[j], l[i]
+func (l *Leaderboard) Add(player *Player) {
+	l.board = append(l.board, player)
+	l.places[player.Username] = len(l.board) - 1
 }
 
-func (l Leaderboard) Less(i, j int) bool {
-	return l[i].Planets > l[j].Planets
+func (l *Leaderboard) Len() int {
+	return len(l.board)
 }
 
-func (l Leaderboard) Sort() {
+func (l *Leaderboard) Swap(i, j int) {
+	l.board[i], l.board[j] = l.board[j], l.board[i]
+}
+
+func (l *Leaderboard) Less(i, j int) bool {
+	return l.board[i].Planets > l.board[j].Planets
+}
+
+func (l *Leaderboard) Sort() {
 	sort.Sort(l)
 }
 
-func (l Leaderboard) Transfer(from_username, to_username string) {
-	from, hasOwner := Places[from_username]
-	to := Places[to_username]
+func (l *Leaderboard) Transfer(from_username, to_username string) {
+	from, hasOwner := l.places[from_username]
+	to := l.places[to_username]
 
 	if hasOwner {
-		l[from].Planets--
+		l.board[from].Planets--
 		l.moveDown(from_username)
 	}
 
-	l[to].Planets++
+	l.board[to].Planets++
 	l.moveUp(to_username)
 }
 
-func (l Leaderboard) move(username string, modificator int) bool {
+func (l *Leaderboard) move(username string, modificator int) bool {
 	firstBlood := true
 	isMoved := false
-	i := Places[username]
+	i := l.places[username]
 
 	for isMoved || firstBlood {
 		firstBlood = false
-		if modificator < 0 && i == 0 || modificator > 0 && i == len(l)-1 {
+		if modificator < 0 && i == 0 || modificator > 0 && i == len(l.board)-1 {
 			return false
 		}
 
@@ -80,17 +81,17 @@ func (l Leaderboard) move(username string, modificator int) bool {
 
 		if isMoved {
 			l.Swap(i, i+modificator)
-			Places[l[i].Username], Places[l[i+modificator].Username] = i+modificator, i
+			l.places[l.board[i].Username], l.places[l.board[i+modificator].Username] = i+modificator, i
 		}
 		i += modificator
 	}
 	return isMoved
 }
 
-func (l Leaderboard) moveUp(username string) bool {
+func (l *Leaderboard) moveUp(username string) bool {
 	return l.move(username, -1)
 }
 
-func (l Leaderboard) moveDown(username string) bool {
+func (l *Leaderboard) moveDown(username string) bool {
 	return l.move(username, 1)
 }

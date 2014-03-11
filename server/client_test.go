@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"warcluster/entities/db"
+	"warcluster/leaderboard"
 )
 
 const (
@@ -25,6 +26,7 @@ func (suite *ClientTestSuite) SetupTest() {
 	suite.conn = db.Pool.Get()
 	suite.conn.Do("FLUSHDB")
 	suite.session = new(testSession)
+	InitLeaderboard(leaderboard.New())
 }
 
 func (suite *ClientTestSuite) TearDownTest() {
@@ -50,17 +52,10 @@ func (suite *ClientTestSuite) TestRegisterNewUser() {
 	assert.Equal(suite.T(), before+1, after)
 }
 
-<<<<<<< HEAD
 func (suite *ClientTestSuite) TestAuthenticateExcistingUser() {
 	suite.session.Send([]byte(user))
 	suite.session.Send([]byte(setupParams))
 	suite.session.Send([]byte(user))
-=======
-func TestAuthenticateExcistingUser(t *testing.T) {
-	conn := db.Pool.Get()
-	defer conn.Close()
-	conn.Do("FLUSHDB")
->>>>>>> Manually select database after dialing to redis
 
 	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
@@ -76,18 +71,8 @@ func TestAuthenticateExcistingUser(t *testing.T) {
 	assert.Equal(suite.T(), before+1, after)
 }
 
-<<<<<<< HEAD
 func (suite *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
 	suite.session.Send([]byte("{\"Command\": \"login\", \"TwitterId\": \"some twitter ID\"}"))
-=======
-func TestAuthenticateUserWithIncompleteData(t *testing.T) {
-	conn := db.Pool.Get()
-	defer conn.Close()
-	conn.Do("FLUSHDB")
-
-	var session testSession
-	session.Send([]byte("{\"Command\": \"login\", \"TwitterId\": \"some twitter ID\"}"))
->>>>>>> Manually select database after dialing to redis
 
 	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
@@ -124,49 +109,24 @@ func (suite *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
 	assert.Equal(suite.T(), before, after)
 }
 
-<<<<<<< HEAD
 func (suite *ClientTestSuite) TestAuthenticateUserWithNilData() {
 	suite.session.Send(nil)
 	_, err := authenticate(suite.session)
-=======
-func TestAuthenticateUserWithNilData(t *testing.T) {
-	conn := db.Pool.Get()
-	defer conn.Close()
-	conn.Do("FLUSHDB")
-
-	session := new(testSession)
-	session.Send(nil)
-	_, err := authenticate(session)
->>>>>>> Manually select database after dialing to redis
 
 	assert.NotNil(suite.T(), err)
 }
 
-<<<<<<< HEAD
 func (suite *ClientTestSuite) TestAuthenticateUserWithInvalidJSONData() {
 	suite.session.Send([]byte("panda"))
 	_, err := authenticate(suite.session)
-=======
-func TestAuthenticateUserWithInvalidJSONData(t *testing.T) {
-	conn := db.Pool.Get()
-	defer conn.Close()
-	conn.Do("FLUSHDB")
->>>>>>> Manually select database after dialing to redis
 
 	assert.NotNil(suite.T(), err)
 }
 
-<<<<<<< HEAD
 func (suite *ClientTestSuite) TestAuthenticateUserWithNilSetupData() {
 	suite.session.Send([]byte(user))
 	suite.session.Send(nil)
 	_, err := authenticate(suite.session)
-=======
-func TestAuthenticateUserWithNilSetupData(t *testing.T) {
-	conn := db.Pool.Get()
-	defer conn.Close()
-	conn.Do("FLUSHDB")
->>>>>>> Manually select database after dialing to redis
 
 	assert.NotNil(suite.T(), err)
 }
