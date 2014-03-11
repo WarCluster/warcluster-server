@@ -16,7 +16,7 @@ const (
 func TestRegisterNewUser(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+	conn.Do("FLUSHDB")
 
 	session := new(testSession)
 	session.Send([]byte(user))
@@ -45,7 +45,7 @@ func TestRegisterNewUser(t *testing.T) {
 func TestAuthenticateExcistingUser(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+	conn.Do("FLUSHDB")
 
 	session := new(testSession)
 	session.Send([]byte(user))
@@ -73,7 +73,7 @@ func TestAuthenticateExcistingUser(t *testing.T) {
 func TestAuthenticateUserWithIncompleteData(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+	conn.Do("FLUSHDB")
 
 	var session testSession
 	session.Send([]byte("{\"Command\": \"login\", \"TwitterId\": \"some twitter ID\"}"))
@@ -98,7 +98,7 @@ func TestAuthenticateUserWithIncompleteData(t *testing.T) {
 func TestAuthenticateUserWithNilData(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+	conn.Do("FLUSHDB")
 
 	session := new(testSession)
 	session.Send(nil)
@@ -112,7 +112,7 @@ func TestAuthenticateUserWithNilData(t *testing.T) {
 func TestAuthenticateUserWithInvalidJSONData(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+	conn.Do("FLUSHDB")
 
 	session := new(testSession)
 	session.Send([]byte("panda"))
@@ -126,7 +126,7 @@ func TestAuthenticateUserWithInvalidJSONData(t *testing.T) {
 func TestAuthenticateUserWithNilSetupData(t *testing.T) {
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+	conn.Do("FLUSHDB")
 
 	session := new(testSession)
 	session.Send([]byte(user))

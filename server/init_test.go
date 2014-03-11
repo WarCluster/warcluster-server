@@ -14,10 +14,11 @@ import (
 func init() {
 	var cfg config.Config
 	cfg.Load("../config/config.gcfg")
-	db.InitPool(cfg.Database.Host, cfg.Database.Port)
+	db.InitPool(cfg.Database.Host, cfg.Database.Port, 13)
 	conn := db.Pool.Get()
 	defer conn.Close()
-	conn.Do("FLUSHALL")
+
+	conn.Do("FLUSHDB")
 }
 
 type testSession struct {
