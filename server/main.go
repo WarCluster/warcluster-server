@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"runtime/debug"
 
+	"warcluster/server/response"
+
 	"github.com/fzzy/sockjs-go/sockjs"
 )
 
@@ -86,11 +88,11 @@ func handler(session sockjs.Session) {
 	}()
 	defer session.End()
 
-	client, response, err := login(session)
+	client, logResponse, err := login(session)
 	if err != nil {
 		log.Print("Error in server.main.handler.login:", err.Error())
 
-		message, err := json.Marshal(response)
+		message, err := json.Marshal(logResponse)
 		if err != nil {
 			log.Println(err.Error())
 		}
@@ -101,7 +103,7 @@ func handler(session sockjs.Session) {
 	clients.Add(client)
 	defer clients.Remove(client)
 
-	clients.Send(client.Player, response)
+	clients.Send(client.Player, logResponse)
 	client.Player.UpdateSpyReports()
 	for {
 		message := session.Receive()
@@ -112,15 +114,20 @@ func handler(session sockjs.Session) {
 		request, err := UnmarshalRequest(message, client)
 		if err != nil {
 			log.Println("Error in server.main.handler.UnmarshalRequest:", err.Error())
+			clients.Send(client.Player, response.NewComsError("Unable to unmarshal request"))
+			continue
 		}
 
 		action, err := ParseRequest(request)
 		if err != nil {
 			log.Println("Error in server.main.handler.ParseRequest:", err.Error())
+			clients.Send(client.Player, response.NewComsError("Unable to parse request"))
+			continue
 		}
 
 		if err := action(request); err != nil {
 			log.Println(err)
+			continue
 		}
 	}
 }
