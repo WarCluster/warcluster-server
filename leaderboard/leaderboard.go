@@ -49,46 +49,48 @@ func (l Leaderboard) Sort() {
 }
 
 func (l Leaderboard) Transfer(from_username, to_username string) {
-	from := Places[from_username]
+	from, hasOwner := Places[from_username]
 	to := Places[to_username]
 
-	if from != -1 {
+	if hasOwner {
 		l[from].Planets--
-		l.moveDown(from)
+		l.moveDown(from_username)
 	}
 
 	l[to].Planets++
-	l.moveUp(to)
+	l.moveUp(to_username)
 }
 
-func (l Leaderboard) move(index, modificator int) bool {
+func (l Leaderboard) move(username string, modificator int) bool {
 	firstBlood := true
 	isMoved := false
+	i := Places[username]
 
 	for isMoved || firstBlood {
 		firstBlood = false
-		if modificator < 0 && index == 0 || modificator > 0 && index == len(l)-1 {
+		if modificator < 0 && i == 0 || modificator > 0 && i == len(l)-1 {
 			return false
 		}
 
 		if modificator < 0 {
-			isMoved = l.Less(index, index+modificator)
+			isMoved = l.Less(i, i+modificator)
 		} else {
-			isMoved = l.Less(index+modificator, index)
+			isMoved = l.Less(i+modificator, i)
 		}
 
 		if isMoved {
-			l.Swap(index, index+modificator)
+			l.Swap(i, i+modificator)
+			Places[l[i].Username], Places[l[i+modificator].Username] = i+modificator, i
 		}
-		index += modificator
+		i += modificator
 	}
 	return isMoved
 }
 
-func (l Leaderboard) moveUp(i int) bool {
-	return l.move(i, -1)
+func (l Leaderboard) moveUp(username string) bool {
+	return l.move(username, -1)
 }
 
-func (l Leaderboard) moveDown(i int) bool {
-	return l.move(i, 1)
+func (l Leaderboard) moveDown(username string) bool {
+	return l.move(username, 1)
 }
