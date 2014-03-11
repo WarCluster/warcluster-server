@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/Vladimiroff/vec2d"
+
+	"warcluster/leaderboard"
 )
 
 func TestMissionKey(t *testing.T) {
@@ -49,6 +51,16 @@ func TestMissionMarshalling(t *testing.T) {
 
 func TestEndAttackMission(t *testing.T) {
 	var excessShips int32
+
+	leaderboard.Board = leaderboard.Leaderboard{
+		{Username: "gophie", Planets: 10},
+		{Username: "chochko", Planets: 8},
+	}
+	leaderboard.Places = map[string]int{
+		"gophie":  0,
+		"chochko": 1,
+	}
+
 	excessShips = secondMission.EndAttackMission(&endPlanet)
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
