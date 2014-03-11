@@ -3,9 +3,9 @@ package server
 import (
 	"testing"
 
+	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/garyburd/redigo/redis"
 
 	"warcluster/entities/db"
 )
@@ -16,13 +16,13 @@ const (
 )
 
 type ClientTestSuite struct {
-    suite.Suite
-    conn redis.Conn
-    session *testSession
+	suite.Suite
+	conn    redis.Conn
+	session *testSession
 }
 
 func (suite *ClientTestSuite) SetupTest() {
-    suite.conn = db.Pool.Get()
+	suite.conn = db.Pool.Get()
 	suite.conn.Do("FLUSHDB")
 	suite.session = new(testSession)
 }
@@ -47,7 +47,7 @@ func (suite *ClientTestSuite) TestRegisterNewUser() {
 
 	assert.Nil(suite.T(), err)
 
-	assert.Equal(suite.T(), before + 1, after)
+	assert.Equal(suite.T(), before+1, after)
 }
 
 func (suite *ClientTestSuite) TestAuthenticateExcistingUser() {
@@ -66,7 +66,7 @@ func (suite *ClientTestSuite) TestAuthenticateExcistingUser() {
 
 	assert.Nil(suite.T(), err)
 
-	assert.Equal(suite.T(), before + 1, after)
+	assert.Equal(suite.T(), before+1, after)
 }
 
 func (suite *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
@@ -107,6 +107,6 @@ func (suite *ClientTestSuite) TestAuthenticateUserWithNilSetupData() {
 	assert.NotNil(suite.T(), err)
 }
 
-func TestClientTestSuite (t *testing.T) {
-    suite.Run(t, new(ClientTestSuite))
+func TestClientTestSuite(t *testing.T) {
+	suite.Run(t, new(ClientTestSuite))
 }
