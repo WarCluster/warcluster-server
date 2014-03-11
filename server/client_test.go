@@ -27,7 +27,7 @@ func (suite *ClientTestSuite) SetupTest() {
 	suite.session = new(testSession)
 }
 
-func (suite *ClientTestSuite) TearDown() {
+func (suite *ClientTestSuite) TearDownTest() {
 	suite.conn.Close()
 }
 
