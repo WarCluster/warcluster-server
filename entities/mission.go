@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"warcluster/leaderboard"
 
 	"github.com/Vladimiroff/vec2d"
 )
@@ -150,6 +151,7 @@ func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
 				target.SetShipCount(0)
 				excessShips = m.ShipCount - target.ShipCount
 			} else {
+				leaderboard.Board.Transfer(target.Owner, m.Player)
 				target.SetShipCount(m.ShipCount - target.ShipCount)
 				target.Owner = m.Player
 				target.Color = m.Color
