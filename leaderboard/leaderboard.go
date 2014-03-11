@@ -2,63 +2,34 @@
 package leaderboard
 
 import (
-	"log"
 	"sort"
-
-	"warcluster/entities"
 )
 
 type Player struct {
-	Username   string
-	Team       *entities.Color
+	Username string
+	Team     struct {
+		R float32
+		G float32
+		B float32
+	}
 	HomePlanet string
 	Planets    uint32
 }
 type Leaderboard []*Player
 
 var (
-	board Leaderboard
+	Places map[string]int
+	Board  Leaderboard
 )
 
 func New() Leaderboard {
-	if board != nil {
-		return board
+	if Board != nil {
+		return Board
 	}
 
-	board = make(Leaderboard, 0)
-	return board
-}
-
-func (l Leaderboard) Init() {
-	log.Println("Initializing the leaderboard...")
-	allPlayers := make(map[string]*Player)
-	planetEntities := entities.Find("planet.*")
-
-	for _, entity := range planetEntities {
-		planet, ok := entity.(*entities.Planet)
-		if !planet.HasOwner() {
-			continue
-		}
-
-		player, ok := allPlayers[planet.Owner]
-
-		if !ok {
-			player = &Player{
-				Username: planet.Owner,
-				Team:     &planet.Color,
-				Planets:  0,
-			}
-			allPlayers[planet.Owner] = player
-			l = append(l, player)
-		}
-
-		if planet.IsHome {
-			player.HomePlanet = planet.Name
-		}
-
-		player.Planets++
-	}
-	l.Sort()
+	Places = make(map[string]int)
+	Board = make(Leaderboard, 0)
+	return Board
 }
 
 func (l Leaderboard) Len() int {
@@ -77,7 +48,10 @@ func (l Leaderboard) Sort() {
 	sort.Sort(l)
 }
 
-func (l Leaderboard) Transfer(from, to int) {
+func (l Leaderboard) Transfer(from_username, to_username string) {
+	from := Places[from_username]
+	to := Places[to_username]
+
 	if from != -1 {
 		l[from].Planets--
 	}

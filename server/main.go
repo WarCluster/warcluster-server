@@ -14,6 +14,9 @@ import (
 	"warcluster/server/response"
 
 	"github.com/fzzy/sockjs-go/sockjs"
+
+	"warcluster/entities"
+	"warcluster/leaderboard"
 )
 
 var (
@@ -136,4 +139,41 @@ func handler(session sockjs.Session) {
 func getStaticDir() string {
 	_, filename, _, _ := runtime.Caller(1)
 	return path.Join(path.Dir(filename), "../static")
+}
+
+// Initialize the leaderboard
+func InitLeaderboard(board *leaderboard.Leaderboard) {
+	log.Println("Initializing the leaderboard...")
+	allPlayers := make(map[string]*leaderboard.Player)
+	planetEntities := entities.Find("planet.*")
+
+	for _, entity := range planetEntities {
+		planet, ok := entity.(*entities.Planet)
+		if !planet.HasOwner() {
+			continue
+		}
+
+		player, ok := allPlayers[planet.Owner]
+
+		if !ok {
+			player = &leaderboard.Player{
+				Username: planet.Owner,
+				Team:     planet.Color,
+				Planets:  0,
+			}
+			allPlayers[planet.Owner] = player
+			*board = append(*board, player)
+		}
+
+		if planet.IsHome {
+			player.HomePlanet = planet.Name
+		}
+
+		player.Planets++
+	}
+	board.Sort()
+
+	for i, player := range *board {
+		leaderboard.Places[player.Username] = i
+	}
 }

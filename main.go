@@ -19,7 +19,7 @@ func main() {
 
 	cfg.Load("config/config.gcfg")
 	db.InitPool(cfg.Database.Host, cfg.Database.Port, 8)
-	leaderboard.New().Init()
+	server.InitLeaderboard(leaderboard.New())
 	server.Start(cfg.Server.Host, cfg.Server.Port)
 }
 
