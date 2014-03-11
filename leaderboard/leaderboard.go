@@ -54,9 +54,11 @@ func (l Leaderboard) Transfer(from_username, to_username string) {
 
 	if from != -1 {
 		l[from].Planets--
+		l.moveDown(from)
 	}
 
 	l[to].Planets++
+	l.moveUp(to)
 }
 
 func (l Leaderboard) move(index, modificator int) bool {
