@@ -71,6 +71,11 @@ func StartMissionary(mission *entities.Mission) {
 		}
 	case "Spy":
 		for {
+			// All spy pilots die if planet is overtaken (they are killed)
+			// Other possible solution is to generate a supply mission back (they flee)
+			if target.Owner != mission.Target.Owner {
+				break
+			}
 			mission.EndSpyMission(target)
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
@@ -114,20 +119,24 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 }
 
 func updateSpyReports(mission *entities.Mission, state *response.StateChange) {
-	var player *entities.Player
+	var (
+		player *entities.Player
+		err    error
+	)
 
 	if mission.Player == "" {
 		log.Print("Error! Found mission with empty owner.")
 		return
 	}
 
-	playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Player))
+	player, err = clients.Player(mission.Player)
 	if err != nil {
-		log.Println("Error in mission owner fetch:", err.Error())
 		return
 	}
-	player = playerEntity.(*entities.Player)
 
-	player.UpdateSpyReports()
+	for element := clients.pool[mission.Player].Front(); element != nil; element = element.Next() {
+		client := element.Value.(*Client)
+		client.Player.UpdateSpyReports()
+	}
 	clients.Send(player, state)
 }

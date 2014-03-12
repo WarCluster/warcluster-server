@@ -78,17 +78,13 @@ func (p *Player) UpdateSpyReports() {
 }
 
 // Creates new player after the authentication and generates color based on the unique hash
-func CreatePlayer(username, TwitterID string, homePlanet *Planet) *Player {
-	userhash := simplifyHash(usernameHash(username))
+func CreatePlayer(username, TwitterID string, homePlanet *Planet, setupData *SetupData) *Player {
 
 	red := []float32{0.59215686, 0.85490196, 0.91372549, 0.28235294, 0.96078431, 0.32941176}
 	green := []float32{0.031372549, 0.29411765, 0.69411765, 0.54901961, 0.41176471, 0.57254902}
 	blue := []float32{0.054901961, 0.058823529, 0.015686275, 0.074509804, 0.56862745, 0.85882353}
-	hashValue := func(index uint8) uint8 {
-		return uint8((userhash[0] - 48) / 2)
-	}
 
-	color := Color{red[hashValue(0)], green[hashValue(0)], blue[hashValue(0)]}
+	color := Color{red[setupData.Fraction], green[setupData.Fraction], blue[setupData.Fraction]}
 	player := Player{
 		Username:       username,
 		Color:          color,

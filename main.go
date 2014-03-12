@@ -17,7 +17,7 @@ func main() {
 	go final()
 
 	cfg.Load("config/config.gcfg")
-	db.InitPool(cfg.Database.Host, cfg.Database.Port)
+	db.InitPool(cfg.Database.Host, cfg.Database.Port, 8)
 	server.Start(cfg.Server.Host, cfg.Server.Port)
 }
 

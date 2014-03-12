@@ -11,11 +11,10 @@ import (
 )
 
 type Sun struct {
-	Username string
-	Name     string
-	speed    int32
-	target   *vec2d.Vector
-	Position *vec2d.Vector
+	Username     string
+	Name         string
+	Position     *vec2d.Vector
+	SunTextureId uint16
 }
 
 // Database key.
@@ -131,12 +130,11 @@ func findHomeSolarSlot(rootSolarSlot *SolarSlot) *SolarSlot {
 // overlapping. To solve this, we simply throw the sun somewhere far away
 // from the desired point and start to move it to THE POINT, but carefully
 // watching for collisions.
-func GenerateSun(username string, friends, others []*Sun) *Sun {
+func GenerateSun(username string, friends, others []*Sun, setupData *SetupData) *Sun {
 	newSun := Sun{
-		Username: username,
-		speed:    5,
-		target:   vec2d.New(0, 0),
-		Position: vec2d.New(0, 0),
+		Username:     username,
+		Position:     vec2d.New(0, 0),
+		SunTextureId: setupData.SunTextureId,
 	}
 	newSun.generateName(username)
 

@@ -10,7 +10,6 @@ import (
 	"warcluster/server/response"
 )
 
-
 var cp = NewClientPool()
 
 var player1 = entities.Player{
@@ -56,7 +55,7 @@ func TestAddClientToClientPool(t *testing.T) {
 
 	l := len(cp.pool)
 	cp.Add(&client1)
-	if len(cp.pool) != l + 1 {
+	if len(cp.pool) != l+1 {
 		t.Fail()
 	}
 	cp.Remove(&client1)
@@ -83,8 +82,8 @@ func TestCloseLastClientSessionAndRemoveIt(t *testing.T) {
 	l := len(cp.pool)
 
 	cp.Remove(&client3)
-	if len(cp.pool) != l - 1 {
-		t.Errorf("Expected %d received %d", l - 1, len(cp.pool))
+	if len(cp.pool) != l-1 {
+		t.Errorf("Expected %d received %d", l-1, len(cp.pool))
 	}
 }
 
@@ -111,11 +110,11 @@ func TestSendMessageToSession(t *testing.T) {
 	l3 := len(client3.Session.(*testSession).Messages)
 	cp.Send(&player1, resp)
 
-	if len(client1.Session.(*testSession).Messages) != l1 + 1 {
+	if len(client1.Session.(*testSession).Messages) != l1+1 {
 		t.Errorf("%d", len(client1.Session.(*testSession).Messages))
 	}
 
-	if len(client2.Session.(*testSession).Messages) != l2 + 1 {
+	if len(client2.Session.(*testSession).Messages) != l2+1 {
 		t.Fail()
 	}
 
@@ -138,15 +137,28 @@ func TestBroadcastToAll(t *testing.T) {
 	l3 := len(client3.Session.(*testSession).Messages)
 	cp.BroadcastToAll(resp)
 
-	if len(client1.Session.(*testSession).Messages) != l1 + 1 {
+	if len(client1.Session.(*testSession).Messages) != l1+1 {
 		t.Errorf("%d", len(client1.Session.(*testSession).Messages))
 	}
 
-	if len(client2.Session.(*testSession).Messages) != l2 + 1 {
+	if len(client2.Session.(*testSession).Messages) != l2+1 {
 		t.Fail()
 	}
 
-	if len(client3.Session.(*testSession).Messages) != l3 + 1 {
+	if len(client3.Session.(*testSession).Messages) != l3+1 {
 		t.Fail()
+	}
+}
+
+func TestPlayer(t *testing.T) {
+	cp.pool = make(map[string]*list.List)
+	cp.Add(&client1)
+
+	if player, err := cp.Player("gophie"); player == nil || err != nil {
+		t.Error(err)
+	}
+
+	if player, err := cp.Player("snoopy"); player != nil || err == nil {
+		t.Errorf("Received %v as player, nil expected", player.Username)
 	}
 }

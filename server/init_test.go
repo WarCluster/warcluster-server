@@ -6,7 +6,20 @@ import (
 	"time"
 
 	"github.com/fzzy/sockjs-go/sockjs"
-	)
+
+	"warcluster/config"
+	"warcluster/entities/db"
+)
+
+func init() {
+	var cfg config.Config
+	cfg.Load("../config/config.gcfg")
+	db.InitPool(cfg.Database.Host, cfg.Database.Port, 13)
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	conn.Do("FLUSHDB")
+}
 
 type testSession struct {
 	session_id string
@@ -14,7 +27,12 @@ type testSession struct {
 }
 
 func (s *testSession) Receive() (m []byte) {
-	return []byte{}
+	result := s.Messages[0]
+	if len(s.Messages) > 0 {
+		s.Messages = s.Messages[1:]
+	}
+
+	return result
 }
 
 func (s *testSession) Send(m []byte) {
@@ -41,5 +59,4 @@ func (s *testSession) Protocol() sockjs.Protocol {
 func (s *testSession) String() string {
 	rand.Seed(time.Now().Unix())
 	return fmt.Sprintf("%d", rand.Int())
-	// return session_id
 }
