@@ -15,7 +15,6 @@ import (
 
 	"github.com/fzzy/sockjs-go/sockjs"
 
-	"warcluster/entities"
 	"warcluster/leaderboard"
 )
 
@@ -35,6 +34,8 @@ func Start(host string, port uint16) error {
 	conf := sockjs.NewConfig()
 
 	http.HandleFunc("/console", staticHandler)
+	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
+	http.HandleFunc("/leaderboard/teams/", leaderboardTeamsHandler)
 	http.Handle("/static", http.FileServer(http.Dir(getStaticDir())))
 	mux.Handle("/universe", handler, conf)
 
@@ -140,38 +141,4 @@ func handler(session sockjs.Session) {
 func getStaticDir() string {
 	_, filename, _, _ := runtime.Caller(1)
 	return path.Join(path.Dir(filename), "../static")
-}
-
-// Initialize the leaderboard
-func InitLeaderboard(board *leaderboard.Leaderboard) {
-	log.Println("Initializing the leaderboard...")
-	allPlayers := make(map[string]*leaderboard.Player)
-	planetEntities := entities.Find("planet.*")
-
-	for _, entity := range planetEntities {
-		planet, ok := entity.(*entities.Planet)
-		if !planet.HasOwner() {
-			continue
-		}
-
-		player, ok := allPlayers[planet.Owner]
-
-		if !ok {
-			player = &leaderboard.Player{
-				Username: planet.Owner,
-				Team:     planet.Color,
-				Planets:  0,
-			}
-			allPlayers[planet.Owner] = player
-			board.Add(player)
-		}
-
-		if planet.IsHome {
-			player.HomePlanet = planet.Name
-		}
-
-		player.Planets++
-	}
-	board.Sort()
-	leaderBoard = board
 }
