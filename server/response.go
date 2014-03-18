@@ -21,7 +21,7 @@ func scopeOfView(request *Request) error {
 // This function makes all the checks needed for creation of a new mission.
 // TODO: Do not stream on spy mission
 func parseAction(request *Request) error {
-	var err error = nil
+	var err error
 
 	defer func() error {
 		if panicked := recover(); panicked != nil {
