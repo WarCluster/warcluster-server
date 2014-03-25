@@ -48,6 +48,9 @@ func (l *Leaderboard) Less(i, j int) bool {
 
 func (l *Leaderboard) Sort() {
 	sort.Sort(l)
+	for index, player := range l.board {
+		l.places[player.Username] = index + 1
+	}
 }
 
 func (l *Leaderboard) Transfer(from_username, to_username string) {
@@ -74,6 +77,15 @@ func (l *Leaderboard) Page(page int64) ([]*Player, error) {
 		to = int64(len(l.board))
 	}
 	return l.board[from:to], nil
+}
+
+func (l *Leaderboard) Place(username string) int {
+	place, ok := l.places[username]
+	if !ok {
+		return 0
+	}
+
+	return place
 }
 
 func (l *Leaderboard) move(username string, modificator int) bool {
