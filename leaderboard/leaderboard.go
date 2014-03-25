@@ -2,6 +2,7 @@
 package leaderboard
 
 import (
+	"errors"
 	"sort"
 )
 
@@ -62,8 +63,17 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 	l.moveUp(to_username)
 }
 
-func (l *Leaderboard) Page(page int64) []*Player {
-	return l.board[(page-1)*10 : ((page-1)*10)+10]
+func (l *Leaderboard) Page(page int64) ([]*Player, error) {
+	from := (page - 1) * 10
+	to := ((page - 1) * 10) + 10
+	if len(l.board) < int(from) {
+		return []*Player{}, errors.New("Not such page")
+	}
+
+	if len(l.board) < int(to) {
+		to = int64(len(l.board))
+	}
+	return l.board[from:to], nil
 }
 
 func (l *Leaderboard) move(username string, modificator int) bool {

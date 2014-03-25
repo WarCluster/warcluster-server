@@ -12,16 +12,25 @@ import (
 )
 
 func leaderboardPlayersHandler(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		if panicked := recover(); panicked != nil {
-			fmt.Fprintf(w, "HTTP/1.1 400 Bad Request\r\n\r\n")
-			return
-		}
-	}()
+	pageQuery, ok := r.URL.Query()["page"]
+	if !ok {
+		http.Error(w, "Bad Request", 400)
+		return
+	}
 
-	pageQuery := r.URL.Query()["page"]
-	page, _ := strconv.ParseInt(pageQuery[0], 10, 0)
-	result, _ := json.Marshal(leaderBoard.Page(page))
+	page, intErr := strconv.ParseInt(pageQuery[0], 10, 0)
+	if intErr != nil {
+		http.Error(w, "Page Not Found", 404)
+		return
+	}
+
+	boardPage, err := leaderBoard.Page(page)
+	if err != nil {
+		http.Error(w, "Page Not Found", 404)
+		return
+	}
+
+	result, _ := json.Marshal(boardPage)
 	fmt.Fprintf(w, string(result))
 }
 
