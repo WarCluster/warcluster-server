@@ -85,6 +85,28 @@ func (suite *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
 	assert.Equal(suite.T(), before, after)
 }
 
+
+func (suite *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
+	setup := "{\"Command\": \"setup\", \"Fraction\": 0, \"SunTextureId\": 0}"
+
+	suite.session.Send([]byte(user))
+	suite.session.Send([]byte(setup))
+
+	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	before := len(players_before)
+
+	_, err = authenticate(suite.session)
+
+	assert.NotNil(suite.T(), err)
+
+	players_after, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	after := len(players_after)
+
+	assert.Nil(suite.T(), err)
+
+	assert.Equal(suite.T(), before, after)
+}
+
 func (suite *ClientTestSuite) TestAuthenticateUserWithNilData() {
 	suite.session.Send(nil)
 	_, err := authenticate(suite.session)
