@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -11,7 +12,13 @@ import (
 	"warcluster/leaderboard"
 )
 
+type searchResult struct {
+	Username string
+	Page     int
+}
+
 func leaderboardPlayersHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	pageQuery, ok := r.URL.Query()["page"]
 	if !ok {
 		http.Error(w, "Bad Request", 400)
@@ -34,8 +41,29 @@ func leaderboardPlayersHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(result))
 }
 
-func leaderboardTeamsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("%#v\n", r.URL.Query())
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	username, ok := r.URL.Query()["player"]
+	if !ok || len(username[0]) < 3 {
+		http.Error(w, "Bad Request", 400)
+		return
+	}
+
+	players, err := entities.GetList(fmt.Sprintf("player.%s*", username[0]))
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	result := make([]searchResult, 0)
+
+	for _, player := range players {
+		username := player[7:len(player)]
+		page := math.Ceil(float64(leaderBoard.Place(username)) / 10)
+		result = append(result, searchResult{username, int(page)})
+	}
+
+	marshalledResult, _ := json.Marshal(result)
+	fmt.Fprintf(w, string(marshalledResult))
 }
 
 // Initialize the leaderboard
