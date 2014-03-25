@@ -78,12 +78,12 @@ func (suite *ResponseTestSuite) SetupTest() {
 	suite.request.Position = vec2d.New(2.0, 4.0)
 	suite.request.Resolution = []uint16{1920, 1080}
 	suite.request.Fleet = 32
-	suite.request.Username = "panda"
-	suite.request.TwitterID = "panda13"
+	suite.request.Username = "gophie"
+	suite.request.TwitterID = "gophie92"
 	suite.request.Fraction = 4
 	suite.request.SunTextureId = 0
 	suite.request.Client = &client
-	suite.request.Type = "spy"
+	suite.request.Type = "Spy"
 }
 
 func (suite *ResponseTestSuite) TestParseActionWithoutStartPlanet() {
@@ -92,8 +92,6 @@ func (suite *ResponseTestSuite) TestParseActionWithoutStartPlanet() {
 	err := parseAction(suite.request)
 
 	assert.NotNil(suite.T(), err)
-
-	suite.request.StartPlanet = planet1.Name
 }
 
 func (suite *ResponseTestSuite) TestParseActionWithoutEndPlanet() {
@@ -102,14 +100,36 @@ func (suite *ResponseTestSuite) TestParseActionWithoutEndPlanet() {
 	err := parseAction(suite.request)
 
 	assert.NotNil(suite.T(), err)
+}
 
-	suite.request.EndPlanet = planet3.Name
+func (suite *ResponseTestSuite) TestParseActionWithDifferentTypes() {
+	err := parseAction(suite.request)
+	assert.Nil(suite.T(), err)
+
+	suite.request.Type = "Attack"
+	err = parseAction(suite.request)
+	assert.Nil(suite.T(), err)
+
+	suite.request.Type = "Supply"
+	err = parseAction(suite.request)
+	assert.Nil(suite.T(), err)
+
+	suite.request.Type = "Panda"
+	err = parseAction(suite.request)
+	assert.NotNil(suite.T(), err)
 }
 
 func (suite *ResponseTestSuite) TestParseActionFromForeignPlanet() {
+	suite.request.StartPlanet, suite.request.EndPlanet = suite.request.EndPlanet, suite.request.StartPlanet
 	err := parseAction(suite.request)
 
 	assert.NotNil(suite.T(), err)
+}
+
+func (suite *ResponseTestSuite) TestParseStartMission() {
+	err := parseAction(suite.request)
+
+	assert.Nil(suite.T(), err)
 }
 
 func TestResponseTestSuite(t *testing.T) {
