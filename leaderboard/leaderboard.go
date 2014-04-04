@@ -67,10 +67,13 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 }
 
 func (l *Leaderboard) Page(page int64) ([]*Player, error) {
+	if page <= 0 {
+		return []*Player{}, errors.New("No such page")
+	}
 	from := (page - 1) * 10
 	to := ((page - 1) * 10) + 10
 	if len(l.board) < int(from) {
-		return []*Player{}, errors.New("Not such page")
+		return []*Player{}, errors.New("No such page")
 	}
 
 	if len(l.board) < int(to) {

@@ -125,6 +125,8 @@ func TestPage(t *testing.T) {
 		out int
 		err bool
 	}{
+		{-1, 0, true},
+		{0, 0, true},
 		{1, 10, false},
 		{2, 9, false},
 		{3, 0, true},
