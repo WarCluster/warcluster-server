@@ -35,6 +35,7 @@ func Start(host string, port uint16) error {
 
 	http.HandleFunc("/console", staticHandler)
 	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
+	http.HandleFunc("/leaderboard/teams/", leaderboardTeamsHandler)
 	http.HandleFunc("/search/", searchHandler)
 	http.Handle("/static", http.FileServer(http.Dir(getStaticDir())))
 	mux.Handle("/universe", handler, conf)

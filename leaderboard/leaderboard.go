@@ -6,6 +6,12 @@ import (
 	"sort"
 )
 
+type Color struct {
+	R float32
+	G float32
+	B float32
+}
+
 type Player struct {
 	Username string
 	Team     struct {
@@ -17,21 +23,56 @@ type Player struct {
 	Planets    uint32
 }
 
+type Team struct {
+	Name    string
+	Color   Color
+	Players uint32
+	Planets uint32
+}
+
+type Teams []*Team
+
 type Leaderboard struct {
-	board  []*Player
 	places map[string]int
+	board  []*Player
+	teams  Teams
 }
 
 func New() *Leaderboard {
 	l := new(Leaderboard)
 	l.places = make(map[string]int)
 	l.board = make([]*Player, 0)
+	l.teams = make([]*Team, 0)
 	return l
 }
 
 func (l *Leaderboard) Add(player *Player) {
 	l.board = append(l.board, player)
 	l.places[player.Username] = len(l.board) - 1
+
+	for _, team := range l.teams {
+		if player.Team == team.Color {
+			team.Players++
+			team.Planets += player.Planets
+			return
+		}
+	}
+
+	l.teams = append(l.teams, &Team{
+		Name:    "Red Panda",
+		Color:   player.Team,
+		Players: 1,
+		Planets: player.Planets,
+	})
+}
+
+func (l *Leaderboard) FindTeam(color Color) *Team {
+	for _, team := range l.teams {
+		if team.Color == color {
+			return team
+		}
+	}
+	return nil
 }
 
 func (l *Leaderboard) Len() int {
@@ -49,7 +90,20 @@ func (l *Leaderboard) Less(i, j int) bool {
 func (l *Leaderboard) Sort() {
 	sort.Sort(l)
 	for index, player := range l.board {
-		l.places[player.Username] = index + 1
+		l.places[player.Username] = index
+	}
+}
+
+func (l *Leaderboard) RecountTeamsPlanets() {
+	for _, team := range l.teams {
+		team.Planets = 0
+	}
+
+	for _, player := range l.board {
+		team := l.FindTeam(player.Team)
+		if team != nil {
+			team.Planets += player.Planets
+		}
 	}
 }
 
@@ -60,10 +114,19 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 	if hasOwner {
 		l.board[from].Planets--
 		l.moveDown(from_username)
+		team := l.FindTeam(l.board[from].Team)
+		if team != nil {
+			team.Planets++
+		}
 	}
 
 	l.board[to].Planets++
 	l.moveUp(to_username)
+	team := l.FindTeam(l.board[to].Team)
+	if team != nil {
+		team.Planets++
+	}
+	l.teams.Sort()
 }
 
 func (l *Leaderboard) Page(page int64) ([]*Player, error) {
@@ -89,6 +152,10 @@ func (l *Leaderboard) Place(username string) int {
 	}
 
 	return place
+}
+
+func (l *Leaderboard) Teams() []*Team {
+	return l.teams
 }
 
 func (l *Leaderboard) move(username string, modificator int) bool {
@@ -123,4 +190,20 @@ func (l *Leaderboard) moveUp(username string) bool {
 
 func (l *Leaderboard) moveDown(username string) bool {
 	return l.move(username, 1)
+}
+
+func (t *Teams) Len() int {
+	return len(*t)
+}
+
+func (t *Teams) Swap(i, j int) {
+	(*t)[i], (*t)[j] = (*t)[j], (*t)[i]
+}
+
+func (t *Teams) Less(i, j int) bool {
+	return (*t)[i].Planets > (*t)[j].Planets
+}
+
+func (t *Teams) Sort() {
+	sort.Sort(t)
 }

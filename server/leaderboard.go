@@ -41,6 +41,17 @@ func leaderboardPlayersHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(result))
 }
 
+func leaderboardTeamsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	teams, err := json.Marshal(leaderBoard.Teams())
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	fmt.Fprintf(w, string(teams))
+}
+
 func searchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	username, ok := r.URL.Query()["player"]
@@ -97,5 +108,6 @@ func InitLeaderboard(board *leaderboard.Leaderboard) {
 		player.Planets++
 	}
 	board.Sort()
+	board.RecountTeamsPlanets()
 	leaderBoard = board
 }

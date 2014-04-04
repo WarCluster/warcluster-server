@@ -166,7 +166,7 @@ func TestSort(t *testing.T) {
 		t.Error("Leaderboard.Sort() did not sorted the board")
 	}
 
-	if l.places["0"] != 2 {
+	if l.places["0"] != 1 {
 		t.Error("Leaderboard.Sort() did not changed the places")
 	}
 }
