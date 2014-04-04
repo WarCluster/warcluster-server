@@ -152,7 +152,9 @@ func (m *Mission) EndAttackMission(target *Planet, leaderboard *leaderboard.Lead
 				target.SetShipCount(0)
 				excessShips = m.ShipCount - target.ShipCount
 			} else {
-				leaderboard.Transfer(target.Owner, m.Player)
+				go func(owned, owner string) {
+					leaderboard.Transfer(owned, owner)
+				}(target.Owner, m.Player)
 				target.SetShipCount(m.ShipCount - target.ShipCount)
 				target.Owner = m.Player
 				target.Color = m.Color
