@@ -92,6 +92,7 @@ func (l *Leaderboard) Sort() {
 	for index, player := range l.board {
 		l.places[player.Username] = index
 	}
+	l.teams.Sort()
 }
 
 func (l *Leaderboard) RecountTeamsPlanets() {
