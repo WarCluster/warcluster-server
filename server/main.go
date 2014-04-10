@@ -14,11 +14,14 @@ import (
 	"warcluster/server/response"
 
 	"github.com/fzzy/sockjs-go/sockjs"
+
+	"warcluster/leaderboard"
 )
 
 var (
-	listener net.Listener
-	clients  *ClientPool = NewClientPool()
+	listener    net.Listener
+	clients     *ClientPool = NewClientPool()
+	leaderBoard *leaderboard.Leaderboard
 )
 
 // This function goes trough all the procedurs needed for the werver to be initialized.
@@ -31,6 +34,9 @@ func Start(host string, port uint16) error {
 	conf := sockjs.NewConfig()
 
 	http.HandleFunc("/console", staticHandler)
+	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
+	http.HandleFunc("/leaderboard/teams/", leaderboardTeamsHandler)
+	http.HandleFunc("/search/", searchHandler)
 	http.Handle("/static", http.FileServer(http.Dir(getStaticDir())))
 	mux.Handle("/universe", handler, conf)
 

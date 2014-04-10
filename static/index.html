@@ -7,6 +7,10 @@
             $(function() {
                 var conn = null;
 
+                function setup_parameters() {
+                    alert("wtf");
+                }
+
                 function log(msg) {
                     var control = $('#json');
                     try {
@@ -40,12 +44,33 @@
                     }
                 }
 
-                $('form').submit(function() {
+                $('#chatform').submit(function() {
                     var text = $('#message').val();
                     conn.send(text);
                     $('#message').val('').focus();
                     return false;
                 });
+
+                $('#loginform').submit(function() {
+                    var text = {
+                        "Command": "login", 
+                        "Username": $('#loginName').val(), 
+                        "TwitterId": "some twitter ID"
+                    }
+                    conn.send(JSON.stringify(text));
+                    return false;
+                });
+
+                $('#paramsform').submit(function() {
+                    var text = {
+                        "Command": "setup_parameters", 
+                        "Fraction": parseInt($('#fraction').val()), 
+                        "SunTextureId": parseInt($('#sunTextureId').val())
+                    }
+                    conn.send(JSON.stringify(text));
+                    return false;
+                });
+
 
                 conn = new SockJS('http://' + window.location.host + '/universe');
                 log('Connecting...');
@@ -82,6 +107,17 @@
             <label for="message">Command:</label>
             <input id="message" type="text" style="width: 80%">
             <input type="submit" value="Send">
+        </form>
+        <form id="loginform">
+            Login with:
+            <input id="loginName" type="text" value="john">
+            <input type="submit" value="login">
+        </form>
+        <form id="paramsform">
+            Request params ->
+            <input type="submit" value="setup_parameters">
+            Fraction: <input id="fraction" type="text" value="0">
+            SunTextureId:  <input id="sunTextureId" type="text" value="0">
         </form>
     </body>
 </html>

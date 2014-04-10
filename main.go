@@ -8,6 +8,7 @@ import (
 
 	"warcluster/config"
 	"warcluster/entities/db"
+	"warcluster/leaderboard"
 	"warcluster/server"
 )
 
@@ -18,6 +19,7 @@ func main() {
 
 	cfg.Load("config/config.gcfg")
 	db.InitPool(cfg.Database.Host, cfg.Database.Port, 8)
+	server.InitLeaderboard(leaderboard.New())
 	server.Start(cfg.Server.Host, cfg.Server.Port)
 }
 

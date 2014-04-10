@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"warcluster/entities/db"
+	"warcluster/leaderboard"
 )
 
 const (
@@ -25,6 +26,7 @@ func (suite *ClientTestSuite) SetupTest() {
 	suite.conn = db.Pool.Get()
 	suite.conn.Do("FLUSHDB")
 	suite.session = new(testSession)
+	InitLeaderboard(leaderboard.New())
 }
 
 func (suite *ClientTestSuite) TearDownTest() {

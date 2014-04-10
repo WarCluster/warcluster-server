@@ -62,10 +62,10 @@ func StartMissionary(mission *entities.Mission) {
 
 	switch mission.Type {
 	case "Attack":
-		excessShips = mission.EndAttackMission(target)
+		excessShips = mission.EndAttackMission(target, leaderBoard)
 		clients.BroadcastToAll(stateChange)
 	case "Supply":
-		excessShips = mission.EndSupplyMission(target)
+		excessShips = mission.EndSupplyMission(target, leaderBoard)
 		if player != nil {
 			clients.Send(player, stateChange)
 		}
@@ -76,7 +76,7 @@ func StartMissionary(mission *entities.Mission) {
 			if target.Owner != mission.Target.Owner {
 				break
 			}
-			mission.EndSpyMission(target)
+			mission.EndSpyMission(target, leaderBoard)
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
 				time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)

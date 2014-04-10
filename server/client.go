@@ -9,6 +9,7 @@ import (
 	"github.com/fzzy/sockjs-go/sockjs"
 
 	"warcluster/entities"
+	"warcluster/leaderboard"
 	"warcluster/server/response"
 )
 
@@ -144,6 +145,12 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 			sun.Key(): sun,
 		}
 		clients.BroadcastToAll(stateChange)
+		leaderBoard.Add(&leaderboard.Player{
+			Username:   player.Username,
+			Team:       player.Color,
+			HomePlanet: player.HomePlanet,
+			Planets:    1,
+		})
 	} else {
 		player = entity.(*entities.Player)
 	}

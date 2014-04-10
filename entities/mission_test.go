@@ -7,7 +7,16 @@ import (
 	"time"
 
 	"github.com/Vladimiroff/vec2d"
+
+	"warcluster/leaderboard"
 )
+
+func initLeaderboard() *leaderboard.Leaderboard {
+	l := leaderboard.New()
+	l.Add(&leaderboard.Player{Username: "gophie", Planets: 10})
+	l.Add(&leaderboard.Player{Username: "chochko", Planets: 8})
+	return l
+}
 
 func TestMissionKey(t *testing.T) {
 	startTime := time.Date(2012, time.November, 10, 23, 0, 0, 0, time.UTC).UnixNano() / 1e6
@@ -49,7 +58,9 @@ func TestMissionMarshalling(t *testing.T) {
 
 func TestEndAttackMission(t *testing.T) {
 	var excessShips int32
-	excessShips = secondMission.EndAttackMission(&endPlanet)
+
+	l := initLeaderboard()
+	excessShips = secondMission.EndAttackMission(&endPlanet, l)
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
 	}
@@ -59,7 +70,7 @@ func TestEndAttackMission(t *testing.T) {
 	}
 
 	mission.ShipCount = 15
-	excessShips = mission.EndAttackMission(&endPlanet)
+	excessShips = mission.EndAttackMission(&endPlanet, l)
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
 	}
@@ -75,11 +86,12 @@ func TestEndAttackMission(t *testing.T) {
 
 func TestEndAttackMissionDenyTakeover(t *testing.T) {
 	var excessShips int32
+	l := initLeaderboard()
 	endPlanet := new(Planet)
 	*endPlanet = Planet{"", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(2, 2), true, 6, 3, timeStamp, 2, 0, "chochko"}
 
 	mission.ShipCount = 5
-	excessShips = mission.EndAttackMission(endPlanet)
+	excessShips = mission.EndAttackMission(endPlanet, l)
 	if endPlanet.GetShipCount() != 0 {
 		t.Error("End Planet ship count was expected to be 0 but it is:", endPlanet.GetShipCount())
 	}
