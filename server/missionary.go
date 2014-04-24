@@ -64,6 +64,13 @@ func StartMissionary(mission *entities.Mission) {
 	case "Attack":
 		excessShips = mission.EndAttackMission(target, leaderBoard)
 		clients.BroadcastToAll(stateChange)
+		if player != nil && player.Username != target.Owner {
+			ownerChange := response.NewOwnerChange()
+			ownerChange.RawPlanet = map[string]*entities.Planet{
+				target.Key(): target,
+			}
+			clients.Send(player, ownerChange)
+		}
 	case "Supply":
 		excessShips = mission.EndSupplyMission(target, leaderBoard)
 		if player != nil {
