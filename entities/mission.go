@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/Vladimiroff/vec2d"
-
-	"warcluster/leaderboard"
 )
 
 type Mission struct {
@@ -139,11 +137,11 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 // If that's true we simply increment the ship count on that planet. If not we do the
 // math and decrease the count ship on the attacked planet. We should check if the attacker
 // should own that planet, which comes with all the changing colors and owner stuff.
-func (m *Mission) EndAttackMission(target *Planet, leaderboard *leaderboard.Leaderboard) (excessShips int32) {
+func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
 	if target.Owner == m.Player {
 		m.Target.Owner = target.Owner
 		m.Type = "Supply"
-		return m.EndSupplyMission(target, leaderboard)
+		return m.EndSupplyMission(target)
 	} else {
 		if m.ShipCount < target.ShipCount {
 			target.SetShipCount(target.ShipCount - m.ShipCount)
@@ -152,9 +150,6 @@ func (m *Mission) EndAttackMission(target *Planet, leaderboard *leaderboard.Lead
 				target.SetShipCount(0)
 				excessShips = m.ShipCount - target.ShipCount
 			} else {
-				go func(owned, owner string) {
-					leaderboard.Transfer(owned, owner)
-				}(target.Owner, m.Player)
 				target.SetShipCount(m.ShipCount - target.ShipCount)
 				target.Owner = m.Player
 				target.Color = m.Color
@@ -167,10 +162,10 @@ func (m *Mission) EndAttackMission(target *Planet, leaderboard *leaderboard.Lead
 // End Supply Mission: We simply increase the ship count and we're done :P
 // If however the owner of the target planet has changed we change the mission type
 // to attack.
-func (m *Mission) EndSupplyMission(target *Planet, leaderboard *leaderboard.Leaderboard) int32 {
+func (m *Mission) EndSupplyMission(target *Planet) int32 {
 	if target.Owner != m.Target.Owner {
 		m.Type = "Attack"
-		return m.EndAttackMission(target, leaderboard)
+		return m.EndAttackMission(target)
 	}
 
 	target.SetShipCount(target.ShipCount + m.ShipCount)
@@ -179,10 +174,10 @@ func (m *Mission) EndSupplyMission(target *Planet, leaderboard *leaderboard.Lead
 
 // End Spy Mission: Create a spy report for that planet and find a way to notify the logged in
 // instances of the user who sent this mission.
-func (m *Mission) EndSpyMission(target *Planet, leaderboard *leaderboard.Leaderboard) int32 {
+func (m *Mission) EndSpyMission(target *Planet) int32 {
 	if target.Owner == m.Player {
 		m.Target.Owner = target.Owner
-		return m.EndSupplyMission(target, leaderboard)
+		return m.EndSupplyMission(target)
 	}
 	CreateSpyReport(target, m)
 	m.ShipCount -= 1

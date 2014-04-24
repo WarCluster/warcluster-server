@@ -62,10 +62,24 @@ func StartMissionary(mission *entities.Mission) {
 
 	switch mission.Type {
 	case "Attack":
-		excessShips = mission.EndAttackMission(target, leaderBoard)
+		ownerBefore := target.Owner
+		excessShips = mission.EndAttackMission(target)
 		clients.BroadcastToAll(stateChange)
+		if ownerBefore != target.Owner {
+			go func(owned, owner string) {
+				leaderBoard.Transfer(owned, owner)
+			}(ownerBefore, target.Owner)
+
+			if player != nil {
+				ownerChange := response.NewOwnerChange()
+				ownerChange.RawPlanet = map[string]*entities.Planet{
+					target.Key(): target,
+				}
+				clients.Send(player, ownerChange)
+			}
+		}
 	case "Supply":
-		excessShips = mission.EndSupplyMission(target, leaderBoard)
+		excessShips = mission.EndSupplyMission(target)
 		if player != nil {
 			clients.Send(player, stateChange)
 		}
@@ -76,7 +90,7 @@ func StartMissionary(mission *entities.Mission) {
 			if target.Owner != mission.Target.Owner {
 				break
 			}
-			mission.EndSpyMission(target, leaderBoard)
+			mission.EndSpyMission(target)
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
 				time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
