@@ -147,7 +147,7 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 		clients.BroadcastToAll(stateChange)
 		leaderBoard.Add(&leaderboard.Player{
 			Username:   player.Username,
-			Team:       player.Color,
+			Team:       player.Race.Color(),
 			HomePlanet: player.HomePlanet,
 			Planets:    1,
 		})
