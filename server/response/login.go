@@ -6,10 +6,17 @@ import (
 	"warcluster/entities"
 )
 
+type Fraction struct {
+	Id    uint16
+	Color entities.Color
+	Name  string
+}
+
 type LoginSuccess struct {
 	baseResponse
 	Username   string
 	Position   *vec2d.Vector
+	Fraction   Fraction
 	HomePlanet struct {
 		Name     string
 		Position *vec2d.Vector
@@ -28,6 +35,7 @@ func NewLoginSuccess(player *entities.Player, homePlanet *entities.Planet) *Logi
 	r := new(LoginSuccess)
 	r.Command = "login_success"
 	r.Username = player.Username
+	r.Fraction = Fraction{player.Race.ID, player.Race.Color(), player.Race.Name()}
 	r.Position = player.ScreenPosition
 	r.HomePlanet.Name = homePlanet.Name
 	r.HomePlanet.Position = homePlanet.Position
