@@ -69,7 +69,7 @@ var (
 	}
 	player Player = Player{
 		Username:       "gophie",
-		Color:          Color{22, 22, 22},
+		Race:           Race{1},
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.GOP6720",
 		ScreenSize:     []uint16{1, 1},

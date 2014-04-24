@@ -3,10 +3,10 @@ package server
 import (
 	"testing"
 
+	"github.com/Vladimiroff/vec2d"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/Vladimiroff/vec2d"
 
 	"warcluster/entities"
 	"warcluster/entities/db"
@@ -14,7 +14,7 @@ import (
 
 var gophie entities.Player = entities.Player{
 	Username:       "gophie",
-	Color:          entities.Color{22, 22, 22},
+	Race:           entities.Race{1},
 	TwitterID:      "gophie92",
 	HomePlanet:     "planet.GOP6720",
 	ScreenSize:     []uint16{1, 1},
@@ -23,7 +23,7 @@ var gophie entities.Player = entities.Player{
 
 var panda entities.Player = entities.Player{
 	Username:       "panda",
-	Color:          entities.Color{22, 22, 22},
+	Race:           entities.Race{1},
 	TwitterID:      "panda13",
 	HomePlanet:     "planet.PAN6720",
 	ScreenSize:     []uint16{1, 1},
@@ -31,29 +31,29 @@ var panda entities.Player = entities.Player{
 }
 
 var client Client = Client{
-	Session:        new(testSession),
-	Player:         &gophie,
+	Session: new(testSession),
+	Player:  &gophie,
 }
 
 var planet1 entities.Planet = entities.Planet{
-	Name:           "GOP6720",
-	Position:       &vec2d.Vector{2, 2},
-	IsHome:         true,
-	Owner:          "gophie",
+	Name:     "GOP6720",
+	Position: &vec2d.Vector{2, 2},
+	IsHome:   true,
+	Owner:    "gophie",
 }
 
 var planet2 entities.Planet = entities.Planet{
-	Name:           "GOP6724",
-	Position:       &vec2d.Vector{4, 4},
-	IsHome:         false,
-	Owner:          "gophie",
+	Name:     "GOP6724",
+	Position: &vec2d.Vector{4, 4},
+	IsHome:   false,
+	Owner:    "gophie",
 }
 
 var planet3 entities.Planet = entities.Planet{
-	Name:           "PAN6720",
-	Position:       &vec2d.Vector{10, 10},
-	IsHome:         true,
-	Owner:          "panda",
+	Name:     "PAN6720",
+	Position: &vec2d.Vector{10, 10},
+	IsHome:   true,
+	Owner:    "panda",
 }
 
 type ResponseTestSuite struct {

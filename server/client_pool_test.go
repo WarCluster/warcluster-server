@@ -14,7 +14,7 @@ var cp = NewClientPool()
 
 var player1 = entities.Player{
 	Username:       "gophie",
-	Color:          entities.Color{0.59215686, 0.59215686, 0.59215686},
+	Race:           entities.Race{1},
 	TwitterID:      "gop",
 	HomePlanet:     "planet.GOP6720",
 	ScreenSize:     []uint16{1, 1},
@@ -23,7 +23,7 @@ var player1 = entities.Player{
 
 var player2 = entities.Player{
 	Username:       "snoopy",
-	Color:          entities.Color{0.59215686, 0.59215686, 0.59215686},
+	Race:           entities.Race{1},
 	TwitterID:      "snoop",
 	HomePlanet:     "planet.SNO6750",
 	ScreenSize:     []uint16{1, 1},
