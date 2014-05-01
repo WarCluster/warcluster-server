@@ -67,9 +67,9 @@ func parseAction(request *Request) error {
 		clients.Send(request.Client.Player, missionFailed)
 	}
 
+	entities.Save(source)
 	go StartMissionary(mission)
 	entities.Save(mission)
-	entities.Save(source)
 
 	sendMission := response.NewSendMission()
 	sendMission.Mission = mission
