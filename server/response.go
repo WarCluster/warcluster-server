@@ -50,6 +50,10 @@ func parseAction(request *Request) error {
 		return errors.New("Invalid mission type!")
 	}
 
+	if request.StartPlanet == request.EndPlanet {
+		return errors.New("Invalid destination")
+	}
+
 	mission := request.Client.Player.StartMission(
 		source,
 		target.(*entities.Planet),
