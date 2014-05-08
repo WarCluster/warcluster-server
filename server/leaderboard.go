@@ -69,7 +69,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, player := range players {
 		username := player[7:len(player)]
-		page := math.Ceil(float64(leaderBoard.Place(username)) / 10)
+		page := math.Ceil(float64(leaderBoard.Place(username)+1) / 10)
 		result = append(result, searchResult{username, int(page)})
 	}
 
