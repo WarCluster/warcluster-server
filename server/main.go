@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"runtime/debug"
 
+	"warcluster/config"
 	"warcluster/server/response"
 
 	"github.com/fzzy/sockjs-go/sockjs"
@@ -19,14 +20,19 @@ import (
 )
 
 var (
-	listener    net.Listener
+	cfg         config.Config
 	clients     *ClientPool = NewClientPool()
 	leaderBoard *leaderboard.Leaderboard
+	listener    net.Listener
 )
 
 // This function goes trough all the procedurs needed for the werver to be initialized.
 // Create an empty connections pool and start the listening foe messages loop.
-func Start(host string, port uint16) error {
+func Start() error {
+	cfg.Load("../config/config.gcfg")
+	host := cfg.Server.Host
+	port := cfg.Server.Port
+
 	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", host, port))
 	log.Print("Quit the server with Ctrl-C.")
 

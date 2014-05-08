@@ -21,13 +21,18 @@ type Player struct {
 
 // Database key.
 func (p *Player) Key() string {
-	return fmt.Sprintf("player.%s", p.Username)
+	return fmt.Sprintf("player.%s", p.TwitterID)
 }
 
 // Returns the sorted set by X or Y where this entity has to be put in
 func (p *Player) AreaSet() string {
 	homePlanet, _ := Get(p.HomePlanet)
 	return homePlanet.AreaSet()
+}
+
+// Returns the name of sun in player's solar system
+func (p *Player) Sun() string {
+	return p.HomePlanet[:len(p.HomePlanet)-1]
 }
 
 // Starts missions to one of the players planet to some other. Each mission have type

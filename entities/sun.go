@@ -130,7 +130,7 @@ func findHomeSolarSlot(rootSolarSlot *SolarSlot) *SolarSlot {
 // overlapping. To solve this, we simply throw the sun somewhere far away
 // from the desired point and start to move it to THE POINT, but carefully
 // watching for collisions.
-func GenerateSun(username string, friends, others []*Sun, setupData *SetupData) *Sun {
+func GenerateSun(username string, friends []*Sun, setupData *SetupData) *Sun {
 	newSun := Sun{
 		Username:     username,
 		Position:     vec2d.New(0, 0),

@@ -18,6 +18,12 @@ type Config struct {
 		Host string
 		Port uint16
 	}
+	Twitter struct {
+		ConsumerKey       string
+		ConsumerSecret    string
+		AccessToken       string
+		AccessTokenSecret string
+	}
 }
 
 func (c *Config) Load(name string) {

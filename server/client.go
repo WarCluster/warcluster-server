@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 
+	"github.com/ChimeraCoder/anaconda"
 	"github.com/fzzy/sockjs-go/sockjs"
 
 	"warcluster/entities"
@@ -109,50 +111,97 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 	twitterId = request.TwitterID
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
-	justRegistered := entity == nil
-	if justRegistered {
-
-		setupInfo, err := FetchSetupData(session)
+	if entity == nil {
+		setupData, err := FetchSetupData(session)
 		if err != nil {
 			return nil, errors.New("Reading client data failed.")
 		}
 
-		allSunsEntities := entities.Find("sun.*")
-		allSuns := []*entities.Sun{}
-		for _, sunEntity := range allSunsEntities {
-			allSuns = append(allSuns, sunEntity.(*entities.Sun))
-		}
-		sun := entities.GenerateSun(nickname, allSuns, []*entities.Sun{}, setupInfo)
-		planets, homePlanet := entities.GeneratePlanets(nickname, sun)
-		player = entities.CreatePlayer(nickname, twitterId, homePlanet, setupInfo)
-
-		//TODO: Remove the bottom three lines when the client is smart enough to invoke
-		//      scope of view on all clients in order to osee the generated system
-		for _, planet := range planets {
-			entities.Save(planet)
-			stateChange := response.NewStateChange()
-			stateChange.RawPlanets = map[string]*entities.Planet{
-				planet.Key(): planet,
-			}
-			clients.BroadcastToAll(stateChange)
-		}
-
-		entities.Save(player)
-		entities.Save(sun)
-
-		stateChange := response.NewStateChange()
-		stateChange.Suns = map[string]*entities.Sun{
-			sun.Key(): sun,
-		}
-		clients.BroadcastToAll(stateChange)
-		leaderBoard.Add(&leaderboard.Player{
-			Username:   player.Username,
-			Team:       player.Race.Color(),
-			HomePlanet: player.HomePlanet,
-			Planets:    1,
-		})
+		player = register(setupData, nickname, twitterId)
 	} else {
 		player = entity.(*entities.Player)
 	}
 	return player, nil
+}
+
+// Registration process is quite simple:
+//
+// - Gather all twitter friends.
+// - Create a new sun with GenerateSun.
+// - Choose home planet from the newly created solar sysitem.
+// - Create a reccord of the new player and start comunication.
+func register(setupData *entities.SetupData, nickname, twitterId string) *entities.Player {
+	friendsSuns := fetchFriendsSuns(nickname)
+	sun := entities.GenerateSun(nickname, friendsSuns, setupData)
+	planets, homePlanet := entities.GeneratePlanets(nickname, sun)
+	player := entities.CreatePlayer(nickname, twitterId, homePlanet, setupData)
+
+	for _, planet := range planets {
+		entities.Save(planet)
+		stateChange := response.NewStateChange()
+		stateChange.RawPlanets = map[string]*entities.Planet{
+			planet.Key(): planet,
+		}
+		clients.BroadcastToAll(stateChange)
+	}
+
+	entities.Save(player)
+	entities.Save(sun)
+
+	stateChange := response.NewStateChange()
+	stateChange.Suns = map[string]*entities.Sun{
+		sun.Key(): sun,
+	}
+	clients.BroadcastToAll(stateChange)
+	leaderBoard.Add(&leaderboard.Player{
+		Username:   player.Username,
+		Team:       player.Race.Color(),
+		HomePlanet: player.HomePlanet,
+		Planets:    1,
+	})
+	return player
+}
+
+// Returns a slice with twitter ids of the given user's friends
+func fetchTwitterFriends(screenName string) ([]int64, error) {
+	anaconda.SetConsumerKey(cfg.Twitter.ConsumerKey)
+	anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
+	api := anaconda.NewTwitterApi(cfg.Twitter.AccessToken, cfg.Twitter.AccessTokenSecret)
+
+	v := url.Values{}
+	v.Set("count", "5000")
+	v.Set("cursor", "-1")
+	v.Set("screen_name", screenName)
+
+	friends, err := api.GetFriendsIds(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return friends.Ids, nil
+}
+
+// Returns a slice of friend's suns
+func fetchFriendsSuns(twitterName string) (suns []*entities.Sun) {
+	friendsIds, twitterErr := fetchTwitterFriends(twitterName)
+	if twitterErr != nil {
+		return
+	}
+
+	for _, id := range friendsIds {
+		playerEntity, err := entities.Get(fmt.Sprintf("player.%d", id))
+		if playerEntity == nil || err != nil {
+			continue
+		}
+
+		player := playerEntity.(*entities.Player)
+		if err != nil {
+			continue
+		}
+
+		if friendSun, sunErr := entities.Get(player.Sun()); sunErr == nil {
+			suns = append(suns, friendSun.(*entities.Sun))
+		}
+	}
+	return
 }
