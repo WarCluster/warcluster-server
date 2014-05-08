@@ -163,33 +163,43 @@ func register(setupData *entities.SetupData, nickname, twitterId string) *entiti
 }
 
 // Returns a slice with twitter ids of the given user's friends
-func fetchTwitterFriends(screenName string) ([]int64, error) {
+func fetchTwitterFriends(screenName string) ([]string, error) {
 	anaconda.SetConsumerKey(cfg.Twitter.ConsumerKey)
 	anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
 	api := anaconda.NewTwitterApi(cfg.Twitter.AccessToken, cfg.Twitter.AccessTokenSecret)
 
 	v := url.Values{}
-	v.Set("count", "5000")
+	v.Set("count", "100")
 	v.Set("cursor", "-1")
 	v.Set("screen_name", screenName)
 
-	friends, err := api.GetFriendsIds(v)
+	friendsIds, err := api.GetFriendsIds(v)
 	if err != nil {
 		return nil, err
 	}
 
-	return friends.Ids, nil
+	friends, err := api.GetUsersLookupByIds(friendsIds.Ids, url.Values{})
+	if err != nil {
+		return nil, err
+	}
+
+	var friendsNames []string
+	for _, friend := range friends {
+		friendsNames = append(friendsNames, friend.ScreenName)
+	}
+
+	return friendsNames, nil
 }
 
 // Returns a slice of friend's suns
 func fetchFriendsSuns(twitterName string) (suns []*entities.Sun) {
-	friendsIds, twitterErr := fetchTwitterFriends(twitterName)
+	friendsNames, twitterErr := fetchTwitterFriends(twitterName)
 	if twitterErr != nil {
 		return
 	}
 
-	for _, id := range friendsIds {
-		playerEntity, err := entities.Get(fmt.Sprintf("player.%d", id))
+	for _, name := range friendsNames {
+		playerEntity, err := entities.Get(fmt.Sprintf("player.%s", name))
 		if playerEntity == nil || err != nil {
 			continue
 		}

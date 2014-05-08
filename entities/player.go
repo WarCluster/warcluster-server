@@ -21,7 +21,7 @@ type Player struct {
 
 // Database key.
 func (p *Player) Key() string {
-	return fmt.Sprintf("player.%s", p.TwitterID)
+	return fmt.Sprintf("player.%s", p.Username)
 }
 
 // Returns the sorted set by X or Y where this entity has to be put in
