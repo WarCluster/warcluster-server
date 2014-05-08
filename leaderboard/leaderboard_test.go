@@ -192,3 +192,36 @@ func TestSort(t *testing.T) {
 		t.Error("Leaderboard.Sort() did not sort teams")
 	}
 }
+
+func TestChangingPlacesAndPlanets(t *testing.T) {
+	l := initLeaderboard()
+	l.Transfer("3", "4")
+	l.Transfer("0", "4")
+
+	if l.places["4"] > l.places["3"] {
+		t.Errorf(
+			"Player 4 is on place %d, Player 3 - %d",
+			l.places["4"],
+			l.places["3"],
+		)
+	}
+
+	planets := l.board[l.places["4"]].Planets
+	if planets != 7 {
+		t.Errorf("Player 4 is has %d planets, expected 7", planets)
+	}
+}
+
+func TestTakePlanetsWithoutOwner(t *testing.T) {
+	l := initLeaderboard()
+	l.Transfer("", "4")
+	l.Transfer("", "4")
+
+	if l.places["4"] > l.places["3"] {
+		t.Errorf(
+			"Player 4 is on place %d, Player 3 - %d",
+			l.places["4"],
+			l.places["3"],
+		)
+	}
+}

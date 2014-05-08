@@ -114,14 +114,17 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 
 	if hasOwner {
 		l.board[from].Planets--
+	}
+	l.board[to].Planets++
+
+	if hasOwner {
 		l.moveDown(from_username)
 		team := l.FindTeam(l.board[from].Team)
 		if team != nil {
-			team.Planets++
+			team.Planets--
 		}
 	}
 
-	l.board[to].Planets++
 	l.moveUp(to_username)
 	team := l.FindTeam(l.board[to].Team)
 	if team != nil {
@@ -178,7 +181,8 @@ func (l *Leaderboard) move(username string, modificator int) bool {
 
 		if isMoved {
 			l.Swap(i, i+modificator)
-			l.places[l.board[i].Username], l.places[l.board[i+modificator].Username] = i+modificator, i
+			l.places[l.board[i].Username] = i
+			l.places[l.board[i+modificator].Username] = i + modificator
 		}
 		i += modificator
 	}
