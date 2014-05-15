@@ -129,18 +129,18 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 	l.board[to].Planets++
 
 	if hasOwner {
-		l.moveDown(from_username)
 		team := l.FindTeam(l.board[from].Team)
 		if team != nil {
 			team.Planets--
 		}
+		l.moveDown(from_username)
 	}
 
-	l.moveUp(to_username)
 	team := l.FindTeam(l.board[to].Team)
 	if team != nil {
 		team.Planets++
 	}
+	l.moveUp(to_username)
 	l.teams.Sort()
 }
 
