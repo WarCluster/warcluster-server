@@ -67,7 +67,7 @@ func StartMissionary(mission *entities.Mission) {
 		clients.BroadcastToAll(stateChange)
 		if ownerBefore != target.Owner {
 			go func(owned, owner string) {
-				leaderBoard.Transfer(owned, owner)
+				leaderBoard.Channel <- [2]string{owned, owner}
 			}(ownerBefore, target.Owner)
 
 			if player != nil {
