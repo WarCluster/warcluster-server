@@ -156,7 +156,7 @@ func register(setupData *entities.SetupData, nickname, twitterId string) *entiti
 	leaderBoard.Add(&leaderboard.Player{
 		Username:   player.Username,
 		Team:       player.Race.Color(),
-		HomePlanet: player.HomePlanet,
+		HomePlanet: homePlanet.Name,
 		Planets:    1,
 	})
 	return player
