@@ -9,6 +9,22 @@ import (
 	"warcluster/server/response"
 )
 
+func FetchMissionTarget(targetKey string) (*entities.Planet, *response.StateChange, error) {
+	targetEntity, err := entities.Get(targetKey)
+	if err != nil {
+		return nil, nil, err
+	}
+	target := targetEntity.(*entities.Planet)
+	target.UpdateShipCount()
+
+	stateChange := response.NewStateChange()
+	stateChange.RawPlanets = map[string]*entities.Planet{
+		target.Key(): target,
+	}
+
+	return target, stateChange, nil
+}
+
 // StartMissionary is used when a call to initiate a new mission is rescived.
 // 1. When the delay ends the thread ends the mission calling EndMission
 // 2. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
@@ -16,10 +32,14 @@ func StartMissionary(mission *entities.Mission) {
 	var (
 		timeSlept   time.Duration = 0
 		excessShips int32
+		target      *entities.Planet
+		stateChange *response.StateChange
+		err         error
 	)
-
+	entities.Save(mission)
 	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
 	for _, transferPoint := range mission.TransferPoints() {
+
 		timeToSleep := transferPoint.TravelTime - timeSlept
 		timeSlept += timeToSleep
 		time.Sleep(timeToSleep * time.Millisecond)
@@ -34,38 +54,30 @@ func StartMissionary(mission *entities.Mission) {
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
 
-	targetEntity, err := entities.Get(targetKey)
-	if err != nil {
-		log.Print("Error in target planet fetch:", err.Error())
-		return
-	}
-	target := targetEntity.(*entities.Planet)
-	target.UpdateShipCount()
-
 	var player *entities.Player
 
 	if mission.Target.Owner == "" {
 		player = nil
 	} else {
-		playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Target.Owner))
-		if err != nil {
-			log.Println("Error in target planet owner fetch:", err.Error())
+		playerEntity, pErr := entities.Get(fmt.Sprintf("player.%s", mission.Target.Owner))
+		if pErr != nil {
+			log.Println("Error in target planet owner fetch:", pErr.Error())
 			return
 		}
 		player = playerEntity.(*entities.Player)
 	}
 
-	stateChange := response.NewStateChange()
-	stateChange.RawPlanets = map[string]*entities.Planet{
-		target.Key(): target,
-	}
-
 	switch mission.Type {
 	case "Attack":
+		target, stateChange, err = FetchMissionTarget(targetKey)
+		if err != nil {
+			log.Print("Error in target planet fetch:", err.Error())
+		}
 		ownerBefore := target.Owner
 		excessShips = mission.EndAttackMission(target)
 		clients.BroadcastToAll(stateChange)
 		if ownerBefore != target.Owner {
+			fmt.Println("Owner changed")
 			go func(owned, owner string) {
 				leaderBoard.Transfer(owned, owner)
 			}(ownerBefore, target.Owner)
@@ -79,22 +91,33 @@ func StartMissionary(mission *entities.Mission) {
 			}
 		}
 	case "Supply":
+		target, stateChange, err = FetchMissionTarget(targetKey)
+		if err != nil {
+			log.Print("Error in target planet fetch:", err.Error())
+		}
 		excessShips = mission.EndSupplyMission(target)
 		if player != nil {
 			clients.Send(player, stateChange)
 		}
 	case "Spy":
 		for {
+			target, stateChange, err = FetchMissionTarget(targetKey)
+			if err != nil {
+				log.Print("Error in target planet fetch:", err.Error())
+			}
 			// All spy pilots die if planet is overtaken (they are killed)
 			// Other possible solution is to generate a supply mission back (they flee)
 			if target.Owner != mission.Target.Owner {
+				fmt.Println("ownera se smeni trugvam si")
 				break
 			}
 			mission.EndSpyMission(target)
+			fmt.Println("endSpyMission")
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
 				time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
 			} else {
+				fmt.Println("Nqma poveche shpioni")
 				break
 			}
 		}
