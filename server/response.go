@@ -42,7 +42,7 @@ func parseAction(request *Request) error {
 	}
 
 	if source.Owner != request.Client.Player.Username {
-		return errors.New("This is not your home!")
+		return errors.New("The mission owner does not own the start planet.")
 	}
 
 	// FIXME: Why not a simple list with the possible attacks?
@@ -51,7 +51,8 @@ func parseAction(request *Request) error {
 	}
 
 	if request.StartPlanet == request.EndPlanet {
-		return errors.New("Invalid destination")
+		clients.Send(request.Client.Player, response.NewComsError("Unable to target the same planet."))
+		return errors.New("Start and end planet are the same. Mission cancelled.")
 	}
 
 	mission := request.Client.Player.StartMission(

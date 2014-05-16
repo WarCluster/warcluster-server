@@ -54,12 +54,12 @@ func (p *Planet) Sanitize(player *Player) *PlanetPacket {
 
 	if p.Owner != player.Username {
 		packet.ShipCount = -1
-	}
 
-	for _, spyReport := range player.SpyReports {
-		if spyReport.Name == p.Name && spyReport.IsValid() {
-			packet.ShipCount = spyReport.ShipCount
-			packet.IsSpied = true
+		for _, spyReport := range player.SpyReports {
+			if spyReport.Name == p.Name && spyReport.IsValid() {
+				packet.ShipCount = spyReport.ShipCount
+				packet.IsSpied = true
+			}
 		}
 	}
 	return &packet
