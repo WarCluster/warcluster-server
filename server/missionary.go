@@ -77,7 +77,6 @@ func StartMissionary(mission *entities.Mission) {
 		excessShips = mission.EndAttackMission(target)
 		clients.BroadcastToAll(stateChange)
 		if ownerBefore != target.Owner {
-			fmt.Println("Owner changed")
 			go func(owned, owner string) {
 				leaderBoard.Transfer(owned, owner)
 			}(ownerBefore, target.Owner)
@@ -108,16 +107,13 @@ func StartMissionary(mission *entities.Mission) {
 			// All spy pilots die if planet is overtaken (they are killed)
 			// Other possible solution is to generate a supply mission back (they flee)
 			if target.Owner != mission.Target.Owner {
-				fmt.Println("ownera se smeni trugvam si")
 				break
 			}
 			mission.EndSpyMission(target)
-			fmt.Println("endSpyMission")
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
 				time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
 			} else {
-				fmt.Println("Nqma poveche shpioni")
 				break
 			}
 		}
