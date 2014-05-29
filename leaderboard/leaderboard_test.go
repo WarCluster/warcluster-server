@@ -61,7 +61,7 @@ func initLeaderboard() *Leaderboard {
 	return l
 }
 
-func xTestSimpleTransfer(t *testing.T) {
+func TestSimpleTransfer(t *testing.T) {
 	l := initLeaderboard()
 	l.Transfer("1", "0")
 	if l.board[0].Planets != 11 && l.board[1].Planets != 7 {
@@ -81,7 +81,7 @@ func xTestSimpleTransfer(t *testing.T) {
 	}
 }
 
-func xTestMovingUp(t *testing.T) {
+func TestMovingUp(t *testing.T) {
 	l := initLeaderboard()
 	l.board[4].Planets = 9
 
@@ -97,7 +97,7 @@ func xTestMovingUp(t *testing.T) {
 	l.moveUp("0")
 }
 
-func xTestMovingDown(t *testing.T) {
+func TestMovingDown(t *testing.T) {
 	l := initLeaderboard()
 	l.board[1].Planets = 2
 
@@ -108,7 +108,7 @@ func xTestMovingDown(t *testing.T) {
 	l.moveUp(string(len(l.board) - 1))
 }
 
-func xTestPlace(t *testing.T) {
+func TestPlace(t *testing.T) {
 	l := initLeaderboard()
 	results := []struct {
 		in  string
@@ -128,7 +128,7 @@ func xTestPlace(t *testing.T) {
 	}
 }
 
-func xTestPage(t *testing.T) {
+func TestPage(t *testing.T) {
 	l := initLeaderboard()
 	results := []struct {
 		in  int64
@@ -152,7 +152,7 @@ func xTestPage(t *testing.T) {
 	}
 }
 
-func xTestAdd(t *testing.T) {
+func TestAdd(t *testing.T) {
 	l := initLeaderboard()
 	boardLengthBefore := l.Len()
 	placesLengthBefore := len(l.places)
@@ -173,7 +173,7 @@ func xTestAdd(t *testing.T) {
 	}
 }
 
-func xTestSort(t *testing.T) {
+func TestSort(t *testing.T) {
 	l := initLeaderboard()
 	l.places["0"] = 20
 	l.board[1].Planets = 128
@@ -193,7 +193,7 @@ func xTestSort(t *testing.T) {
 	}
 }
 
-func xTestChangingPlacesAndPlanets(t *testing.T) {
+func TestChangingPlacesAndPlanets(t *testing.T) {
 	l := initLeaderboard()
 	l.Transfer("3", "4")
 	l.Transfer("0", "4")
@@ -212,7 +212,7 @@ func xTestChangingPlacesAndPlanets(t *testing.T) {
 	}
 }
 
-func xTestTakePlanetsWithoutOwner(t *testing.T) {
+func TestTakePlanetsWithoutOwner(t *testing.T) {
 	l := initLeaderboard()
 	l.Transfer("", "4")
 	l.Transfer("", "4")
