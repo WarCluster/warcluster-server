@@ -61,6 +61,14 @@ func initLeaderboard() *Leaderboard {
 	return l
 }
 
+func TestAddTeam(t *testing.T) {
+	l := initLeaderboard()
+	l.AddTeam("Raccoon", Color{1, 2, 3})
+	if len(l.teams) != 4 {
+		t.Errorf("Expected number of teams is 4, but received %d", len(l.teams))
+	}
+}
+
 func TestSimpleTransfer(t *testing.T) {
 	l := initLeaderboard()
 	l.Transfer("1", "0")
@@ -156,7 +164,6 @@ func TestAdd(t *testing.T) {
 	l := initLeaderboard()
 	boardLengthBefore := l.Len()
 	placesLengthBefore := len(l.places)
-	teamsLengthBefore := len(l.teams)
 	l.Add(&Player{Username: "panda", Planets: 42, Team: Color{13, 11, 92}})
 	l.FindTeam(Color{21, 6, 90})
 	l.Add(&Player{Username: "gophie", Planets: 42, Team: Color{21, 6, 90}})
@@ -165,10 +172,6 @@ func TestAdd(t *testing.T) {
 	}
 
 	if placesLengthBefore+2 != len(l.places) {
-		t.Error("Places map size did not changed after adding a player")
-	}
-
-	if teamsLengthBefore+1 != len(l.Teams()) {
 		t.Error("Places map size did not changed after adding a player")
 	}
 }

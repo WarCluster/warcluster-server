@@ -68,13 +68,6 @@ func (l *Leaderboard) Add(player *Player) {
 			return
 		}
 	}
-
-	l.teams = append(l.teams, &Team{
-		Name:    "Red Panda",
-		Color:   player.Team,
-		Players: 1,
-		Planets: player.Planets,
-	})
 }
 
 func (l *Leaderboard) FindTeam(color Color) *Team {
@@ -171,6 +164,7 @@ func (l *Leaderboard) Place(username string) int {
 
 func (l *Leaderboard) Teams() []*Team {
 	return l.teams
+
 }
 
 func (l *Leaderboard) move(username string, modificator int) bool {
@@ -206,6 +200,15 @@ func (l *Leaderboard) moveUp(username string) bool {
 
 func (l *Leaderboard) moveDown(username string) bool {
 	return l.move(username, 1)
+}
+
+func (l *Leaderboard) AddTeam(name string, color Color) {
+	l.teams = append(l.teams, &Team{
+		Name:    name,
+		Color:   color,
+		Players: 0,
+		Planets: 0,
+	})
 }
 
 func (t *Teams) Len() int {
