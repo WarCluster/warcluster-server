@@ -11,3 +11,23 @@
    consumerSecret = "consumer-secret-goes-here"
    accessToken = "access-token-goes-here"
    accessTokenSecret = "access-token-secret-goes-here"
+
+[team "init Lab"]
+    red = 0.89215686
+    green = 0.031372549
+    blue = 0.054901961
+
+[team "VarnaLab"]
+    red = 0.95490196
+    green = 0.29411765
+    blue = 0.058823529
+
+[team "Hackafe"]
+    red = 0.99372549
+    green = 0.79411765
+    blue = 0.015686275
+
+[team "BurgasLab"]
+    red = 0.28235294
+    green = 0.64901961
+    blue = 0.074509804

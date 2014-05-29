@@ -24,6 +24,11 @@ type Config struct {
 		AccessToken       string
 		AccessTokenSecret string
 	}
+	Team map[string]*struct {
+		Red   float32
+		Green float32
+		Blue  float32
+	}
 }
 
 func (c *Config) Load(name string) {
