@@ -33,9 +33,10 @@ type Team struct {
 type Teams []*Team
 
 type Leaderboard struct {
-	places map[string]int
-	board  []*Player
-	teams  Teams
+	places  map[string]int
+	board   []*Player
+	teams   Teams
+	Channel chan [2]string
 }
 
 func New() *Leaderboard {
@@ -43,6 +44,16 @@ func New() *Leaderboard {
 	l.places = make(map[string]int)
 	l.board = make([]*Player, 0)
 	l.teams = make([]*Team, 0)
+	l.Channel = make(chan [2]string)
+
+	go func(l *Leaderboard) {
+		var transfer [2]string
+		for {
+			transfer = <-l.Channel
+			l.Transfer(transfer[0], transfer[1])
+		}
+	}(l)
+
 	return l
 }
 
@@ -118,18 +129,18 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 	l.board[to].Planets++
 
 	if hasOwner {
-		l.moveDown(from_username)
 		team := l.FindTeam(l.board[from].Team)
 		if team != nil {
 			team.Planets--
 		}
+		l.moveDown(from_username)
 	}
 
-	l.moveUp(to_username)
 	team := l.FindTeam(l.board[to].Team)
 	if team != nil {
 		team.Planets++
 	}
+	l.moveUp(to_username)
 	l.teams.Sort()
 }
 

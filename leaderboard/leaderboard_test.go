@@ -225,3 +225,39 @@ func TestTakePlanetsWithoutOwner(t *testing.T) {
 		)
 	}
 }
+
+func TestTeamPlanetsTransfer(t *testing.T) {
+	d := New()
+	d.board = []*Player{
+		{Username: "0", Planets: 10, Team: Color{13, 11, 92}},
+		{Username: "1", Planets: 10, Team: Color{16, 5, 90}},
+		{Username: "2", Planets: 9, Team: Color{16, 5, 90}},
+		{Username: "3", Planets: 8, Team: Color{13, 11, 92}},
+		{Username: "4", Planets: 7, Team: Color{6, 9, 90}},
+	}
+
+	d.places = map[string]int{
+		"0": 0,
+		"1": 1,
+		"2": 2,
+		"3": 3,
+		"4": 4,
+	}
+
+	d.teams = Teams{
+		{Color: Color{13, 11, 92}},
+		{Color: Color{6, 9, 90}},
+		{Color: Color{16, 5, 90}},
+	}
+
+	d.RecountTeamsPlanets()
+
+	d.Transfer("", "3")
+	d.Transfer("", "3")
+	d.Transfer("", "2")
+
+	planets := d.FindTeam(Color{13, 11, 92}).Planets
+	if planets != 20 {
+		t.Errorf("This team has %d", planets)
+	}
+}
