@@ -107,6 +107,13 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 		return nil, errors.New("Incomplete credentials")
 	}
 
+	serverParamsMessage := response.NewServerParams()
+	marshalledMessage, err := json.Marshal(serverParamsMessage)
+	if err != nil {
+		return nil, errors.New("Failed to provide server params.")
+	}
+	session.Send(marshalledMessage)
+
 	nickname = request.Username
 	twitterId = request.TwitterID
 
@@ -116,7 +123,6 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 		if err != nil {
 			return nil, errors.New("Reading client data failed.")
 		}
-
 		player = register(setupData, nickname, twitterId)
 	} else {
 		player = entity.(*entities.Player)
