@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
 
 	"github.com/ChimeraCoder/anaconda"
@@ -106,6 +107,8 @@ func authenticate(session sockjs.Session) (*entities.Player, error) {
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
 		return nil, errors.New("Incomplete credentials")
 	}
+
+	log.Printf("-> %s", message)
 
 	serverParamsMessage := response.NewServerParams()
 	marshalledMessage, err := json.Marshal(serverParamsMessage)

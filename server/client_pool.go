@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"errors"
+	"log"
 	"sync"
 
 	"warcluster/entities"
@@ -89,4 +90,6 @@ func (cp *ClientPool) Send(player *entities.Player, response response.Responser)
 		client := element.Value.(*Client)
 		client.Session.Send(message)
 	}
+
+	log.Printf("<- %s", message)
 }
