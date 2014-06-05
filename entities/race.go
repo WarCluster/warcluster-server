@@ -21,7 +21,7 @@ func (r *Race) Color() Color {
 }
 
 func (r *Race) Name() string {
-	names := []string{"Init Lab", "Varna Lab", "Burgas Lab", "Vratsa Lab", "Space lab", "Bio Lab"}
+	names := []string{"Hackafe", "BurgasLab", "InitLab", "VarnaLab", "Space lab", "Bio Lab"}
 	return names[r.ID]
 }
 

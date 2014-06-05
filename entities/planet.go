@@ -54,7 +54,6 @@ func (p *Planet) Sanitize(player *Player) *PlanetPacket {
 
 	if p.Owner != player.Username {
 		packet.ShipCount = -1
-
 		for _, spyReport := range player.SpyReports {
 			if spyReport.Name == p.Name && spyReport.IsValid() {
 				packet.ShipCount = spyReport.ShipCount
@@ -79,19 +78,23 @@ func (p *Planet) SetShipCount(count int32) {
 	p.LastShipCountUpdate = time.Now().Unix()
 }
 
+func ShipCountTimeMod(size int8, isHome bool) int64 {
+	var timeModifier int64
+	if isHome {
+		timeModifier = 2
+	} else {
+		timeModifier = 6 - int64(size/3)
+	}
+	return timeModifier * 10
+}
+
 // Updates the ship count based on last time this count has
 // been updated and of course the planet size.
 // NOTE: If the planet is somebody's home we set a static increasion rate.
 func (p *Planet) UpdateShipCount() {
-	var timeModifier int64
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
-		if p.IsHome {
-			timeModifier = 2
-		} else {
-			timeModifier = 6 - int64(p.Size/3)
-		}
-		p.ShipCount += int32(passedTime / (timeModifier * 10))
+		p.ShipCount += int32(passedTime / ShipCountTimeMod(p.Size, p.IsHome))
 		p.LastShipCountUpdate = time.Now().Unix()
 	}
 }

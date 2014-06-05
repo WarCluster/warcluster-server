@@ -103,7 +103,7 @@ func handler(session sockjs.Session) {
 	client, logResponse, err := login(session)
 	if err != nil {
 		log.Print("Error in server.main.handler.login:", err.Error())
-
+		log.Println(err.Error())
 		message, err := json.Marshal(logResponse)
 		if err != nil {
 			log.Println(err.Error())
@@ -116,6 +116,7 @@ func handler(session sockjs.Session) {
 	defer clients.Remove(client)
 
 	clients.Send(client.Player, logResponse)
+
 	client.Player.UpdateSpyReports()
 	for {
 		message := session.Receive()
