@@ -26,7 +26,9 @@ func (suite *ClientTestSuite) SetupTest() {
 	suite.conn = db.Pool.Get()
 	suite.conn.Do("FLUSHDB")
 	suite.session = new(testSession)
-	InitLeaderboard(leaderboard.New())
+
+	cfg.Load("../config/config.gcfg")
+	InitLeaderboard(leaderboard.New(), cfg)
 }
 
 func (suite *ClientTestSuite) TearDownTest() {
@@ -86,7 +88,6 @@ func (suite *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
 
 	assert.Equal(suite.T(), before, after)
 }
-
 
 func (suite *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
 	setup := "{\"Command\": \"setup\", \"Fraction\": 0, \"SunTextureId\": 0}"
