@@ -9,9 +9,18 @@ import (
 )
 
 const (
-	CANVAS_OFFSET_X = 10000
-	CANVAS_OFFSET_Y = 10000
+	CANVAS_OFFSET_X = 0
+	CANVAS_OFFSET_Y = 0
 )
+
+func contains(vector []string, str string) bool {
+	for _, elem := range vector {
+		if elem == str {
+			return true
+		}
+	}
+	return false
+}
 
 type ScopeOfView struct {
 	baseResponse
@@ -30,8 +39,26 @@ func (s *ScopeOfView) Sanitize(player *entities.Player) {
 }
 
 // TODO: Use vector for rawPlanets
-func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
-	topLeft, bottomRight := calculateCanvasSize(position, resolution)
+func NewScopeOfView(oldposition, newposition *vec2d.Vector, oldresolution, newresolution []uint16) *ScopeOfView {
+
+	var oldMissions []string
+	var oldRawPlanets []string
+	var oldSuns []string
+
+	oldEntityList := entities.GetAreasMembers(listAreas(calculateCanvasSize(oldposition, oldresolution)))
+	for _, entity := range oldEntityList {
+		switch entity.(type) {
+		case *entities.Mission:
+			oldMissions = append(oldMissions, entity.Key())
+		case *entities.Planet:
+			oldRawPlanets = append(oldRawPlanets, entity.Key())
+		case *entities.Sun:
+			oldSuns = append(oldSuns, entity.Key())
+		default:
+		}
+	}
+
+	topLeft, bottomRight := calculateCanvasSize(newposition, newresolution)
 	areas := listAreas(topLeft, bottomRight)
 	entityList := entities.GetAreasMembers(areas)
 
@@ -47,11 +74,17 @@ func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
 	for _, entity := range entityList {
 		switch entity.(type) {
 		case *entities.Mission:
-			s.Missions[entity.Key()] = entity.(*entities.Mission)
+			if !contains(oldMissions, entity.Key()) {
+				s.Missions[entity.Key()] = entity.(*entities.Mission)
+			}
 		case *entities.Planet:
-			s.rawPlanets[entity.Key()] = entity.(*entities.Planet)
+			if !contains(oldRawPlanets, entity.Key()) {
+				s.rawPlanets[entity.Key()] = entity.(*entities.Planet)
+			}
 		case *entities.Sun:
-			s.Suns[entity.Key()] = entity.(*entities.Sun)
+			if !contains(oldSuns, entity.Key()) {
+				s.Suns[entity.Key()] = entity.(*entities.Sun)
+			}
 		default:
 		}
 	}

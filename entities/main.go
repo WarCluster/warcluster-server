@@ -13,7 +13,7 @@ import (
 
 const (
 	AREA_TEMPLATE       = "area:%d:%d"
-	AREA_SIZE           = 10000
+	AREA_SIZE           = 5000
 	PLANETS_RING_OFFSET = 300
 	PLANET_RADIUS       = 300
 	PLANET_COUNT        = 10
