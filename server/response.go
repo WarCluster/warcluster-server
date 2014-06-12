@@ -11,8 +11,13 @@ import (
 // to call calculateCanvasSize and give the player the information
 // contained in the given borders.
 func scopeOfView(request *Request) error {
-	response := response.NewScopeOfView(request.Position, request.Resolution)
+	response := response.NewScopeOfView(request.Client.Player.ScreenPosition, request.Position,
+		request.Client.Player.ScreenSize, request.Resolution)
+
 	request.Client.Player.ScreenPosition = request.Position
+	request.Client.Player.ScreenSize[0] = request.Resolution[0]
+	request.Client.Player.ScreenSize[1] = request.Resolution[1]
+
 	go entities.Save(request.Client.Player)
 	clients.Send(request.Client.Player, response)
 	return nil
