@@ -6,17 +6,11 @@ import (
 	"warcluster/entities"
 )
 
-type Fraction struct {
-	Id    uint16
-	Color entities.Color
-	Name  string
-}
-
 type LoginSuccess struct {
 	baseResponse
 	Username   string
 	Position   *vec2d.Vector
-	Fraction   Fraction
+	RaceID     uint8
 	HomePlanet struct {
 		Name     string
 		Position *vec2d.Vector
@@ -43,7 +37,7 @@ func NewLoginSuccess(player *entities.Player, homePlanet *entities.Planet) *Logi
 	r := new(LoginSuccess)
 	r.Command = "login_success"
 	r.Username = player.Username
-	r.Fraction = Fraction{player.Race.ID, player.Race.Color(), player.Race.Name()}
+	r.RaceID = player.RaceID
 	r.Position = player.ScreenPosition
 	r.HomePlanet.Name = homePlanet.Name
 	r.HomePlanet.Position = homePlanet.Position
@@ -70,9 +64,9 @@ func NewServerParams() *ServerParams {
 	r.PlanetsSPM = make(map[string]float64)
 
 	r.Command = "server_params"
-	for raceIdx := 0; raceIdx < entities.RACE_VARIATION_CNT; raceIdx++ {
-		race, _ := entities.AssignRace(uint16(raceIdx))
-		r.Teams[race.Name()] = race.Color()
+	for raceIdx := 0; raceIdx < len(entities.Races); raceIdx++ {
+		race := entities.Races[uint8(raceIdx)]
+		r.Teams[race.Name] = race.Color
 	}
 	r.HomeSPM = 60 / float64(entities.ShipCountTimeMod(1, true))
 	for planetSizeIdx = 1; planetSizeIdx <= 10; planetSizeIdx++ {

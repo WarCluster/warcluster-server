@@ -13,7 +13,7 @@ import (
 
 const (
 	user        = "{\"Command\": \"login\", \"Username\": \"JohnDoe\", \"TwitterId\": \"some twitter ID\"}"
-	setupParams = "{\"Command\": \"setup_parameters\", \"Fraction\": 0, \"SunTextureId\": 0}"
+	setupParams = "{\"Command\": \"setup_parameters\", \"Race\": 0, \"SunTextureId\": 0}"
 )
 
 type ClientTestSuite struct {
@@ -90,7 +90,7 @@ func (suite *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
 }
 
 func (suite *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
-	setup := "{\"Command\": \"setup\", \"Fraction\": 0, \"SunTextureId\": 0}"
+	setup := "{\"Command\": \"setup\", \"Race\": 0, \"SunTextureId\": 0}"
 
 	suite.session.Send([]byte(user))
 	suite.session.Send([]byte(setup))

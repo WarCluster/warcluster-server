@@ -7,6 +7,7 @@ import (
 	"errors"
 	"strings"
 
+	"warcluster/config"
 	"warcluster/entities/db"
 )
 
@@ -20,6 +21,14 @@ const (
 	SOLAR_SYSTEM_RADIUS = 9000
 	SPY_REPORT_VALIDITY = 30 // in seconds
 )
+
+type Race struct {
+	ID    uint8
+	Name  string
+	Color Color
+}
+
+var Races []Race
 
 // Entity interface is implemented by all entity types here
 type Entity interface {
@@ -184,4 +193,14 @@ func RemoveFromArea(key, from string) error {
 	defer conn.Close()
 
 	return db.Srem(conn, key, from)
+}
+
+func init() {
+	var cfg config.Config
+	cfg.Load("../config/config.gcfg")
+	var i uint8 = 0
+	Races = make([]Race, len(cfg.Team))
+	for name, color := range cfg.Team {
+		Races[i] = Race{i, name, Color{color.Red, color.Green, color.Blue}}
+	}
 }
