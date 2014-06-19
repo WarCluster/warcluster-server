@@ -14,7 +14,7 @@ import (
 
 var gophie entities.Player = entities.Player{
 	Username:       "gophie",
-	Race:           entities.Race{1},
+	RaceID:         1,
 	TwitterID:      "gophie92",
 	HomePlanet:     "planet.GOP6720",
 	ScreenSize:     []uint16{1, 1},
@@ -23,7 +23,7 @@ var gophie entities.Player = entities.Player{
 
 var panda entities.Player = entities.Player{
 	Username:       "panda",
-	Race:           entities.Race{1},
+	RaceID:         1,
 	TwitterID:      "panda13",
 	HomePlanet:     "planet.PAN6720",
 	ScreenSize:     []uint16{1, 1},
@@ -80,7 +80,7 @@ func (suite *ResponseTestSuite) SetupTest() {
 	suite.request.Fleet = 32
 	suite.request.Username = "gophie"
 	suite.request.TwitterID = "gophie92"
-	suite.request.Fraction = 4
+	suite.request.Race = 4
 	suite.request.SunTextureId = 0
 	suite.request.Client = &client
 	suite.request.Type = "Spy"

@@ -28,7 +28,7 @@ type Request struct {
 	Fleet        int32
 	Username     string
 	TwitterID    string
-	Fraction     uint16
+	Race         uint8
 	SunTextureId uint16
 }
 

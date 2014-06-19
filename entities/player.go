@@ -10,7 +10,7 @@ import (
 
 type Player struct {
 	Username       string
-	Race           Race
+	RaceID         uint8
 	TwitterID      string
 	HomePlanet     string
 	ScreenSize     []uint16
@@ -44,7 +44,7 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 	source.SetShipCount(baseShipCount - shipCount)
 
 	mission := Mission{
-		Color: p.Race.Color(),
+		Color: Races[p.RaceID].Color,
 		Source: embeddedPlanet{
 			Name:     source.Name,
 			Owner:    source.Owner,
@@ -91,14 +91,10 @@ func CreatePlayer(username, TwitterID string, homePlanet *Planet, setupData *Set
 		ScreenSize:     []uint16{0, 0},
 		ScreenPosition: homePlanet.Position,
 	}
-	newPlayerRace, err := AssignRace(setupData.Fraction)
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	player.Race = *newPlayerRace
+
+	player.RaceID = setupData.Race
 
 	homePlanet.Owner = username
-	homePlanet.Color = player.Race.Color()
+	homePlanet.Color = Races[player.RaceID].Color
 	return &player
 }

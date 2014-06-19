@@ -72,7 +72,7 @@ func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
 		return nil, errors.New("Wrong command")
 	}
 
-	accountData.Fraction = request.Fraction
+	accountData.Race = request.Race
 	accountData.SunTextureId = request.SunTextureId
 
 	if err := accountData.Validate(); err != nil {
@@ -164,7 +164,7 @@ func register(setupData *entities.SetupData, nickname, twitterId string) *entiti
 	clients.BroadcastToAll(stateChange)
 	leaderBoard.Add(&leaderboard.Player{
 		Username:   player.Username,
-		Team:       player.Race.Color(),
+		Team:       entities.Races[player.RaceID].Color,
 		HomePlanet: homePlanet.Name,
 		Planets:    1,
 	})

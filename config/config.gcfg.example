@@ -12,7 +12,7 @@
    accessToken = "access-token-goes-here"
    accessTokenSecret = "access-token-secret-goes-here"
 
-[team "init Lab"]
+[team "initLab"]
     red = 0.89215686
     green = 0.031372549
     blue = 0.054901961
