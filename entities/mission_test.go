@@ -57,9 +57,17 @@ func TestMissionMarshalling(t *testing.T) {
 }
 
 func TestEndAttackMission(t *testing.T) {
-	var excessShips int32
+	var (
+		excessShips     int32
+		ownerHasChanged bool
+	)
 
-	excessShips = secondMission.EndAttackMission(&endPlanet)
+	excessShips, ownerHasChanged = secondMission.EndAttackMission(&endPlanet)
+
+	if ownerHasChanged {
+		t.Error("Owner has changed after a mission weaker than his planet")
+	}
+
 	if endPlanet.GetShipCount() != 12 {
 		t.Error("End Planet ship count was expected  to be 12 but it is:", endPlanet.GetShipCount())
 	}
@@ -69,7 +77,12 @@ func TestEndAttackMission(t *testing.T) {
 	}
 
 	mission.ShipCount = 15
-	excessShips = mission.EndAttackMission(&endPlanet)
+	excessShips, ownerHasChanged = mission.EndAttackMission(&endPlanet)
+
+	if !ownerHasChanged {
+		t.Error("Owner did not change after attack with a stronger mission")
+	}
+
 	if endPlanet.GetShipCount() != 3 {
 		t.Error("End Planet ship count was expected  to be 3 but it is:", endPlanet.GetShipCount())
 	}
@@ -84,12 +97,21 @@ func TestEndAttackMission(t *testing.T) {
 }
 
 func TestEndAttackMissionDenyTakeover(t *testing.T) {
-	var excessShips int32
+	var (
+		excessShips     int32
+		ownerHasChanged bool
+	)
+
 	endPlanet := new(Planet)
 	*endPlanet = Planet{"", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(2, 2), true, 6, 3, timeStamp, 2, 0, "chochko"}
 
 	mission.ShipCount = 5
-	excessShips = mission.EndAttackMission(endPlanet)
+	excessShips, ownerHasChanged = mission.EndAttackMission(endPlanet)
+
+	if ownerHasChanged {
+		t.Error("Owner has changed after a mission weaker than his planet")
+	}
+
 	if endPlanet.GetShipCount() != 0 {
 		t.Error("End Planet ship count was expected to be 0 but it is:", endPlanet.GetShipCount())
 	}
