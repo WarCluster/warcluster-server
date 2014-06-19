@@ -30,11 +30,13 @@ func FetchMissionTarget(targetKey string) (*entities.Planet, *response.StateChan
 // 2. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
 func StartMissionary(mission *entities.Mission) {
 	var (
-		timeSlept   time.Duration = 0
-		excessShips int32
-		target      *entities.Planet
-		stateChange *response.StateChange
-		err         error
+		err             error
+		excessShips     int32
+		ownerHasChanged bool
+		player          *entities.Player
+		stateChange     *response.StateChange
+		target          *entities.Planet
+		timeSlept       time.Duration = 0
 	)
 	entities.Save(mission)
 	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
@@ -53,13 +55,13 @@ func StartMissionary(mission *entities.Mission) {
 	}
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
+	target, stateChange, err = FetchMissionTarget(targetKey)
+	ownerBeforeMission := target.Owner
 
-	var player *entities.Player
-
-	if mission.Target.Owner == "" {
+	if ownerBeforeMission == "" {
 		player = nil
 	} else {
-		playerEntity, pErr := entities.Get(fmt.Sprintf("player.%s", mission.Target.Owner))
+		playerEntity, pErr := entities.Get(fmt.Sprintf("player.%s", ownerBeforeMission))
 		if pErr != nil {
 			log.Println("Error in target planet owner fetch:", pErr.Error())
 			return
@@ -69,38 +71,21 @@ func StartMissionary(mission *entities.Mission) {
 
 	switch mission.Type {
 	case "Attack":
-		target, stateChange, err = FetchMissionTarget(targetKey)
 		if err != nil {
 			log.Print("Error in target planet fetch:", err.Error())
 		}
-		ownerBefore := target.Owner
-		excessShips = mission.EndAttackMission(target)
+		excessShips, ownerHasChanged = mission.EndAttackMission(target)
 		clients.BroadcastToAll(stateChange)
-		if ownerBefore != target.Owner {
-			go func(owned, owner string) {
-				leaderBoard.Channel <- [2]string{owned, owner}
-			}(ownerBefore, target.Owner)
-
-			if player != nil {
-				ownerChange := response.NewOwnerChange()
-				ownerChange.RawPlanet = map[string]*entities.Planet{
-					target.Key(): target,
-				}
-				clients.Send(player, ownerChange)
-			}
-		}
 	case "Supply":
-		target, stateChange, err = FetchMissionTarget(targetKey)
 		if err != nil {
 			log.Print("Error in target planet fetch:", err.Error())
 		}
-		excessShips = mission.EndSupplyMission(target)
+		excessShips, ownerHasChanged = mission.EndSupplyMission(target)
 		if player != nil {
 			clients.Send(player, stateChange)
 		}
 	case "Spy":
 		for {
-			target, stateChange, err = FetchMissionTarget(targetKey)
 			if err != nil {
 				log.Print("Error in target planet fetch:", err.Error())
 			}
@@ -116,6 +101,7 @@ func StartMissionary(mission *entities.Mission) {
 			} else {
 				break
 			}
+			target, stateChange, err = FetchMissionTarget(targetKey)
 		}
 		time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
 		updateSpyReports(mission, stateChange)
@@ -124,6 +110,20 @@ func StartMissionary(mission *entities.Mission) {
 	entities.RemoveFromArea(mission.Key(), mission.AreaSet())
 	entities.Delete(mission.Key())
 	entities.Save(target)
+
+	if ownerHasChanged {
+		go func(owned, owner string) {
+			leaderBoard.Channel <- [2]string{owned, owner}
+		}(ownerBeforeMission, target.Owner)
+
+		if player != nil {
+			ownerChange := response.NewOwnerChange()
+			ownerChange.RawPlanet = map[string]*entities.Planet{
+				target.Key(): target,
+			}
+			clients.Send(player, ownerChange)
+		}
+	}
 
 	if excessShips > 0 {
 		startExcessMission(mission, target, excessShips)
