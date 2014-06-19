@@ -64,8 +64,8 @@ func NewServerParams() *ServerParams {
 	r.PlanetsSPM = make(map[string]float64)
 
 	r.Command = "server_params"
-	for raceIdx := 0; raceIdx < len(entities.Races); raceIdx++ {
-		race := entities.Races[uint8(raceIdx)]
+	for raceIdx := range entities.Races {
+		race := entities.Races[raceIdx]
 		r.Teams[race.Name] = race.Color
 	}
 	r.HomeSPM = 60 / float64(entities.ShipCountTimeMod(1, true))

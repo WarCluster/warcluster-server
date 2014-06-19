@@ -202,5 +202,6 @@ func init() {
 	Races = make([]Race, len(cfg.Team))
 	for name, color := range cfg.Team {
 		Races[i] = Race{i, name, Color{color.Red, color.Green, color.Blue}}
+		i++
 	}
 }
