@@ -2,15 +2,15 @@ package response
 
 import (
 	"fmt"
-
+	"log"
 	"github.com/Vladimiroff/vec2d"
 
 	"warcluster/entities"
 )
 
 const (
-	CANVAS_OFFSET_X = 10000
-	CANVAS_OFFSET_Y = 10000
+	CANVAS_OFFSET_X = 0
+	CANVAS_OFFSET_Y = 0
 )
 
 type ScopeOfView struct {
@@ -70,6 +70,7 @@ func calculateCanvasSize(position *vec2d.Vector, resolution []uint16) (*vec2d.Ve
 		position.X+float64(resolution[0]+CANVAS_OFFSET_X)/2,
 		position.Y-float64(resolution[1]+CANVAS_OFFSET_Y)/2,
 	)
+	log.Println("calculateCanvasSize: ", position.X, position.Y, resolution[0], resolution[1], topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
 	return topLeft, bottomRight
 }
 
@@ -79,11 +80,14 @@ func listAreas(topLeft, bottomRight *vec2d.Vector) []string {
 	bottomRightX := entities.RoundCoordinateTo(bottomRight.X)
 	bottomRightY := entities.RoundCoordinateTo(bottomRight.Y)
 
+	log.Println("1.listAreas: ", topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y, topLeftX, topLeftY, bottomRightX, bottomRightY)
+
 	var output []string
 
-	for xIter := topLeftX; xIter <= bottomRightX; xIter++ {
-		for yIter := topLeftY; yIter >= bottomRightY; yIter-- {
+	for xIter := topLeftX; xIter < bottomRightX; xIter++ {
+		for yIter := bottomRightY; yIter < topLeftY; yIter++ {
 			if xIter != 0 && yIter != 0 {
+				log.Println("### 3.listAreas: ", xIter, yIter)
 				output = append(output, fmt.Sprintf("area:%v:%v", xIter, yIter))
 			}
 		}
