@@ -91,9 +91,8 @@ func CreatePlayer(username, TwitterID string, homePlanet *Planet, setupData *Set
 		ScreenSize:     []uint16{0, 0},
 		ScreenPosition: homePlanet.Position,
 	}
-	newPlayerRace := Races[setupData.Race]
 
-	player.RaceID = newPlayerRace.ID
+	player.RaceID = setupData.Race
 
 	homePlanet.Owner = username
 	homePlanet.Color = Races[player.RaceID].Color
