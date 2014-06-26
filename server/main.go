@@ -88,7 +88,7 @@ func consoleHandler(response http.ResponseWriter, request *http.Request) {
 	if cfg.Server.Console {
 		http.ServeFile(response, request, path.Join(getStaticDir(), "/index.html"))
 	} else {
-		http.ServeFile(response, request, path.Join(getStaticDir(), "/troll_face.png"))
+		http.NotFound(response, request)
 	}
 }
 
