@@ -198,10 +198,9 @@ func RemoveFromArea(key, from string) error {
 func init() {
 	var cfg config.Config
 	cfg.Load("../config/config.gcfg")
-	var i uint8 = 0
+
 	Races = make([]Race, len(cfg.Team))
 	for name, params := range cfg.Team {
-		Races[i] = Race{params.Id, name, Color{params.Red, params.Green, params.Blue}}
-		i++
+		Races = append(Races, Race{params.Id, name, Color{params.Red, params.Green, params.Blue}})
 	}
 }
