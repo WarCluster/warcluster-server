@@ -139,7 +139,7 @@ func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duratio
 // If that's true we simply increment the ship count on that planet. If not we do the
 // math and decrease the count ship on the attacked planet. We should check if the attacker
 // should own that planet, which comes with all the changing colors and owner stuff.
-func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
+func (m *Mission) EndAttackMission(target *Planet) (excessShips int32, ownerHasChanged bool) {
 	if target.Owner == m.Player {
 		m.Target.Owner = target.Owner
 		m.Type = "Supply"
@@ -155,6 +155,7 @@ func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
 				target.SetShipCount(m.ShipCount - target.ShipCount)
 				target.Owner = m.Player
 				target.Color = m.Color
+				ownerHasChanged = true
 			}
 		}
 	}
@@ -164,24 +165,24 @@ func (m *Mission) EndAttackMission(target *Planet) (excessShips int32) {
 // End Supply Mission: We simply increase the ship count and we're done :P
 // If however the owner of the target planet has changed we change the mission type
 // to attack.
-func (m *Mission) EndSupplyMission(target *Planet) int32 {
+func (m *Mission) EndSupplyMission(target *Planet) (int32, bool) {
 	if target.Owner != m.Target.Owner {
 		m.Type = "Attack"
 		return m.EndAttackMission(target)
 	}
 
 	target.SetShipCount(target.ShipCount + m.ShipCount)
-	return 0
+	return 0, false
 }
 
 // End Spy Mission: Create a spy report for that planet and find a way to notify the logged in
 // instances of the user who sent this mission.
-func (m *Mission) EndSpyMission(target *Planet) int32 {
+func (m *Mission) EndSpyMission(target *Planet) (int32, bool) {
 	if target.Owner == m.Player {
 		m.Target.Owner = target.Owner
 		return m.EndSupplyMission(target)
 	}
 	CreateSpyReport(target, m)
 	m.ShipCount -= 1
-	return 0
+	return 0, false
 }
