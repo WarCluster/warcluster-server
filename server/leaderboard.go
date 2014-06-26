@@ -42,15 +42,15 @@ func leaderboardPlayersHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(result))
 }
 
-func leaderboardTeamsHandler(w http.ResponseWriter, r *http.Request) {
+func leaderboardRacesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	teams, err := json.Marshal(leaderBoard.Teams())
+	races, err := json.Marshal(leaderBoard.Races())
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-	fmt.Fprintf(w, string(teams))
+	fmt.Fprintf(w, string(races))
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,8 +84,8 @@ func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
 	allPlayers := make(map[string]*leaderboard.Player)
 	planetEntities := entities.Find("planet.*")
 
-	for key, value := range cfg.Team {
-		board.AddTeam(
+	for key, value := range cfg.Race {
+		board.AddRace(
 			key,
 			leaderboard.Color{
 				value.Red,
@@ -106,7 +106,7 @@ func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
 		if !ok {
 			player = &leaderboard.Player{
 				Username: planet.Owner,
-				Team:     planet.Color,
+				Race:     planet.Color,
 				Planets:  0,
 			}
 			allPlayers[planet.Owner] = player
@@ -120,6 +120,6 @@ func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
 		player.Planets++
 	}
 	board.Sort()
-	board.RecountTeamsPlanets()
+	board.RecountRacesPlanets()
 	leaderBoard = board
 }

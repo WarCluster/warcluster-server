@@ -25,7 +25,7 @@ type Config struct {
 		AccessToken       string
 		AccessTokenSecret string
 	}
-	Team map[string]*struct {
+	Race map[string]*struct {
 		Id    uint8
 		Red   float32
 		Green float32
