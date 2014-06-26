@@ -11,8 +11,9 @@ import (
 
 type Config struct {
 	Server struct {
-		Host string
-		Port uint16
+		Host    string
+		Port    uint16
+		Console bool
 	}
 	Database struct {
 		Host string

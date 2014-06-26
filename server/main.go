@@ -39,11 +39,10 @@ func Start() error {
 	mux := sockjs.NewServeMux(http.DefaultServeMux)
 	conf := sockjs.NewConfig()
 
-	http.HandleFunc("/console", staticHandler)
+	http.HandleFunc("/console", consoleHandler)
 	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
 	http.HandleFunc("/leaderboard/teams/", leaderboardTeamsHandler)
 	http.HandleFunc("/search/", searchHandler)
-	http.Handle("/static", http.FileServer(http.Dir(getStaticDir())))
 	mux.Handle("/universe", handler, conf)
 
 	if err := ListenAndServe(fmt.Sprintf("%v:%v", host, port), mux); err != nil {
@@ -82,8 +81,15 @@ func Stop() error {
 }
 
 // Returns the HTML page needed to display the debug page (server "chat" window).
-func staticHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, path.Join(getStaticDir(), "/index.html"))
+func consoleHandler(response http.ResponseWriter, request *http.Request) {
+	response.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
+	response.Header().Add("Pragma", "no-cache")                                   // HTTP 1.0.
+	response.Header().Add("Expires", "0")                                         // Proxies
+	if cfg.Server.Console {
+		http.ServeFile(response, request, path.Join(getStaticDir(), "/index.html"))
+	} else {
+		http.ServeFile(response, request, path.Join(getStaticDir(), "/troll_face.png"))
+	}
 }
 
 // On the first received message from each connection the server will call the handler.
