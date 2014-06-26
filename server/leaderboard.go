@@ -82,36 +82,36 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
 	log.Println("Initializing the leaderboard...")
 	allPlayers := make(map[string]*leaderboard.Player)
+	playerEntities := entities.Find("player.*")
 	planetEntities := entities.Find("planet.*")
 
 	for key, value := range cfg.Race {
 		board.AddRace(
 			key,
-			leaderboard.Color{
-				value.Red,
-				value.Green,
-				value.Blue,
-			},
+			value.Id,
 		)
+	}
+
+	for _, playerEntity := range playerEntities {
+		player := playerEntity.(*entities.Player)
+
+		leaderboardPlayer := &leaderboard.Player{
+			Username: player.Username,
+			RaceId:   player.RaceID,
+			Planets:  0,
+		}
+		allPlayers[player.Username] = leaderboardPlayer
+		board.Add(leaderboardPlayer)
 	}
 
 	for _, entity := range planetEntities {
 		planet, ok := entity.(*entities.Planet)
-		if !planet.HasOwner() {
+
+		if !planet.HasOwner() || !ok {
 			continue
 		}
 
-		player, ok := allPlayers[planet.Owner]
-
-		if !ok {
-			player = &leaderboard.Player{
-				Username: planet.Owner,
-				Race:     planet.Color,
-				Planets:  0,
-			}
-			allPlayers[planet.Owner] = player
-			board.Add(player)
-		}
+		player, _ := allPlayers[planet.Owner]
 
 		if planet.IsHome {
 			player.HomePlanet = planet.Name

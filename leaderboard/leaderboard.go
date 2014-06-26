@@ -13,19 +13,15 @@ type Color struct {
 }
 
 type Player struct {
-	Username string
-	Race     struct {
-		R float32
-		G float32
-		B float32
-	}
+	Username   string
+	RaceId     uint8
 	HomePlanet string
 	Planets    uint32
 }
 
 type Race struct {
 	Name    string
-	Color   Color
+	Id      uint8
 	Players uint32
 	Planets uint32
 }
@@ -62,7 +58,7 @@ func (l *Leaderboard) Add(player *Player) {
 	l.places[player.Username] = len(l.board) - 1
 
 	for _, race := range l.races {
-		if player.Race == race.Color {
+		if player.RaceId == race.Id {
 			race.Players++
 			race.Planets += player.Planets
 			return
@@ -70,9 +66,9 @@ func (l *Leaderboard) Add(player *Player) {
 	}
 }
 
-func (l *Leaderboard) FindRace(color Color) *Race {
+func (l *Leaderboard) FindRace(raceId uint8) *Race {
 	for _, race := range l.races {
-		if race.Color == color {
+		if race.Id == raceId {
 			return race
 		}
 	}
@@ -105,7 +101,7 @@ func (l *Leaderboard) RecountRacesPlanets() {
 	}
 
 	for _, player := range l.board {
-		race := l.FindRace(player.Race)
+		race := l.FindRace(player.RaceId)
 		if race != nil {
 			race.Planets += player.Planets
 		}
@@ -122,14 +118,14 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 	l.board[to].Planets++
 
 	if hasOwner {
-		race := l.FindRace(l.board[from].Race)
+		race := l.FindRace(l.board[from].RaceId)
 		if race != nil {
 			race.Planets--
 		}
 		l.moveDown(from_username)
 	}
 
-	race := l.FindRace(l.board[to].Race)
+	race := l.FindRace(l.board[to].RaceId)
 	if race != nil {
 		race.Planets++
 	}
@@ -202,10 +198,10 @@ func (l *Leaderboard) moveDown(username string) bool {
 	return l.move(username, 1)
 }
 
-func (l *Leaderboard) AddRace(name string, color Color) {
+func (l *Leaderboard) AddRace(name string, raceId uint8) {
 	l.races = append(l.races, &Race{
 		Name:    name,
-		Color:   color,
+		Id:      raceId,
 		Players: 0,
 		Planets: 0,
 	})
