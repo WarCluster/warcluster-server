@@ -53,8 +53,8 @@
 
                 $('#loginform').submit(function() {
                     var text = {
-                        "Command": "login", 
-                        "Username": $('#loginName').val(), 
+                        "Command": "login",
+                        "Username": $('#loginName').val(),
                         "TwitterId": "some twitter ID"
                     }
                     conn.send(JSON.stringify(text));
@@ -63,8 +63,8 @@
 
                 $('#paramsform').submit(function() {
                     var text = {
-                        "Command": "setup_parameters", 
-                        "Fraction": parseInt($('#fraction').val()), 
+                        "Command": "setup_parameters",
+                        "Race": parseInt($('#fraction').val()),
                         "SunTextureId": parseInt($('#sunTextureId').val())
                     }
                     conn.send(JSON.stringify(text));

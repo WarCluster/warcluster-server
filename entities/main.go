@@ -199,8 +199,10 @@ func init() {
 	var cfg config.Config
 	cfg.Load("../config/config.gcfg")
 
-	Races = make([]Race, len(cfg.Team))
+	Races = make([]Race, len(cfg.Team), len(cfg.Team))
+	i := 0
 	for name, params := range cfg.Team {
-		Races = append(Races, Race{params.Id, name, Color{params.Red, params.Green, params.Blue}})
+		Races[i] = Race{params.Id, name, Color{params.Red, params.Green, params.Blue}}
+		i++
 	}
 }
