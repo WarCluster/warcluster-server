@@ -6,6 +6,8 @@ import (
 	"github.com/Vladimiroff/vec2d"
 
 	"warcluster/entities"
+
+	"log"
 )
 
 const (
@@ -114,8 +116,11 @@ func listAreas(topLeft, bottomRight *vec2d.Vector) []string {
 
 	var output []string
 
+	log.Println("1.listAreas: ", topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y, topLeftX, topLeftY, bottomRightX, bottomRightY)
+
 	for xIter := topLeftX; xIter <= bottomRightX; xIter++ {
-		for yIter := topLeftY; yIter >= bottomRightY; yIter-- {
+		for yIter := bottomRightY; yIter <= topLeftY; yIter++ {
+			log.Println("### 3.listAreas: ", xIter, yIter)
 			if xIter != 0 && yIter != 0 {
 				output = append(output, fmt.Sprintf("area:%v:%v", xIter, yIter))
 			}
