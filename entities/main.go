@@ -196,11 +196,11 @@ func moveToArea(key, from, to string) error {
 }
 
 // Remove a member from set
-func RemoveFromArea(key, from string) error {
+func RemoveFromArea(key, set string) error {
 	conn := db.Pool.Get()
 	defer conn.Close()
 
-	return db.Srem(conn, key, from)
+	return db.Srem(conn, set, key)
 }
 
 // Returns if entity is a member of the set
