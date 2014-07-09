@@ -25,7 +25,6 @@ func SpawnDbMissions() {
 		}
 		source := sourceEntity.(*entities.Planet)
 
-		initialTimeSlept := time.Duration(time.Now().UnixNano()/1e6 - mission.StartTime)
 		mission.SetAreaSet(source.AreaSet())
 		log.Printf(
 			"Spawning %s's mission from %s to %s...\n",
@@ -33,14 +32,14 @@ func SpawnDbMissions() {
 			mission.Source.Name,
 			mission.Target.Name,
 		)
-		go StartMissionary(mission, initialTimeSlept)
+		go StartMissionary(mission)
 	}
 }
 
 // StartMissionary is used when a call to initiate a new mission is rescived.
 // 1. When the delay ends the thread ends the mission calling EndMission
 // 2. The end of the mission is bradcasted to all clients and the mission entry is erased from the DB.
-func StartMissionary(mission *entities.Mission, initialTimeSlept time.Duration) {
+func StartMissionary(mission *entities.Mission) {
 	var (
 		err             error
 		excessShips     int32
@@ -52,10 +51,11 @@ func StartMissionary(mission *entities.Mission, initialTimeSlept time.Duration) 
 		timeSlept       time.Duration
 	)
 
-	if initialTimeSlept == 0 {
-		foundStartPoint = true
-	} else {
+	initialTimeSlept := time.Duration(time.Now().UnixNano()/1e6 - mission.StartTime)
+	if initialTimeSlept > 0 {
 		timeSlept = initialTimeSlept
+	} else {
+		foundStartPoint = true
 	}
 
 	entities.Save(mission)
@@ -172,7 +172,7 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 
 	excessMission := player.StartMission(homePlanet, newTargetEntity.(*entities.Planet), 100, "Attack")
 	excessMission.ShipCount = ships
-	go StartMissionary(excessMission, 0)
+	go StartMissionary(excessMission)
 	entities.Save(excessMission)
 
 	sendMission := response.NewSendMission()
