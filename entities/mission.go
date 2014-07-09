@@ -57,10 +57,9 @@ func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
 		y += int64(direction)
 	}
 
-	RemoveFromArea(m.Key(), m.areaSet)
+	oldAreaSet := m.areaSet
 	m.areaSet = fmt.Sprintf("area:%d:%d", x, y)
-	Save(m)
-
+	moveToArea(m.Key(), oldAreaSet, m.areaSet)
 }
 
 // Returns all transfer points this mission will ever cross
