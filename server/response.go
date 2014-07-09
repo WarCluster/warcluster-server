@@ -69,7 +69,7 @@ func parseAction(request *Request) error {
 	}
 
 	entities.Save(source)
-	go StartMissionary(mission)
+	go StartMissionary(mission, 0)
 	entities.Save(mission)
 
 	sendMission := response.NewSendMission()
