@@ -45,6 +45,11 @@ func (m *Mission) AreaSet() string {
 	return m.areaSet
 }
 
+// Setter of m.areaSet
+func (m *Mission) SetAreaSet(value string) {
+	m.areaSet = value
+}
+
 // Changes its areaset based on axis and direction and updates the db
 func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
 	areaParts := strings.Split(m.areaSet, ":")
