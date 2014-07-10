@@ -9,20 +9,31 @@ import (
 	"warcluster/server/response"
 )
 
-func FetchMissionTarget(targetKey string) (*entities.Planet, *response.StateChange, error) {
-	targetEntity, err := entities.Get(targetKey)
-	if err != nil {
-		return nil, nil, err
-	}
-	target := targetEntity.(*entities.Planet)
-	target.UpdateShipCount()
+// Spawns missionary for all mission records found
+// in the database when the server is started
+func SpawnDbMissions() {
+	for _, entity := range entities.Find("mission.*") {
+		mission, ok := entity.(*entities.Mission)
+		if !ok {
+			log.Printf("Record %s does not seem to be a mission!?\n", mission.Key())
+		}
 
-	stateChange := response.NewStateChange()
-	stateChange.RawPlanets = map[string]*entities.Planet{
-		target.Key(): target,
-	}
+		sourceKey := fmt.Sprintf("planet.%s", mission.Source.Name)
+		sourceEntity, err := entities.Get(sourceKey)
+		if err != nil {
+			log.Printf("Can't find planet %s for mission %s!?\n", sourceKey, mission.Key())
+		}
+		source := sourceEntity.(*entities.Planet)
 
-	return target, stateChange, nil
+		mission.SetAreaSet(source.AreaSet())
+		log.Printf(
+			"Spawning %s's mission from %s to %s...\n",
+			mission.Player,
+			mission.Source.Name,
+			mission.Target.Name,
+		)
+		go StartMissionary(mission)
+	}
 }
 
 // StartMissionary is used when a call to initiate a new mission is rescived.
@@ -33,14 +44,32 @@ func StartMissionary(mission *entities.Mission) {
 		err             error
 		excessShips     int32
 		ownerHasChanged bool
+		foundStartPoint bool
 		player          *entities.Player
 		stateChange     *response.StateChange
 		target          *entities.Planet
-		timeSlept       time.Duration = 0
+		timeSlept       time.Duration
 	)
+
+	initialTimeSlept := time.Duration(time.Now().UnixNano()/1e6 - mission.StartTime)
+	if initialTimeSlept > 0 {
+		timeSlept = initialTimeSlept
+	} else {
+		foundStartPoint = true
+	}
+
 	entities.Save(mission)
 	targetKey := fmt.Sprintf("planet.%s", mission.Target.Name)
 	for _, transferPoint := range mission.TransferPoints() {
+		if !foundStartPoint {
+			if initialTimeSlept > transferPoint.TravelTime {
+				initialTimeSlept -= transferPoint.TravelTime
+				mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
+				continue
+			} else {
+				foundStartPoint = true
+			}
+		}
 
 		timeToSleep := transferPoint.TravelTime - timeSlept
 		timeSlept += timeToSleep
@@ -55,7 +84,7 @@ func StartMissionary(mission *entities.Mission) {
 	}
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
-	target, stateChange, err = FetchMissionTarget(targetKey)
+	target, stateChange, err = fetchMissionTarget(targetKey)
 	ownerBeforeMission := target.Owner
 
 	if ownerBeforeMission == "" {
@@ -101,7 +130,7 @@ func StartMissionary(mission *entities.Mission) {
 			} else {
 				break
 			}
-			target, stateChange, err = FetchMissionTarget(targetKey)
+			target, stateChange, err = fetchMissionTarget(targetKey)
 		}
 		time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
 		updateSpyReports(mission, stateChange)
@@ -172,4 +201,20 @@ func updateSpyReports(mission *entities.Mission, state *response.StateChange) {
 		client.Player.UpdateSpyReports()
 	}
 	clients.Send(player, state)
+}
+
+func fetchMissionTarget(targetKey string) (*entities.Planet, *response.StateChange, error) {
+	targetEntity, err := entities.Get(targetKey)
+	if err != nil {
+		return nil, nil, err
+	}
+	target := targetEntity.(*entities.Planet)
+	target.UpdateShipCount()
+
+	stateChange := response.NewStateChange()
+	stateChange.RawPlanets = map[string]*entities.Planet{
+		target.Key(): target,
+	}
+
+	return target, stateChange, nil
 }

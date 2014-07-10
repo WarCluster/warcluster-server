@@ -45,6 +45,11 @@ func (m *Mission) AreaSet() string {
 	return m.areaSet
 }
 
+// Setter of m.areaSet
+func (m *Mission) SetAreaSet(value string) {
+	m.areaSet = value
+}
+
 // Changes its areaset based on axis and direction and updates the db
 func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
 	areaParts := strings.Split(m.areaSet, ":")
@@ -57,10 +62,9 @@ func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
 		y += int64(direction)
 	}
 
-	RemoveFromArea(m.Key(), m.areaSet)
+	oldAreaSet := m.areaSet
 	m.areaSet = fmt.Sprintf("area:%d:%d", x, y)
-	Save(m)
-
+	moveToArea(m.Key(), oldAreaSet, m.areaSet)
 }
 
 // Returns all transfer points this mission will ever cross

@@ -187,12 +187,32 @@ func GetAreasMembers(areas []string) []Entity {
 	return entityList
 }
 
-// Remove a member from set
-func RemoveFromArea(key, from string) error {
+// Move member from one set to another
+func moveToArea(key, from, to string) error {
 	conn := db.Pool.Get()
 	defer conn.Close()
 
-	return db.Srem(conn, key, from)
+	return db.Smove(conn, from, to, key)
+}
+
+// Remove a member from set
+func RemoveFromArea(key, set string) error {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	return db.Srem(conn, set, key)
+}
+
+// Returns if entity is a member of the set
+func InArea(key, set string) bool {
+	conn := db.Pool.Get()
+	defer conn.Close()
+
+	result, err := db.Sismember(conn, set, key)
+	if err != nil {
+		return false
+	}
+	return result
 }
 
 func init() {
