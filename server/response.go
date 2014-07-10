@@ -7,6 +7,12 @@ import (
 	"warcluster/server/response"
 )
 
+var missionTypes = map[string]struct{}{
+	"Attack": {},
+	"Supply": {},
+	"Spy":    {},
+}
+
 // scopeOfView is not finished yet but the purpose of the function is
 // to call calculateCanvasSize and give the player the information
 // contained in the given borders.
@@ -19,7 +25,6 @@ func scopeOfView(request *Request) error {
 }
 
 // This function makes all the checks needed for creation of a new mission.
-// TODO: Do not stream on spy mission
 func parseAction(request *Request) error {
 	var err error
 
@@ -45,8 +50,7 @@ func parseAction(request *Request) error {
 		return errors.New("The mission owner does not own the start planet.")
 	}
 
-	// FIXME: Why not a simple list with the possible attacks?
-	if request.Type != "Attack" && request.Type != "Supply" && request.Type != "Spy" {
+	if _, isMissionTypeValid := missionTypes[request.Type]; !isMissionTypeValid {
 		return errors.New("Invalid mission type!")
 	}
 
