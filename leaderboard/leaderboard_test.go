@@ -7,25 +7,25 @@ import (
 func initLeaderboard() *Leaderboard {
 	l := New()
 	l.board = []*Player{
-		{Username: "0", Planets: 10, Team: Color{13, 11, 92}},
-		{Username: "1", Planets: 8, Team: Color{16, 5, 90}},
-		{Username: "2", Planets: 7, Team: Color{16, 5, 90}},
-		{Username: "3", Planets: 6, Team: Color{13, 11, 92}},
-		{Username: "4", Planets: 5, Team: Color{13, 11, 92}},
-		{Username: "5", Planets: 0, Team: Color{20, 6, 90}},
-		{Username: "6", Planets: 0, Team: Color{13, 11, 92}},
-		{Username: "7", Planets: 0, Team: Color{20, 6, 90}},
-		{Username: "8", Planets: 0, Team: Color{20, 6, 90}},
-		{Username: "9", Planets: 0, Team: Color{20, 6, 90}},
-		{Username: "10", Planets: 0, Team: Color{20, 6, 90}},
-		{Username: "11", Planets: 0, Team: Color{13, 11, 92}},
-		{Username: "12", Planets: 0, Team: Color{16, 5, 90}},
-		{Username: "13", Planets: 0, Team: Color{13, 11, 92}},
-		{Username: "14", Planets: 0, Team: Color{20, 6, 90}},
-		{Username: "15", Planets: 0, Team: Color{16, 5, 90}},
-		{Username: "16", Planets: 0, Team: Color{16, 5, 90}},
-		{Username: "17", Planets: 0, Team: Color{16, 5, 90}},
-		{Username: "18", Planets: 0, Team: Color{20, 6, 90}},
+		{Username: "0", Planets: 10, RaceId: 1},
+		{Username: "1", Planets: 8, RaceId: 0},
+		{Username: "2", Planets: 7, RaceId: 0},
+		{Username: "3", Planets: 6, RaceId: 1},
+		{Username: "4", Planets: 5, RaceId: 1},
+		{Username: "5", Planets: 0, RaceId: 2},
+		{Username: "6", Planets: 0, RaceId: 1},
+		{Username: "7", Planets: 0, RaceId: 2},
+		{Username: "8", Planets: 0, RaceId: 2},
+		{Username: "9", Planets: 0, RaceId: 2},
+		{Username: "10", Planets: 0, RaceId: 2},
+		{Username: "11", Planets: 0, RaceId: 1},
+		{Username: "12", Planets: 0, RaceId: 0},
+		{Username: "13", Planets: 0, RaceId: 1},
+		{Username: "14", Planets: 0, RaceId: 2},
+		{Username: "15", Planets: 0, RaceId: 0},
+		{Username: "16", Planets: 0, RaceId: 0},
+		{Username: "17", Planets: 0, RaceId: 0},
+		{Username: "18", Planets: 0, RaceId: 2},
 	}
 
 	l.places = map[string]int{
@@ -50,22 +50,22 @@ func initLeaderboard() *Leaderboard {
 		"18": 18,
 	}
 
-	l.teams = Teams{
-		{Color: Color{13, 11, 92}},
-		{Color: Color{20, 6, 90}},
-		{Color: Color{16, 5, 90}},
+	l.races = Races{
+		{Id: 1},
+		{Id: 2},
+		{Id: 0},
 	}
 
-	l.RecountTeamsPlanets()
+	l.RecountRacesPlanets()
 
 	return l
 }
 
-func TestAddTeam(t *testing.T) {
+func TestAddRace(t *testing.T) {
 	l := initLeaderboard()
-	l.AddTeam("Raccoon", Color{1, 2, 3})
-	if len(l.teams) != 4 {
-		t.Errorf("Expected number of teams is 4, but received %d", len(l.teams))
+	l.AddRace("Raccoon", 3)
+	if len(l.races) != 4 {
+		t.Errorf("Expected number of races is 4, but received %d", len(l.races))
 	}
 }
 
@@ -164,9 +164,9 @@ func TestAdd(t *testing.T) {
 	l := initLeaderboard()
 	boardLengthBefore := l.Len()
 	placesLengthBefore := len(l.places)
-	l.Add(&Player{Username: "panda", Planets: 42, Team: Color{13, 11, 92}})
-	l.FindTeam(Color{21, 6, 90})
-	l.Add(&Player{Username: "gophie", Planets: 42, Team: Color{21, 6, 90}})
+	l.Add(&Player{Username: "panda", Planets: 42, RaceId: 1})
+	l.FindRace(3)
+	l.Add(&Player{Username: "gophie", Planets: 42, RaceId: 3})
 	if boardLengthBefore+2 != l.Len() {
 		t.Error("Board size did not changed after adding a player")
 	}
@@ -180,7 +180,7 @@ func TestSort(t *testing.T) {
 	l := initLeaderboard()
 	l.places["0"] = 20
 	l.board[1].Planets = 128
-	l.RecountTeamsPlanets()
+	l.RecountRacesPlanets()
 	l.Sort()
 
 	if l.board[0].Username != "1" {
@@ -191,8 +191,8 @@ func TestSort(t *testing.T) {
 		t.Error("Leaderboard.Sort() did not changed the places")
 	}
 
-	if l.teams[0] != l.FindTeam(Color{16, 5, 90}) {
-		t.Error("Leaderboard.Sort() did not sort teams")
+	if l.races[0] != l.FindRace(0) {
+		t.Error("Leaderboard.Sort() did not sort races")
 	}
 }
 
@@ -229,14 +229,14 @@ func TestTakePlanetsWithoutOwner(t *testing.T) {
 	}
 }
 
-func TestTeamPlanetsTransfer(t *testing.T) {
+func TestRacePlanetsTransfer(t *testing.T) {
 	d := New()
 	d.board = []*Player{
-		{Username: "0", Planets: 10, Team: Color{13, 11, 92}},
-		{Username: "1", Planets: 10, Team: Color{16, 5, 90}},
-		{Username: "2", Planets: 9, Team: Color{16, 5, 90}},
-		{Username: "3", Planets: 8, Team: Color{13, 11, 92}},
-		{Username: "4", Planets: 7, Team: Color{6, 9, 90}},
+		{Username: "0", Planets: 10, RaceId: 1},
+		{Username: "1", Planets: 10, RaceId: 0},
+		{Username: "2", Planets: 9, RaceId: 0},
+		{Username: "3", Planets: 8, RaceId: 1},
+		{Username: "4", Planets: 7, RaceId: 4},
 	}
 
 	d.places = map[string]int{
@@ -247,20 +247,20 @@ func TestTeamPlanetsTransfer(t *testing.T) {
 		"4": 4,
 	}
 
-	d.teams = Teams{
-		{Color: Color{13, 11, 92}},
-		{Color: Color{6, 9, 90}},
-		{Color: Color{16, 5, 90}},
+	d.races = Races{
+		{Id: 1},
+		{Id: 4},
+		{Id: 0},
 	}
 
-	d.RecountTeamsPlanets()
+	d.RecountRacesPlanets()
 
 	d.Transfer("", "3")
 	d.Transfer("", "3")
 	d.Transfer("", "2")
 
-	planets := d.FindTeam(Color{13, 11, 92}).Planets
+	planets := d.FindRace(1).Planets
 	if planets != 20 {
-		t.Errorf("This team has %d", planets)
+		t.Errorf("This race has %d", planets)
 	}
 }

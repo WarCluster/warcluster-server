@@ -13,29 +13,25 @@ type Color struct {
 }
 
 type Player struct {
-	Username string
-	Team     struct {
-		R float32
-		G float32
-		B float32
-	}
+	Username   string
+	RaceId     uint8
 	HomePlanet string
 	Planets    uint32
 }
 
-type Team struct {
+type Race struct {
 	Name    string
-	Color   Color
+	Id      uint8
 	Players uint32
 	Planets uint32
 }
 
-type Teams []*Team
+type Races []*Race
 
 type Leaderboard struct {
 	places  map[string]int
 	board   []*Player
-	teams   Teams
+	races   Races
 	Channel chan [2]string
 }
 
@@ -43,7 +39,7 @@ func New() *Leaderboard {
 	l := new(Leaderboard)
 	l.places = make(map[string]int)
 	l.board = make([]*Player, 0)
-	l.teams = make([]*Team, 0)
+	l.races = make([]*Race, 0)
 	l.Channel = make(chan [2]string)
 
 	go func(l *Leaderboard) {
@@ -61,19 +57,19 @@ func (l *Leaderboard) Add(player *Player) {
 	l.board = append(l.board, player)
 	l.places[player.Username] = len(l.board) - 1
 
-	for _, team := range l.teams {
-		if player.Team == team.Color {
-			team.Players++
-			team.Planets += player.Planets
+	for _, race := range l.races {
+		if player.RaceId == race.Id {
+			race.Players++
+			race.Planets += player.Planets
 			return
 		}
 	}
 }
 
-func (l *Leaderboard) FindTeam(color Color) *Team {
-	for _, team := range l.teams {
-		if team.Color == color {
-			return team
+func (l *Leaderboard) FindRace(raceId uint8) *Race {
+	for _, race := range l.races {
+		if race.Id == raceId {
+			return race
 		}
 	}
 	return nil
@@ -96,18 +92,18 @@ func (l *Leaderboard) Sort() {
 	for index, player := range l.board {
 		l.places[player.Username] = index
 	}
-	l.teams.Sort()
+	l.races.Sort()
 }
 
-func (l *Leaderboard) RecountTeamsPlanets() {
-	for _, team := range l.teams {
-		team.Planets = 0
+func (l *Leaderboard) RecountRacesPlanets() {
+	for _, race := range l.races {
+		race.Planets = 0
 	}
 
 	for _, player := range l.board {
-		team := l.FindTeam(player.Team)
-		if team != nil {
-			team.Planets += player.Planets
+		race := l.FindRace(player.RaceId)
+		if race != nil {
+			race.Planets += player.Planets
 		}
 	}
 }
@@ -122,19 +118,19 @@ func (l *Leaderboard) Transfer(from_username, to_username string) {
 	l.board[to].Planets++
 
 	if hasOwner {
-		team := l.FindTeam(l.board[from].Team)
-		if team != nil {
-			team.Planets--
+		race := l.FindRace(l.board[from].RaceId)
+		if race != nil {
+			race.Planets--
 		}
 		l.moveDown(from_username)
 	}
 
-	team := l.FindTeam(l.board[to].Team)
-	if team != nil {
-		team.Planets++
+	race := l.FindRace(l.board[to].RaceId)
+	if race != nil {
+		race.Planets++
 	}
 	l.moveUp(to_username)
-	l.teams.Sort()
+	l.races.Sort()
 }
 
 func (l *Leaderboard) Page(page int64) ([]*Player, error) {
@@ -162,8 +158,8 @@ func (l *Leaderboard) Place(username string) int {
 	return place
 }
 
-func (l *Leaderboard) Teams() []*Team {
-	return l.teams
+func (l *Leaderboard) Races() []*Race {
+	return l.races
 
 }
 
@@ -202,27 +198,27 @@ func (l *Leaderboard) moveDown(username string) bool {
 	return l.move(username, 1)
 }
 
-func (l *Leaderboard) AddTeam(name string, color Color) {
-	l.teams = append(l.teams, &Team{
+func (l *Leaderboard) AddRace(name string, raceId uint8) {
+	l.races = append(l.races, &Race{
 		Name:    name,
-		Color:   color,
+		Id:      raceId,
 		Players: 0,
 		Planets: 0,
 	})
 }
 
-func (t *Teams) Len() int {
-	return len(*t)
+func (r *Races) Len() int {
+	return len(*r)
 }
 
-func (t *Teams) Swap(i, j int) {
-	(*t)[i], (*t)[j] = (*t)[j], (*t)[i]
+func (r *Races) Swap(i, j int) {
+	(*r)[i], (*r)[j] = (*r)[j], (*r)[i]
 }
 
-func (t *Teams) Less(i, j int) bool {
-	return (*t)[i].Planets > (*t)[j].Planets
+func (r *Races) Less(i, j int) bool {
+	return (*r)[i].Planets > (*r)[j].Planets
 }
 
-func (t *Teams) Sort() {
-	sort.Sort(t)
+func (r *Races) Sort() {
+	sort.Sort(r)
 }

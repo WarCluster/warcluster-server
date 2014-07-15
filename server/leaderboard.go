@@ -42,15 +42,15 @@ func leaderboardPlayersHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(result))
 }
 
-func leaderboardTeamsHandler(w http.ResponseWriter, r *http.Request) {
+func leaderboardRacesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	teams, err := json.Marshal(leaderBoard.Teams())
+	races, err := json.Marshal(leaderBoard.Races())
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
-	fmt.Fprintf(w, string(teams))
+	fmt.Fprintf(w, string(races))
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,36 +82,36 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
 	log.Println("Initializing the leaderboard...")
 	allPlayers := make(map[string]*leaderboard.Player)
+	playerEntities := entities.Find("player.*")
 	planetEntities := entities.Find("planet.*")
 
-	for key, value := range cfg.Team {
-		board.AddTeam(
+	for key, value := range cfg.Race {
+		board.AddRace(
 			key,
-			leaderboard.Color{
-				value.Red,
-				value.Green,
-				value.Blue,
-			},
+			value.Id,
 		)
+	}
+
+	for _, playerEntity := range playerEntities {
+		player := playerEntity.(*entities.Player)
+
+		leaderboardPlayer := &leaderboard.Player{
+			Username: player.Username,
+			RaceId:   player.RaceID,
+			Planets:  0,
+		}
+		allPlayers[player.Username] = leaderboardPlayer
+		board.Add(leaderboardPlayer)
 	}
 
 	for _, entity := range planetEntities {
 		planet, ok := entity.(*entities.Planet)
-		if !planet.HasOwner() {
+
+		if !planet.HasOwner() || !ok {
 			continue
 		}
 
-		player, ok := allPlayers[planet.Owner]
-
-		if !ok {
-			player = &leaderboard.Player{
-				Username: planet.Owner,
-				Team:     planet.Color,
-				Planets:  0,
-			}
-			allPlayers[planet.Owner] = player
-			board.Add(player)
-		}
+		player, _ := allPlayers[planet.Owner]
 
 		if planet.IsHome {
 			player.HomePlanet = planet.Name
@@ -120,6 +120,6 @@ func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
 		player.Planets++
 	}
 	board.Sort()
-	board.RecountTeamsPlanets()
+	board.RecountRacesPlanets()
 	leaderBoard = board
 }

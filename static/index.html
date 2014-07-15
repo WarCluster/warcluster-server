@@ -64,7 +64,7 @@
                 $('#paramsform').submit(function() {
                     var text = {
                         "Command": "setup_parameters",
-                        "Race": parseInt($('#fraction').val()),
+                        "Race": parseInt($('#race').val()),
                         "SunTextureId": parseInt($('#sunTextureId').val())
                     }
                     conn.send(JSON.stringify(text));
@@ -116,7 +116,7 @@
         <form id="paramsform">
             Request params ->
             <input type="submit" value="setup_parameters">
-            Fraction: <input id="fraction" type="text" value="0">
+            Race: <input id="race" type="text" value="0">
             SunTextureId:  <input id="sunTextureId" type="text" value="0">
         </form>
     </body>

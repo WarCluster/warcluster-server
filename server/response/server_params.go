@@ -27,7 +27,8 @@ func NewServerParams() *ServerParams {
 	}
 	r.HomeSPM = 60 / float64(entities.ShipCountTimeMod(1, true))
 	for planetSizeIdx = 1; planetSizeIdx <= 10; planetSizeIdx++ {
-		r.PlanetsSPM[fmt.Sprintf("%v", planetSizeIdx)] = 60 / float64(entities.ShipCountTimeMod(planetSizeIdx, false))
+		planetSPM := float64(entities.ShipCountTimeMod(planetSizeIdx, false))
+		r.PlanetsSPM[fmt.Sprintf("%v", planetSizeIdx)] = 60 / planetSPM
 	}
 	return r
 }
