@@ -55,10 +55,8 @@ func ParseRequest(request *Request) (func(*Request) error, error) {
 	switch request.Command {
 	case "start_mission":
 		if len(request.StartPlanet) > 0 && len(request.EndPlanet) > 0 {
-			if request.Fleet > 100 {
+			if request.Fleet > 100 || request.Fleet <= 0 {
 				request.Fleet = 100
-			} else if request.Fleet <= 0 {
-				request.Fleet = 10
 			}
 			return parseAction, nil
 		} else {
