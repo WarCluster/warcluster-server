@@ -67,7 +67,7 @@ func TestStartMissionWithNegativeFleet(t *testing.T) {
 	request.Fleet = -10
 	ParseRequest(request)
 
-	if request.Fleet != 10 {
+	if request.Fleet != 100 {
 		t.Errorf("Request start_mision with negative fleet makes fleet size %d", request.Fleet)
 	}
 }
