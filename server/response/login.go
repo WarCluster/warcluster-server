@@ -1,8 +1,8 @@
 package response
 
 import (
-	"fmt"
 	"github.com/Vladimiroff/vec2d"
+
 	"warcluster/entities"
 )
 
@@ -78,4 +78,3 @@ func NewServerParams() *ServerParams {
 func (l *LoginSuccess) Sanitize(*entities.Player)     {}
 func (l *LoginFailed) Sanitize(*entities.Player)      {}
 func (l *LoginInformation) Sanitize(*entities.Player) {}
-func (l *ServerParams) Sanitize(*entities.Player)     {}

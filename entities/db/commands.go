@@ -40,8 +40,19 @@ func Smembers(conn redis.Conn, set string) ([]string, error) {
 	return redis.Strings(conn.Do("SMEMBERS", set))
 }
 
+// Move member from one set to another
+func Smove(conn redis.Conn, from, to, key string) error {
+	_, err := conn.Do("SMOVE", from, to, key)
+	return err
+}
+
 // Remove a member from set
 func Srem(conn redis.Conn, set, key string) error {
 	_, err := conn.Do("SREM", set, key)
 	return err
+}
+
+// Returns if member is a member of the set stored at key.
+func Sismember(conn redis.Conn, set, key string) (bool, error) {
+	return redis.Bool(conn.Do("SISMEMBER", set, key))
 }
