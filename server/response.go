@@ -70,6 +70,7 @@ func parseAction(request *Request) error {
 		missionFailed := response.NewSendMissionFailed()
 		missionFailed.Error = "Not enough pilots on source planet!"
 		clients.Send(request.Client.Player, missionFailed)
+		return nil
 	}
 
 	entities.Save(source)
