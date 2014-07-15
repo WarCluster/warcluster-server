@@ -23,4 +23,4 @@ warcluster.exe
 *.test
 
 # ctags file
-tags
+*tags
