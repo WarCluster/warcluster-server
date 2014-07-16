@@ -36,4 +36,14 @@
     red = 0.28235294
     green = 0.64901961
     blue = 0.074509804
+[race "Hackube"]
+    id = 4
+    red = 0.28235294
+    green = 0.64901961
+    blue = 0.074509804
+[race "MegaDev"]
+    id = 5
+    red = 0.28235294
+    green = 0.64901961
+    blue = 0.074509804
 
