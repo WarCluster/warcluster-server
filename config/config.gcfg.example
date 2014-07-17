@@ -8,10 +8,10 @@
     port = 6379
 
 [twitter]
-   consumerKey = "consumer-key-goes-here"
-   consumerSecret = "consumer-secret-goes-here"
-   accessToken = "access-token-goes-here"
-   accessTokenSecret = "access-token-secret-goes-here"
+   consumerKey = "PWlHfyxHf78KUjOTXBNVA"
+   consumerSecret = "c7DMDAV5Ag3oYhrn67nkN7xHg3NXRBwtoxKpVl6AIo"
+   accessToken = "1099448875-VWhp6eyLUE20vhHpOcGB4lMJDMQQFlMUt4hRqIu"
+   accessTokenSecret = "4bxZVKF2GTDEpSHMoBv0ankVEJr6oX1FAleImuDKk"
 
 [race "InitLab"]
     id = 0
