@@ -133,6 +133,6 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
 	homePlanetIdx := int8(hashElement(PLANET_COUNT*PLANET_HASH_ARGS + 1))
 	result[homePlanetIdx].IsHome = true
-	result[homePlanetIdx].ShipCount = 80
+	result[homePlanetIdx].ShipCount = 1200
 	return result, result[homePlanetIdx]
 }
