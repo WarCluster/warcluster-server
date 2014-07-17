@@ -13,7 +13,7 @@
    accessToken = "access-token-goes-here"
    accessTokenSecret = "access-token-secret-goes-here"
 
-[race "initLab"]
+[race "InitLab"]
     id = 0
     red = 0.89215686
     green = 0.031372549
@@ -33,7 +33,19 @@
 
 [race "BurgasLab"]
     id = 3
-    red = 0.28235294
-    green = 0.64901961
-    blue = 0.074509804
+    red = 0.39215686
+    green = 0.89803921
+    blue = 0.10196078
+
+[race "Hackube"]
+    id = 4
+    red = 0
+    green = 0.81568627
+    blue = 1
+
+[race "MegaDev"]
+    id = 5
+    red = 1
+    green = 0
+    blue = 0.7843137254901961
 
