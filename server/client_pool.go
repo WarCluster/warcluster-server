@@ -4,7 +4,9 @@ import (
 	"container/list"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"runtime/debug"
 	"sync"
 
 	"warcluster/entities"
@@ -65,13 +67,7 @@ func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 
 		client := clients.Front().Value.(*Client)
 		response.Sanitize(client.Player)
-		message, _ := json.Marshal(response)
-
-		for element := clients.Front(); element != nil; element = element.Next() {
-			value := element.Value
-			client := value.(*Client)
-			client.Session.Send(message)
-		}
+		cp.Send(client.Player, response)
 	}
 }
 
@@ -79,6 +75,7 @@ func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 func (cp *ClientPool) Send(player *entities.Player, response response.Responser) {
 	defer func() {
 		if panicked := recover(); panicked != nil {
+			log.Println(fmt.Sprintf("%s\n\nStacktrace:\n\n%s", panicked, debug.Stack()))
 			return
 		}
 	}()
