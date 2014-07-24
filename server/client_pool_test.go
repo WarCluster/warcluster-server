@@ -17,7 +17,7 @@ var player1 = entities.Player{
 	RaceID:         1,
 	TwitterID:      "gop",
 	HomePlanet:     "planet.GOP6720",
-	ScreenSize:     []uint16{1, 1},
+	ScreenSize:     []uint64{1, 1},
 	ScreenPosition: &vec2d.Vector{2, 2},
 }
 
@@ -26,7 +26,7 @@ var player2 = entities.Player{
 	RaceID:         1,
 	TwitterID:      "snoop",
 	HomePlanet:     "planet.SNO6750",
-	ScreenSize:     []uint16{1, 1},
+	ScreenSize:     []uint64{1, 1},
 	ScreenPosition: &vec2d.Vector{2, 8},
 }
 

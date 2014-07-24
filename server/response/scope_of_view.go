@@ -30,7 +30,7 @@ func (s *ScopeOfView) Sanitize(player *entities.Player) {
 }
 
 // TODO: Use vector for rawPlanets
-func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
+func NewScopeOfView(position *vec2d.Vector, resolution []uint64) *ScopeOfView {
 	topLeft, bottomRight := calculateCanvasSize(position, resolution)
 	areas := listAreas(topLeft, bottomRight)
 	entityList := entities.GetAreasMembers(areas)
@@ -60,7 +60,7 @@ func NewScopeOfView(position *vec2d.Vector, resolution []uint16) *ScopeOfView {
 }
 
 // calculateCanvasSize is used to determine where is the viewable by client's area
-func calculateCanvasSize(position *vec2d.Vector, resolution []uint16) (*vec2d.Vector, *vec2d.Vector) {
+func calculateCanvasSize(position *vec2d.Vector, resolution []uint64) (*vec2d.Vector, *vec2d.Vector) {
 	topLeft := vec2d.New(
 		position.X-float64(resolution[0]+CANVAS_OFFSET_X)/2,
 		position.Y+float64(resolution[1]+CANVAS_OFFSET_Y)/2,

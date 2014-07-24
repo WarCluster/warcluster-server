@@ -7,7 +7,7 @@ import (
 )
 
 func TestCalculateCanvasSize(t *testing.T) {
-	topLeft, bottomRight := calculateCanvasSize(vec2d.New(20, 50), []uint16{800, 600})
+	topLeft, bottomRight := calculateCanvasSize(vec2d.New(20, 50), []uint64{800, 600})
 	if *topLeft != *vec2d.New(-5380, 5350) {
 		t.Errorf("topLeft is %#v, expected: %#v", *topLeft, *vec2d.New(-5380, 5350))
 	}

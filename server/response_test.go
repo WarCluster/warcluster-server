@@ -17,7 +17,7 @@ var gophie entities.Player = entities.Player{
 	RaceID:         1,
 	TwitterID:      "gophie92",
 	HomePlanet:     "planet.GOP6720",
-	ScreenSize:     []uint16{1, 1},
+	ScreenSize:     []uint64{1, 1},
 	ScreenPosition: &vec2d.Vector{2, 2},
 }
 
@@ -26,7 +26,7 @@ var panda entities.Player = entities.Player{
 	RaceID:         1,
 	TwitterID:      "panda13",
 	HomePlanet:     "planet.PAN6720",
-	ScreenSize:     []uint16{1, 1},
+	ScreenSize:     []uint64{1, 1},
 	ScreenPosition: &vec2d.Vector{2, 2},
 }
 
@@ -76,7 +76,7 @@ func (suite *ResponseTestSuite) SetupTest() {
 	suite.request.StartPlanet = "planet.GOP6720"
 	suite.request.EndPlanet = "planet.PAN6720"
 	suite.request.Position = vec2d.New(2.0, 4.0)
-	suite.request.Resolution = []uint16{1920, 1080}
+	suite.request.Resolution = []uint64{1920, 1080}
 	suite.request.Fleet = 32
 	suite.request.Username = "gophie"
 	suite.request.TwitterID = "gophie92"

@@ -22,7 +22,7 @@ type Request struct {
 	Command      string
 	Type         string
 	Position     *vec2d.Vector
-	Resolution   []uint16
+	Resolution   []uint64
 	StartPlanet  string
 	EndPlanet    string
 	Fleet        int32

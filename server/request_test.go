@@ -22,7 +22,7 @@ func TestAllTypesOfMission(t *testing.T) {
 	request.StartPlanet = "start"
 	request.EndPlanet = "end"
 	request.Position = vec2d.New(2.0, 4.0)
-	request.Resolution = []uint16{1920, 1080}
+	request.Resolution = []uint64{1920, 1080}
 
 	for _, test := range tableTests {
 		request.Command = test.input

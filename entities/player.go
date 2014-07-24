@@ -13,7 +13,7 @@ type Player struct {
 	RaceID         uint8
 	TwitterID      string
 	HomePlanet     string
-	ScreenSize     []uint16
+	ScreenSize     []uint64
 	ScreenPosition *vec2d.Vector
 	SpyReports     []*SpyReport `json:"-" bson:"-"`
 	mutex          sync.Mutex
@@ -88,7 +88,7 @@ func CreatePlayer(username, TwitterID string, homePlanet *Planet, setupData *Set
 		Username:       username,
 		TwitterID:      TwitterID,
 		HomePlanet:     homePlanet.Key(),
-		ScreenSize:     []uint16{0, 0},
+		ScreenSize:     []uint64{0, 0},
 		ScreenPosition: homePlanet.Position,
 	}
 

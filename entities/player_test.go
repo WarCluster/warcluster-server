@@ -40,7 +40,7 @@ func TestCreateMission(t *testing.T) {
 		RaceID:         1,
 		TwitterID:      "asdf",
 		HomePlanet:     "planet.GOP6720",
-		ScreenSize:     []uint16{1, 1},
+		ScreenSize:     []uint64{1, 1},
 		ScreenPosition: &vec2d.Vector{2, 2},
 	}
 
