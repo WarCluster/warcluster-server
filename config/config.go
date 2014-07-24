@@ -42,17 +42,17 @@ type Entities struct {
 	PlanetCount         int
 	PlanetHashArgs      int
 	PlanetRadius        uint16
-	PilotsPerMinute1    float64
-	PilotsPerMinute2    float64
-	PilotsPerMinute3    float64
-	PilotsPerMinute4    float64
-	PilotsPerMinute5    float64
-	PilotsPerMinute6    float64
-	PilotsPerMinute7    float64
-	PilotsPerMinute8    float64
-	PilotsPerMinute9    float64
-	PilotsPerMinute10   float64
-	PilotsPerMinuteHome float64
+	ShipsPerMinute1    float64
+	ShipsPerMinute2    float64
+	ShipsPerMinute3    float64
+	ShipsPerMinute4    float64
+	ShipsPerMinute5    float64
+	ShipsPerMinute6    float64
+	ShipsPerMinute7    float64
+	ShipsPerMinute8    float64
+	ShipsPerMinute9    float64
+	ShipsPerMinute10   float64
+	ShipsPerMinuteHome float64
 	PlanetsRingOffset   uint16
 	SolarSystemRadius   float64
 	SpyReportValidity   time.Duration

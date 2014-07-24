@@ -81,29 +81,29 @@ func (p *Planet) SetShipCount(count int32) {
 func ShipCountTimeMod(size int8, isHome bool) int64 {
 	var timeModifier float64
 	if isHome {
-		timeModifier = Settings.PilotsPerMinuteHome
+		timeModifier = Settings.ShipsPerMinuteHome
 	} else {
 		switch size {
 		case 1:
-			timeModifier = Settings.PilotsPerMinute1
+			timeModifier = Settings.ShipsPerMinute1
 		case 2:
-			timeModifier = Settings.PilotsPerMinute2
+			timeModifier = Settings.ShipsPerMinute2
 		case 3:
-			timeModifier = Settings.PilotsPerMinute3
+			timeModifier = Settings.ShipsPerMinute3
 		case 4:
-			timeModifier = Settings.PilotsPerMinute4
+			timeModifier = Settings.ShipsPerMinute4
 		case 5:
-			timeModifier = Settings.PilotsPerMinute5
+			timeModifier = Settings.ShipsPerMinute5
 		case 6:
-			timeModifier = Settings.PilotsPerMinute6
+			timeModifier = Settings.ShipsPerMinute6
 		case 7:
-			timeModifier = Settings.PilotsPerMinute7
+			timeModifier = Settings.ShipsPerMinute7
 		case 8:
-			timeModifier = Settings.PilotsPerMinute8
+			timeModifier = Settings.ShipsPerMinute8
 		case 9:
-			timeModifier = Settings.PilotsPerMinute9
+			timeModifier = Settings.ShipsPerMinute9
 		case 10:
-			timeModifier = Settings.PilotsPerMinute10
+			timeModifier = Settings.ShipsPerMinute10
 		}
 	}
 	return int64(timeModifier * 10)
