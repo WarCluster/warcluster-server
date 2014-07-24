@@ -126,13 +126,13 @@ func StartMissionary(mission *entities.Mission) {
 			mission.EndSpyMission(target)
 			updateSpyReports(mission, stateChange)
 			if mission.ShipCount > 0 {
-				time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
+				time.Sleep(entities.Settings.SpyReportValidity * time.Second)
 			} else {
 				break
 			}
 			target, stateChange, err = fetchMissionTarget(targetKey)
 		}
-		time.Sleep(entities.SPY_REPORT_VALIDITY * time.Second)
+		time.Sleep(entities.Settings.SpyReportValidity * time.Second)
 		updateSpyReports(mission, stateChange)
 	}
 

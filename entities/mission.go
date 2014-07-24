@@ -34,12 +34,6 @@ func (m *Mission) Key() string {
 	return fmt.Sprintf("mission.%d_%s", m.StartTime, m.Source.Name)
 }
 
-// We plan to tweak the missions' speed based on some game logic.
-// For now, 10 seems like a fair choice.
-func (m *Mission) GetSpeed() int64 {
-	return 10
-}
-
 // Returns the sorted set by X or Y where this entity has to be put in
 func (m *Mission) AreaSet() string {
 	return m.areaSet
@@ -80,7 +74,7 @@ func (m *Mission) TransferPoints() AreaTransferPoints {
 		}
 
 		for i := axises[0] + 1; i < axises[1]; i += 1 {
-			container = append(container, i*AREA_SIZE)
+			container = append(container, i*Settings.AreaSize)
 		}
 		return
 	}
@@ -108,7 +102,7 @@ func (m *Mission) TransferPoints() AreaTransferPoints {
 	for _, axis := range xAxises {
 		crossPoint := vec2d.New(float64(axis), missionVectorEquation.GetYByX(float64(axis)))
 		transferPoint := &AreaTransferPoint{
-			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, m.GetSpeed()),
+			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, Settings.MissionSpeed),
 			Direction:      direction[0],
 			CoordinateAxis: 'X',
 		}
@@ -118,7 +112,7 @@ func (m *Mission) TransferPoints() AreaTransferPoints {
 	for _, axis := range yAxises {
 		crossPoint := vec2d.New(missionVectorEquation.GetXByY(float64(axis)), float64(axis))
 		transferPoint := &AreaTransferPoint{
-			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, m.GetSpeed()),
+			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, Settings.MissionSpeed),
 			Direction:      direction[1],
 			CoordinateAxis: 'Y',
 		}

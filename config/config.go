@@ -5,6 +5,7 @@ import (
 	"log"
 	"path"
 	"runtime"
+	"time"
 
 	"code.google.com/p/gcfg"
 )
@@ -31,6 +32,33 @@ type Config struct {
 		Green float32
 		Blue  float32
 	}
+	Entities Entities
+}
+
+type Entities struct {
+	AreaSize            int64
+	AreaTemplate        string
+	MissionSpeed        int64
+	PlanetCount         int
+	PlanetHashArgs      int
+	PlanetRadius        uint16
+	PilotsPerMinute1    float64
+	PilotsPerMinute2    float64
+	PilotsPerMinute3    float64
+	PilotsPerMinute4    float64
+	PilotsPerMinute5    float64
+	PilotsPerMinute6    float64
+	PilotsPerMinute7    float64
+	PilotsPerMinute8    float64
+	PilotsPerMinute9    float64
+	PilotsPerMinute10   float64
+	PilotsPerMinuteHome float64
+	PlanetsRingOffset   uint16
+	SolarSystemRadius   float64
+	SpyReportValidity   time.Duration
+	SunCanvasOffsetX    uint64
+	SunCanvasOffsetY    uint64
+	SunTextures         uint16
 }
 
 func (c *Config) Load(name string) {
