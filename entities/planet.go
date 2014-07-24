@@ -136,7 +136,7 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 			Color:        Color{0.78431373, 0.70588235, 0.54901961},
 			Position:     new(vec2d.Vector),
 			IsHome:       false,
-			ShipCount:    10,
+			ShipCount:    Settings.InitialPlanetShipCount,
 			MaxShipCount: 0,
 			Owner:        "",
 		}
@@ -154,6 +154,6 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
 	homePlanetIdx := int8(hashElement(Settings.PlanetCount*Settings.PlanetHashArgs + 1))
 	result[homePlanetIdx].IsHome = true
-	result[homePlanetIdx].ShipCount = 1200
+	result[homePlanetIdx].ShipCount = Settings.InitialHomePlanetShipCount
 	return result, result[homePlanetIdx]
 }

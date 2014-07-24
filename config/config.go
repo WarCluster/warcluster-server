@@ -36,29 +36,31 @@ type Config struct {
 }
 
 type Entities struct {
-	AreaSize            int64
-	AreaTemplate        string
-	MissionSpeed        int64
-	PlanetCount         int
-	PlanetHashArgs      int
-	PlanetRadius        uint16
-	ShipsPerMinute1    float64
-	ShipsPerMinute2    float64
-	ShipsPerMinute3    float64
-	ShipsPerMinute4    float64
-	ShipsPerMinute5    float64
-	ShipsPerMinute6    float64
-	ShipsPerMinute7    float64
-	ShipsPerMinute8    float64
-	ShipsPerMinute9    float64
-	ShipsPerMinute10   float64
-	ShipsPerMinuteHome float64
-	PlanetsRingOffset   uint16
-	SolarSystemRadius   float64
-	SpyReportValidity   time.Duration
-	SunCanvasOffsetX    uint64
-	SunCanvasOffsetY    uint64
-	SunTextures         uint16
+	AreaSize                   int64
+	AreaTemplate               string
+	InitialHomePlanetShipCount int32
+	InitialPlanetShipCount     int32
+	MissionSpeed               int64
+	PlanetCount                int
+	PlanetHashArgs             int
+	PlanetRadius               uint16
+	ShipsPerMinute1            float64
+	ShipsPerMinute2            float64
+	ShipsPerMinute3            float64
+	ShipsPerMinute4            float64
+	ShipsPerMinute5            float64
+	ShipsPerMinute6            float64
+	ShipsPerMinute7            float64
+	ShipsPerMinute8            float64
+	ShipsPerMinute9            float64
+	ShipsPerMinute10           float64
+	ShipsPerMinuteHome         float64
+	PlanetsRingOffset          uint16
+	SolarSystemRadius          float64
+	SpyReportValidity          time.Duration
+	SunCanvasOffsetX           uint64
+	SunCanvasOffsetY           uint64
+	SunTextures                uint16
 }
 
 func (c *Config) Load(name string) {

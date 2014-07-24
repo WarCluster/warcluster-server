@@ -16,6 +16,8 @@
 [entities]
     areaSize = 10000
     areaTemplate = "area:%d:%d"
+    initialPlanetShipCount = 10
+    initialHomePlanetShipCount = 100
     pilotsPerMinute1 = 1
     pilotsPerMinute2 = 1
     pilotsPerMinute3 = 1.2
