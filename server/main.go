@@ -131,15 +131,14 @@ func handler(session sockjs.Session) {
 
 		request, err := UnmarshalRequest(message, client)
 		if err != nil {
-			log.Println("Error in server.main.handler.UnmarshalRequest:", err.Error())
-			clients.Send(client.Player, response.NewComsError("Unable to unmarshal request"))
+			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
 
 		action, err := ParseRequest(request)
 		if err != nil {
 			log.Println("Error in server.main.handler.ParseRequest:", err.Error())
-			clients.Send(client.Player, response.NewComsError("Unable to parse request"))
+			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
 

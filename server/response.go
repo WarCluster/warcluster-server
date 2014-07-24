@@ -55,7 +55,7 @@ func parseAction(request *Request) error {
 	}
 
 	if request.StartPlanet == request.EndPlanet {
-		clients.Send(request.Client.Player, response.NewComsError("Unable to target the same planet."))
+		clients.Send(request.Client.Player, response.NewError("Unable to target the same planet."))
 		return errors.New("Start and end planet are the same. Mission cancelled.")
 	}
 
