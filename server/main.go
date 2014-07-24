@@ -115,8 +115,6 @@ func handler(session sockjs.Session) {
 			log.Println(err.Error())
 		}
 		session.Send(message)
-		log.Printf("<- %s", message)
-
 		return
 	}
 	clients.Add(client)
@@ -149,7 +147,6 @@ func handler(session sockjs.Session) {
 			log.Println(err)
 			continue
 		}
-		log.Printf("-> %s", message)
 	}
 }
 
