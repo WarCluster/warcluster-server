@@ -53,6 +53,17 @@ func leaderboardRacesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(races))
 }
 
+func leaderboardRacesInfoHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	races, err := json.Marshal(entities.Races)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	fmt.Fprintf(w, string(races))
+}
+
 func searchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	username, ok := r.URL.Query()["player"]
