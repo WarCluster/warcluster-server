@@ -36,7 +36,7 @@
     solarSystemRadius = 9000
     spyReportValidity = 30
     sunCanvasOffsetX = 10000
-	sunCanvasOffsetY = 10000
+    sunCanvasOffsetY = 10000
     sunTextures = 5
 
 [race "InitLab"]
