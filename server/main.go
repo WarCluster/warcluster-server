@@ -11,12 +11,11 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	"warcluster/config"
-	"warcluster/server/response"
-
 	"github.com/fzzy/sockjs-go/sockjs"
 
+	"warcluster/config"
 	"warcluster/leaderboard"
+	"warcluster/server/response"
 )
 
 var (
