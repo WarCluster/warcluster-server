@@ -19,7 +19,7 @@ func TestAllTypesOfMission(t *testing.T) {
 	}
 
 	request := new(Request)
-	request.StartPlanet = []string{"start"}
+	request.StartPlanets = []string{"start"}
 	request.EndPlanet = "end"
 	request.Position = vec2d.New(2.0, 4.0)
 	request.Resolution = []uint64{1920, 1080}
@@ -40,7 +40,7 @@ func TestAllTypesOfMission(t *testing.T) {
 func TestStartMissionWithoutEnoughArguments(t *testing.T) {
 	request := new(Request)
 	request.Command = "start_mission"
-	request.StartPlanet = []string{"start"}
+	request.StartPlanets = []string{"start"}
 	result, _ := ParseRequest(request)
 
 	if result != nil {
@@ -62,7 +62,7 @@ func TestScopeOfViewWithoutEnoughArguments(t *testing.T) {
 func TestStartMissionWithNegativeFleet(t *testing.T) {
 	request := new(Request)
 	request.Command = "start_mission"
-	request.StartPlanet = []string{"start"}
+	request.StartPlanets = []string{"start"}
 	request.EndPlanet = "end"
 	request.Fleet = -10
 	ParseRequest(request)
@@ -75,7 +75,7 @@ func TestStartMissionWithNegativeFleet(t *testing.T) {
 func TestStartMissionWithMoreThanHundredFleet(t *testing.T) {
 	request := new(Request)
 	request.Command = "start_mission"
-	request.StartPlanet = []string{"start"}
+	request.StartPlanets = []string{"start"}
 	request.EndPlanet = "end"
 	request.Fleet = 150
 	ParseRequest(request)

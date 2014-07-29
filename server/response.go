@@ -35,6 +35,10 @@ func parseAction(request *Request) error {
 		return err
 	}()
 
+	if len(request.StartPlanets) == 0 {
+		return errors.New("No start planets provided")
+	}
+
 	target, err := entities.Get(request.EndPlanet)
 	if err != nil {
 		return errors.New("End planet does not exist")
@@ -45,14 +49,13 @@ func parseAction(request *Request) error {
 		return errors.New("Invalid mission type!")
 	}
 
-	for _, startPlanet := range request.StartPlanet {
+	for _, startPlanet := range request.StartPlanets {
 
 		missionErr := prepareMission(startPlanet, endPlanet, request)
 
 		if missionErr != nil {
 			clients.Send(request.Client.Player, missionErr)
 		}
-
 	}
 
 	return nil

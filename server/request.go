@@ -23,7 +23,7 @@ type Request struct {
 	Type         string
 	Position     *vec2d.Vector
 	Resolution   []uint64
-	StartPlanet  []string
+	StartPlanets []string
 	EndPlanet    string
 	Fleet        int32
 	Username     string
@@ -54,7 +54,7 @@ func UnmarshalRequest(message []byte, client *Client) (*Request, error) {
 func ParseRequest(request *Request) (func(*Request) error, error) {
 	switch request.Command {
 	case "start_mission":
-		if len(request.StartPlanet) > 0 && len(request.EndPlanet) > 0 {
+		if len(request.StartPlanets) > 0 && len(request.EndPlanet) > 0 {
 			if request.Fleet > 100 || request.Fleet <= 0 {
 				request.Fleet = 100
 			}

@@ -46,7 +46,7 @@ var planet2 entities.Planet = entities.Planet{
 	Name:     "GOP6724",
 	Position: &vec2d.Vector{4, 4},
 	IsHome:   false,
-	Owner:    "gophie",
+	Owner:    "gosho",
 }
 
 var planet3 entities.Planet = entities.Planet{
@@ -73,7 +73,7 @@ func (suite *ResponseTestSuite) SetupTest() {
 
 	suite.request = new(Request)
 	suite.request.Command = "start_mission"
-	suite.request.StartPlanet = []string{"planet.GOP6720"}
+	suite.request.StartPlanets = []string{"planet.GOP6720"}
 	suite.request.EndPlanet = "planet.PAN6720"
 	suite.request.Position = vec2d.New(2.0, 4.0)
 	suite.request.Resolution = []uint64{1920, 1080}
@@ -87,7 +87,7 @@ func (suite *ResponseTestSuite) SetupTest() {
 }
 
 func (suite *ResponseTestSuite) TestParseActionWithoutStartPlanet() {
-	suite.request.StartPlanet = []string{""}
+	suite.request.StartPlanets = []string{}
 
 	err := parseAction(suite.request)
 
@@ -120,8 +120,8 @@ func (suite *ResponseTestSuite) TestParseActionWithDifferentTypes() {
 }
 
 func (suite *ResponseTestSuite) TestParseActionFromForeignPlanet() {
-	suite.request.StartPlanet[0], suite.request.EndPlanet = suite.request.EndPlanet, suite.request.StartPlanet[0]
-	err := parseAction(suite.request)
+	suite.request.StartPlanets[0], suite.request.EndPlanet = suite.request.EndPlanet, suite.request.StartPlanets[0]
+	err := prepareMission(suite.request.EndPlanet, &planet1, suite.request)
 
 	assert.NotNil(suite.T(), err)
 }
