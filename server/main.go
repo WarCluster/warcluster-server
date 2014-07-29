@@ -41,6 +41,7 @@ func Start() error {
 	http.HandleFunc("/console", consoleHandler)
 	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
 	http.HandleFunc("/leaderboard/races/", leaderboardRacesHandler)
+	http.HandleFunc("/leaderboard/races/info/", leaderboardRacesInfoHandler)
 	http.HandleFunc("/search/", searchHandler)
 	mux.Handle("/universe", handler, conf)
 
