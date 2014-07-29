@@ -56,6 +56,13 @@ var planet3 entities.Planet = entities.Planet{
 	Owner:    "panda",
 }
 
+var planet4 entities.Planet = entities.Planet{
+	Name:     "PAN6729",
+	Position: &vec2d.Vector{12, 12},
+	IsHome:   true,
+	Owner:    "panda",
+}
+
 type ResponseTestSuite struct {
 	suite.Suite
 	conn    redis.Conn
@@ -120,13 +127,20 @@ func (suite *ResponseTestSuite) TestParseActionWithDifferentTypes() {
 }
 
 func (suite *ResponseTestSuite) TestParseActionFromForeignPlanet() {
-	suite.request.StartPlanets[0], suite.request.EndPlanet = suite.request.EndPlanet, suite.request.StartPlanets[0]
 	err := prepareMission(suite.request.EndPlanet, &planet1, suite.request)
 
 	assert.NotNil(suite.T(), err)
 }
 
 func (suite *ResponseTestSuite) TestParseStartMission() {
+	err := parseAction(suite.request)
+
+	assert.Nil(suite.T(), err)
+}
+
+func (suite *ResponseTestSuite) TestParseActionWithMultipleStartPlanet() {
+	suite.request.StartPlanets = []string{"planet.GOP6720", "planet.PAN6729"}
+
 	err := parseAction(suite.request)
 
 	assert.Nil(suite.T(), err)
