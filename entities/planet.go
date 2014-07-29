@@ -40,7 +40,7 @@ func (p *Planet) HasOwner() bool {
 // Returns the set by X or Y where this entity has to be put in
 func (p *Planet) AreaSet() string {
 	return fmt.Sprintf(
-		AREA_TEMPLATE,
+		Settings.AreaTemplate,
 		RoundCoordinateTo(p.Position.X),
 		RoundCoordinateTo(p.Position.Y),
 	)
@@ -79,13 +79,34 @@ func (p *Planet) SetShipCount(count int32) {
 }
 
 func ShipCountTimeMod(size int8, isHome bool) int64 {
-	var timeModifier int64
+	var timeModifier float64
 	if isHome {
-		timeModifier = 2
+		timeModifier = Settings.ShipsPerMinuteHome
 	} else {
-		timeModifier = 6 - int64(size/3)
+		switch size {
+		case 1:
+			timeModifier = Settings.ShipsPerMinute1
+		case 2:
+			timeModifier = Settings.ShipsPerMinute2
+		case 3:
+			timeModifier = Settings.ShipsPerMinute3
+		case 4:
+			timeModifier = Settings.ShipsPerMinute4
+		case 5:
+			timeModifier = Settings.ShipsPerMinute5
+		case 6:
+			timeModifier = Settings.ShipsPerMinute6
+		case 7:
+			timeModifier = Settings.ShipsPerMinute7
+		case 8:
+			timeModifier = Settings.ShipsPerMinute8
+		case 9:
+			timeModifier = Settings.ShipsPerMinute9
+		case 10:
+			timeModifier = Settings.ShipsPerMinute10
+		}
 	}
-	return timeModifier * 10
+	return int64(timeModifier * 10)
 }
 
 // Updates the ship count based on last time this count has
@@ -107,15 +128,15 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	}
 
 	result := []*Planet{}
-	ringOffset := float64(PLANETS_RING_OFFSET)
-	planetRadius := float64(PLANET_RADIUS)
+	ringOffset := float64(Settings.PlanetsRingOffset)
+	planetRadius := float64(Settings.PlanetRadius)
 
-	for ix := 0; ix < PLANET_COUNT; ix++ {
+	for ix := 0; ix < Settings.PlanetCount; ix++ {
 		planet := Planet{
 			Color:        Color{0.78431373, 0.70588235, 0.54901961},
 			Position:     new(vec2d.Vector),
 			IsHome:       false,
-			ShipCount:    10,
+			ShipCount:    Settings.InitialPlanetShipCount,
 			MaxShipCount: 0,
 			Owner:        "",
 		}
@@ -131,8 +152,8 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		result = append(result, &planet)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	homePlanetIdx := int8(hashElement(PLANET_COUNT*PLANET_HASH_ARGS + 1))
+	homePlanetIdx := int8(hashElement(Settings.PlanetCount*Settings.PlanetHashArgs + 1))
 	result[homePlanetIdx].IsHome = true
-	result[homePlanetIdx].ShipCount = 1200
+	result[homePlanetIdx].ShipCount = Settings.InitialHomePlanetShipCount
 	return result, result[homePlanetIdx]
 }

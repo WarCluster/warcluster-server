@@ -61,7 +61,7 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 		ShipCount: shipCount,
 		areaSet:   source.AreaSet(),
 	}
-	mission.TravelTime = calculateTravelTime(source.Position, target.Position, mission.GetSpeed())
+	mission.TravelTime = calculateTravelTime(source.Position, target.Position, Settings.MissionSpeed)
 	return &mission
 }
 

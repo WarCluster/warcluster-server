@@ -25,7 +25,7 @@ func (s *Sun) Key() string {
 // Returns the set by X or Y where this entity has to be put in
 func (s *Sun) AreaSet() string {
 	return fmt.Sprintf(
-		AREA_TEMPLATE,
+		Settings.AreaTemplate,
 		RoundCoordinateTo(s.Position.X),
 		RoundCoordinateTo(s.Position.Y),
 	)
@@ -41,9 +41,9 @@ func (s *Sun) generateName(nickname string) {
 }
 
 func (ss *Sun) calculateAdjacentSlots() []*SolarSlot {
-	verticalOffset := math.Floor((SOLAR_SYSTEM_RADIUS * math.Sqrt(3) / 2) + 0.5)
-	angeledOffsetStepX := math.Floor((SOLAR_SYSTEM_RADIUS / 2) + 0.5)
-	horizontalOffsetStepX := float64(SOLAR_SYSTEM_RADIUS)
+	verticalOffset := math.Floor((Settings.SolarSystemRadius * math.Sqrt(3) / 2) + 0.5)
+	angeledOffsetStepX := math.Floor((Settings.SolarSystemRadius / 2) + 0.5)
+	horizontalOffsetStepX := float64(Settings.SolarSystemRadius)
 
 	slots := []*SolarSlot{
 		newSolarSlot(ss.Position.X-horizontalOffsetStepX, ss.Position.Y),
@@ -71,7 +71,7 @@ func (ss *Sun) createAdjacentSlots() {
 func getStartSolarSlotPosition(friends []*Sun) *SolarSlot {
 	targetPosition := vec2d.New(0, 0)
 
-	verticalOffset := math.Floor(SOLAR_SYSTEM_RADIUS * (math.Sqrt(3) / 2))
+	verticalOffset := math.Floor(Settings.SolarSystemRadius * (math.Sqrt(3) / 2))
 
 	//Find best position between all friends
 	for _, friend := range friends {
@@ -81,14 +81,14 @@ func getStartSolarSlotPosition(friends []*Sun) *SolarSlot {
 		targetPosition.DivToFloat64(float64(len(friends)))
 	}
 
-	//math.Floor(targetPosition.Y/SOLAR_SYSTEM_RADIUS*(math.Sqrt(3)/2) + 0.5)
+	//math.Floor(targetPosition.Y/Settings.SolarSystemRadius*(math.Sqrt(3)/2) + 0.5)
 
 	//Approximate target to nearest node
 	verticalOffsetCoefficent := math.Floor((targetPosition.Y / verticalOffset) + 0.5)
 	if int64(verticalOffsetCoefficent)%2 != 0 {
-		targetPosition.X += SOLAR_SYSTEM_RADIUS / 2
+		targetPosition.X += Settings.SolarSystemRadius / 2
 	}
-	targetPosition.X = SOLAR_SYSTEM_RADIUS * math.Floor((targetPosition.X/SOLAR_SYSTEM_RADIUS)+0.5)
+	targetPosition.X = Settings.SolarSystemRadius * math.Floor((targetPosition.X/Settings.SolarSystemRadius)+0.5)
 	targetPosition.Y = verticalOffset * verticalOffsetCoefficent
 	return newSolarSlot(targetPosition.X, targetPosition.Y)
 

@@ -11,24 +11,11 @@ import (
 	"warcluster/entities/db"
 )
 
-const (
-	AREA_TEMPLATE       = "area:%d:%d"
-	AREA_SIZE           = 10000
-	PLANETS_RING_OFFSET = 300
-	PLANET_RADIUS       = 300
-	PLANET_COUNT        = 10
-	PLANET_HASH_ARGS    = 4
-	SOLAR_SYSTEM_RADIUS = 9000
-	SPY_REPORT_VALIDITY = 30 // in seconds
-)
-
 type Race struct {
 	ID    uint8
 	Name  string
 	Color Color
 }
-
-var Races []Race
 
 // Entity interface is implemented by all entity types here
 type Entity interface {
@@ -41,6 +28,22 @@ type Color struct {
 	R float32
 	G float32
 	B float32
+}
+
+var (
+	Settings config.Entities
+	Races    []Race
+)
+
+func init() {
+	var cfg config.Config
+	cfg.Load("../config/config.gcfg")
+
+	Settings = cfg.Entities
+	Races = make([]Race, len(cfg.Race), len(cfg.Race))
+	for name, params := range cfg.Race {
+		Races[params.Id] = Race{params.Id, name, Color{params.Red, params.Green, params.Blue}}
+	}
 }
 
 //Validate if the color values are in range
@@ -213,14 +216,4 @@ func InArea(key, set string) bool {
 		return false
 	}
 	return result
-}
-
-func init() {
-	var cfg config.Config
-	cfg.Load("../config/config.gcfg")
-
-	Races = make([]Race, len(cfg.Race), len(cfg.Race))
-	for name, params := range cfg.Race {
-		Races[params.Id] = Race{params.Id, name, Color{params.Red, params.Green, params.Blue}}
-	}
 }

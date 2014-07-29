@@ -4,8 +4,6 @@ import (
 	"errors"
 )
 
-const SUN_TEXTURE_COUNT = 5
-
 //SetupData is a structure to hold the data from the initial character setup
 //Race (represented by colors) is the index of the players race
 //SunTextureId is the index of the home solar system sun texture
@@ -16,7 +14,7 @@ type SetupData struct {
 
 // Database key.
 func (s *SetupData) Validate() error {
-	if s.SunTextureId < 0 || s.SunTextureId > SUN_TEXTURE_COUNT {
+	if s.SunTextureId < 0 || s.SunTextureId > Settings.SunTextures {
 		return errors.New("Sun testure index out of range.")
 	}
 	if s.Race >= uint8(len(Races)) {

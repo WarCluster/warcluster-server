@@ -32,15 +32,15 @@ func (s *SpyReport) IsValid() bool {
 }
 
 func CreateSpyReport(target *Planet, mission *Mission) *SpyReport {
-	now := time.Now().Unix()
+	now := time.Now()
 	report := &SpyReport{
 		Player:     mission.Player,
 		Name:       target.Name,
 		Owner:      target.Owner,
 		Position:   target.Position,
 		ShipCount:  target.ShipCount,
-		CreatedAt:  now,
-		ValidUntil: now + SPY_REPORT_VALIDITY,
+		CreatedAt:  now.Unix(),
+		ValidUntil: now.Add(Settings.SpyReportValidity * time.Second).Unix(),
 	}
 	Save(report)
 	return report

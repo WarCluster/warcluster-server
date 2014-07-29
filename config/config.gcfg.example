@@ -13,6 +13,32 @@
    accessToken = "1099448875-VWhp6eyLUE20vhHpOcGB4lMJDMQQFlMUt4hRqIu"
    accessTokenSecret = "4bxZVKF2GTDEpSHMoBv0ankVEJr6oX1FAleImuDKk"
 
+[entities]
+    areaSize = 10000
+    areaTemplate = "area:%d:%d"
+    initialPlanetShipCount = 10
+    initialHomePlanetShipCount = 100
+    pilotsPerMinute1 = 1
+    pilotsPerMinute2 = 1
+    pilotsPerMinute3 = 1.2
+    pilotsPerMinute4 = 1.2
+    pilotsPerMinute5 = 1.2
+    pilotsPerMinute6 = 1.5
+    pilotsPerMinute7 = 1.5
+    pilotsPerMinute8 = 1.5
+    pilotsPerMinute9 = 2
+    pilotsPerMinute10 = 2
+    pilotsPerMinuteHome = 3
+    planetCount = 10
+    planetHashArgs = 4
+    planetRadius = 300
+    planetsRingOffset = 300
+    solarSystemRadius = 9000
+    spyReportValidity = 30
+    sunCanvasOffsetX = 10000
+    sunCanvasOffsetY = 10000
+    sunTextures = 5
+
 [race "InitLab"]
     id = 0
     red = 0.89215686
