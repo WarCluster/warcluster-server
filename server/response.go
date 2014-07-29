@@ -28,58 +28,66 @@ func scopeOfView(request *Request) error {
 func parseAction(request *Request) error {
 	var err error
 
+	sendMissionMessage := response.NewSendMissions()
+
 	defer func() error {
 		if panicked := recover(); panicked != nil {
-			err = errors.New("Invalid action!")
+			err = errors.New("Parse action panic!")
 		}
 		return err
 	}()
 
 	if len(request.StartPlanets) == 0 {
-		return errors.New("No start planets provided")
+		errorMessage := "No start planets provided"
+		sendMissionMessage.FailedMissions["Global"] = errorMessage
+		return errors.New(errorMessage)
 	}
 
 	target, err := entities.Get(request.EndPlanet)
 	if err != nil {
-		return errors.New("End planet does not exist")
+		errorMessage := "End planet does not exist"
+		sendMissionMessage.FailedMissions["Global"] = errorMessage
+		return errors.New(errorMessage)
 	}
 	endPlanet := target.(*entities.Planet)
 
 	if _, isMissionTypeValid := missionTypes[request.Type]; !isMissionTypeValid {
-		return errors.New("Invalid mission type!")
+		errorMessage := "Invalid mission type!"
+		sendMissionMessage.FailedMissions["Global"] = errorMessage
+		return errors.New(errorMessage)
 	}
 
 	for _, startPlanet := range request.StartPlanets {
 
-		missionErr := prepareMission(startPlanet, endPlanet, request)
+		mission, err := prepareMission(startPlanet, endPlanet, request)
 
-		if missionErr != nil {
-			clients.Send(request.Client.Player, missionErr)
+		if err == nil {
+			sendMissionMessage.Missions[mission.Key()] = mission
+		} else {
+			sendMissionMessage.FailedMissions[startPlanet] = err.Error()
 		}
 	}
+
+	clients.BroadcastToAll(sendMissionMessage)
 
 	return nil
 }
 
-func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Request) *response.SendMissionFailed {
-	missionFailed := response.NewSendMissionFailed()
-
+func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Request) (*entities.Mission, error) {
 	sourceEntity, err := entities.Get(startPlanet)
 	if err != nil {
-		missionFailed.Error = err.Error()
-		return missionFailed
+		return nil, err
 	}
 
 	source := sourceEntity.(*entities.Planet)
 
 	if source.Owner != request.Client.Player.Username {
-		missionFailed.Error = "The mission owner does not own the start planet."
-		return missionFailed
+
+		return nil, errors.New("The mission owner does not own the start planet.")
 	}
 
 	if startPlanet == request.EndPlanet {
-		missionFailed.Error = "Start and end planet are the same. Mission cancelled."
-		return missionFailed
+		return nil, errors.New("Start and end planet are the same.")
 	}
 
 	mission := request.Client.Player.StartMission(
@@ -90,25 +98,18 @@ func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Req
 	)
 
 	if mission.ShipCount == 0 {
-		missionFailed.Error = "Not enough pilots on source planet!"
-		return missionFailed
+		return nil, errors.New("Not enough pilots on source planet!")
 	}
-	executeMission(mission, source)
-	return nil
-}
 
-func executeMission(mission *entities.Mission, base *entities.Planet) {
-	entities.Save(base)
+	entities.Save(source)
 	go StartMissionary(mission)
 	entities.Save(mission)
 
-	sendMission := response.NewSendMission()
-	sendMission.Mission = mission
-	clients.BroadcastToAll(sendMission)
-
 	stateChange := response.NewStateChange()
 	stateChange.RawPlanets = map[string]*entities.Planet{
-		base.Key(): base,
+		source.Key(): source,
 	}
 	clients.BroadcastToAll(stateChange)
+
+	return mission, nil
 }

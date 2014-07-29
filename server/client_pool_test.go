@@ -98,7 +98,7 @@ func TestRemoveUnexistingClient(t *testing.T) {
 
 func TestSendMessageToSession(t *testing.T) {
 	cp.pool = make(map[string]*list.List)
-	resp := response.NewSendMission()
+	resp := response.NewSendMissions()
 	cp.Send(&player1, resp)
 
 	cp.Add(&client1)
@@ -126,7 +126,7 @@ func TestSendMessageToSession(t *testing.T) {
 
 func TestBroadcastToAll(t *testing.T) {
 	cp.pool = make(map[string]*list.List)
-	resp := response.NewSendMission()
+	resp := response.NewSendMissions()
 	cp.BroadcastToAll(resp)
 
 	cp.Add(&client1)

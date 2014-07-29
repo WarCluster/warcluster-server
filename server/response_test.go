@@ -127,7 +127,7 @@ func (suite *ResponseTestSuite) TestParseActionWithDifferentTypes() {
 }
 
 func (suite *ResponseTestSuite) TestParseActionFromForeignPlanet() {
-	err := prepareMission(suite.request.EndPlanet, &planet1, suite.request)
+	_, err := prepareMission(suite.request.EndPlanet, &planet1, suite.request)
 
 	assert.NotNil(suite.T(), err)
 }

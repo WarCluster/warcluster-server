@@ -175,8 +175,8 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 	go StartMissionary(excessMission)
 	entities.Save(excessMission)
 
-	sendMission := response.NewSendMission()
-	sendMission.Mission = excessMission
+	sendMission := response.NewSendMissions()
+	sendMission.Missions[excessMission.Key()] = excessMission
 	clients.BroadcastToAll(sendMission)
 }
 
