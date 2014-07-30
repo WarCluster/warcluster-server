@@ -84,8 +84,8 @@ func TestSimpleLoggerWithMaster(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		sendToLogger(logger, fmt.Sprintf("%s", i))
-		assert.Equal(t, logger.size, i+1)
-		assert.Equal(t, master.size, 0)
+		assert.Equal(t, len(logger.stash), i+1)
+		assert.Equal(t, len(master.stash), 0)
 	}
 	logger.Close()
 }
@@ -100,8 +100,8 @@ func TestOverflowedLogger(t *testing.T) {
 
 	time.Sleep(3) // I know, right
 
-	assert.True(t, logger.size < 3)
-	assert.Equal(t, master.size, 8)
+	assert.True(t, len(logger.stash) < 3)
+	assert.Equal(t, len(master.stash), 8)
 }
 
 func TestOverflowedMasterLogger(t *testing.T) {
@@ -113,8 +113,8 @@ func TestOverflowedMasterLogger(t *testing.T) {
 	for i := 0; i < 25; i++ {
 		sendToLogger(logger, fmt.Sprintf("%s", i))
 	}
-	assert.Equal(t, logger.size, 1)
-	assert.Equal(t, master.size, 8)
+	assert.Equal(t, len(logger.stash), 1)
+	assert.Equal(t, len(master.stash), 8)
 
 	for i := 0; i < 16; i++ {
 		line, err := mockedOuput.ReadBytes('\n')

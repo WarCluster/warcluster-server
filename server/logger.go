@@ -27,7 +27,6 @@ type LogRecord struct {
 type Logger struct {
 	master  *MasterLogger
 	channel chan *LogRecord
-	size    int
 	maxSize int
 	stash   []*LogRecord
 }
@@ -44,7 +43,6 @@ type Logger struct {
 type MasterLogger struct {
 	stream  io.Writer
 	mutex   *sync.Mutex
-	size    int
 	maxSize int
 	stash   []*LogRecord
 }
@@ -78,7 +76,7 @@ func NewLogger(master *MasterLogger, maxSize int) *Logger {
 }
 
 func (m *MasterLogger) Len() int {
-	return m.size
+	return len(m.stash)
 }
 
 func (m *MasterLogger) Less(i, j int) bool {
@@ -114,12 +112,9 @@ func (l *Logger) Log(message string) {
 // concurrent environment.
 func (l *Logger) push(record *LogRecord) {
 	l.stash = append(l.stash, record)
-	l.size++
 
-	if l.size == l.maxSize {
+	if len(l.stash) >= l.maxSize {
 		l.writeBack()
-		l.stash = make([]*LogRecord, 0, l.maxSize)
-		l.size = 0
 	}
 }
 
@@ -129,8 +124,8 @@ func (l *Logger) writeBack() {
 	defer l.master.mutex.Unlock()
 
 	l.master.stash = append(l.master.stash, l.stash...)
-	l.master.size += l.size
-	if l.master.size >= l.master.maxSize {
+	l.stash = make([]*LogRecord, 0, l.maxSize)
+	if len(l.master.stash) >= l.master.maxSize {
 		l.master.writeBack()
 	}
 }
@@ -150,5 +145,4 @@ func (m *MasterLogger) writeBack() {
 		)
 	}
 	m.stash = make([]*LogRecord, 0, m.maxSize)
-	m.size = 0
 }
