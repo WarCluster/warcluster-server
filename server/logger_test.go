@@ -131,15 +131,15 @@ func BenchmarkPushingToM1024L256(b *testing.B) {
 }
 
 func BenchmarkPushingToM2048L512(b *testing.B) {
-	benchmarkWithLoggerSizes(b, 1024, 256)
+	benchmarkWithLoggerSizes(b, 2048, 512)
 }
 
 func BenchmarkPushingToM4096L1024(b *testing.B) {
-	benchmarkWithLoggerSizes(b, 1024, 256)
+	benchmarkWithLoggerSizes(b, 4096, 1024)
 }
 
 func BenchmarkPushingToM8192L2048(b *testing.B) {
-	benchmarkWithLoggerSizes(b, 1024, 256)
+	benchmarkWithLoggerSizes(b, 8192, 2048)
 }
 
 func BenchmarkPushStubbedMessage(b *testing.B) {
