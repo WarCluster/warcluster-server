@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"warcluster/config"
 	"warcluster/entities"
 	"warcluster/leaderboard"
 )
@@ -90,7 +89,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Initialize the leaderboard
-func InitLeaderboard(board *leaderboard.Leaderboard, cfg config.Config) {
+func InitLeaderboard(board *leaderboard.Leaderboard) {
 	log.Println("Initializing the leaderboard...")
 	allPlayers := make(map[string]*leaderboard.Player)
 	playerEntities := entities.Find("player.*")

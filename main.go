@@ -17,9 +17,10 @@ var cfg config.Config
 func main() {
 	go final()
 
-	cfg.Load("config/config.gcfg")
+	cfg.Load()
 	db.InitPool(cfg.Database.Host, cfg.Database.Port, 8)
-	server.InitLeaderboard(leaderboard.New(), cfg)
+	server.ExportConfig(cfg)
+	server.InitLeaderboard(leaderboard.New())
 	server.SpawnDbMissions()
 	server.Start()
 }

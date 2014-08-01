@@ -25,10 +25,14 @@ var (
 	listener    net.Listener
 )
 
+// Exports to given loaded config file into server.cfg
+func ExportConfig(loadedCfg config.Config) {
+	cfg = loadedCfg
+}
+
 // This function goes trough all the procedurs needed for the werver to be initialized.
 // Create an empty connections pool and start the listening foe messages loop.
 func Start() error {
-	cfg.Load("../config/config.gcfg")
 	host := cfg.Server.Host
 	port := cfg.Server.Port
 
