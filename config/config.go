@@ -3,8 +3,7 @@ package config
 
 import (
 	"log"
-	"path"
-	"runtime"
+	"os"
 	"time"
 
 	"code.google.com/p/gcfg"
@@ -63,10 +62,18 @@ type Entities struct {
 	SunTextures                uint16
 }
 
-func (c *Config) Load(name string) {
-	_, filename, _, _ := runtime.Caller(1)
-	configPath := path.Join(path.Dir(filename), name)
-	if err := gcfg.ReadFileInto(c, configPath); err != nil {
-		log.Fatal("Error loading cfg:", err)
+func (c *Config) Load() {
+	if err := gcfg.ReadFileInto(c, "./config/config.gcfg"); err != nil {
+		if os.IsNotExist(err) {
+			c.LoadDefault()
+		} else {
+			log.Fatal("Error loading cfg:", err)
+		}
+	}
+}
+
+func (c *Config) LoadDefault() {
+	if err := gcfg.ReadFileInto(c, "./config/config.gcfg.default"); err != nil {
+		log.Fatal("Error loading default cfg:", err)
 	}
 }

@@ -37,7 +37,7 @@ var (
 
 func init() {
 	var cfg config.Config
-	cfg.Load("../config/config.gcfg")
+	cfg.Load()
 
 	Settings = cfg.Entities
 	Races = make([]Race, len(cfg.Race), len(cfg.Race))
