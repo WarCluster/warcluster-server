@@ -109,13 +109,32 @@ func ShipCountTimeMod(size int8, isHome bool) int64 {
 	return int64(timeModifier * 10)
 }
 
+func (p *Planet) planetMaxShipCount() int32 {
+	return int32(Settings.PlanetMaxShipsMod * ShipCountTimeMod(p.Size, p.IsHome))
+}
+
 // Updates the ship count based on last time this count has
 // been updated and of course the planet size.
 // NOTE: If the planet is somebody's home we set a static increasion rate.
 func (p *Planet) UpdateShipCount() {
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
-		p.ShipCount += int32(passedTime / ShipCountTimeMod(p.Size, p.IsHome))
+		shipDiff := int32(passedTime / ShipCountTimeMod(p.Size, p.IsHome))
+
+		if p.ShipCount > p.planetMaxShipCount() {
+			if (p.ShipCount - p.planetMaxShipCount()) > shipDiff {
+				p.ShipCount -= shipDiff
+			} else {
+				p.ShipCount = p.planetMaxShipCount()
+			}
+		} else {
+			if (p.planetMaxShipCount() - p.ShipCount) > shipDiff {
+				p.ShipCount += shipDiff
+			} else {
+				p.ShipCount = p.planetMaxShipCount()
+			}
+		}
+
 		p.LastShipCountUpdate = time.Now().Unix()
 	}
 }

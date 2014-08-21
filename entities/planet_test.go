@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/Vladimiroff/vec2d"
 )
@@ -41,6 +42,49 @@ func TestGeneratePlanets(t *testing.T) {
 		if generatedPlanets[i].Size != expectedPlanets[i].Size {
 			t.Error("Size missmatch on Planet[", strconv.Itoa(i), "] Expected", expectedPlanets[i].Size, "Actual ", generatedPlanets[i].Size)
 		}
+	}
+}
+
+func TestUpdatePlanetShipCount(t *testing.T) {
+	var spmSize3 float64
+	var maxPlanetShipMod int64
+	defer func() {
+		Settings.ShipsPerMinute3 = spmSize3
+		Settings.PlanetMaxShipsMod = maxPlanetShipMod
+		return
+	}()
+
+	spmSize3 = Settings.ShipsPerMinute3
+	maxPlanetShipMod = Settings.PlanetMaxShipsMod
+
+	Settings.ShipsPerMinute3 = 1
+	Settings.PlanetMaxShipsMod = 10
+
+	basePlanets := []Planet{
+		{"ABC1231", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(-77, 57), false, 6, 3, time.Now().Unix() - 100, 170, 0, "gophie"},     //160
+		{"ABC1232", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(1470, 300), false, 8, 3, time.Now().Unix() - 6000, 10, 0, "gophie"},   //100
+		{"ABC1233", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(-690, -201), false, 3, 3, time.Now().Unix() - 6000, 110, 0, "gophie"}, //100
+		{"ABC1234", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(1110, 200), false, 2, 3, time.Now().Unix() - 100, 50, 0, "gophie"},    //60
+	}
+
+	planetOneShipCount := basePlanets[0].GetShipCount()
+	if planetOneShipCount != 160 {
+		t.Error("Planet[", basePlanets[0].Key(), "] Expected", 160, "Actual ", planetOneShipCount)
+	}
+
+	planetTwoShipCount := basePlanets[1].GetShipCount()
+	if planetTwoShipCount != 100 {
+		t.Error("Planet[", basePlanets[1].Key(), "] Expected", 100, "Actual ", planetTwoShipCount)
+	}
+
+	planetThreeShipCount := basePlanets[2].GetShipCount()
+	if planetThreeShipCount != 100 {
+		t.Error("Planet[", basePlanets[2].Key(), "] Expected", 100, "Actual ", planetThreeShipCount)
+	}
+
+	planetFourShipCount := basePlanets[3].GetShipCount()
+	if planetFourShipCount != 60 {
+		t.Error("Planet[", basePlanets[3].Key(), "] Expected", 60, "Actual ", planetFourShipCount)
 	}
 }
 
