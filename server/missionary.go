@@ -196,10 +196,7 @@ func updateSpyReports(mission *entities.Mission, state *response.StateChange) {
 		return
 	}
 
-	for element := clients.pool[mission.Player].Front(); element != nil; element = element.Next() {
-		client := element.Value.(*Client)
-		client.Player.UpdateSpyReports()
-	}
+	clients.UpdateSpyReports(player)
 	clients.Send(player, state)
 }
 

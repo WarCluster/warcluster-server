@@ -68,6 +68,20 @@ func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 	}
 }
 
+func (cp *ClientPool) UpdateSpyReports(player *entities.Player) {
+	defer func() {
+		if panicked := recover(); panicked != nil {
+			return
+		}
+	}()
+
+	poolMember := cp.pool[player.Username]
+	for element := poolMember.list.Front(); element != nil; element = element.Next() {
+		client := element.Value.(*Client)
+		client.Player.UpdateSpyReports()
+	}
+}
+
 // Sanitizes given response and sends it to every player's session in the pool.
 func (cp *ClientPool) Send(player *entities.Player, response response.Responser) {
 	defer func() {
