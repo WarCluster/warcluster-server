@@ -85,6 +85,10 @@ func StartMissionary(mission *entities.Mission) {
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
 	target, stateChange, err = fetchMissionTarget(targetKey)
+	if err != nil {
+		log.Print("fetchMissionTarget fail: ", err.Error())
+		return
+	}
 	ownerBeforeMission := target.Owner
 
 	if ownerBeforeMission == "" {
