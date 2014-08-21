@@ -27,8 +27,8 @@ func (suite *ClientTestSuite) SetupTest() {
 	suite.conn.Do("FLUSHDB")
 	suite.session = new(testSession)
 
-	cfg.Load("../config/config.gcfg")
-	InitLeaderboard(leaderboard.New(), cfg)
+	cfg.Load()
+	InitLeaderboard(leaderboard.New())
 }
 
 func (suite *ClientTestSuite) TearDownTest() {

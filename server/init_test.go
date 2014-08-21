@@ -13,7 +13,7 @@ import (
 
 func init() {
 	var cfg config.Config
-	cfg.Load("../config/config.gcfg")
+	cfg.Load()
 	db.InitPool(cfg.Database.Host, cfg.Database.Port, 13)
 	conn := db.Pool.Get()
 	defer conn.Close()
