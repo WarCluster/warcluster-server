@@ -131,6 +131,10 @@ func TestTravelTime(t *testing.T) {
 	expectedTime := time.Duration(7017)
 	time := calculateTravelTime(source, target, 10)
 
+	if Settings.MissionSpeed <= 0 {
+		t.Errorf("The mission speed in config is %d\n", Settings.MissionSpeed)
+	}
+
 	if time != expectedTime {
 		t.Errorf(
 			"CalculateTravelTime(%v, %v, 10) = %d instead of %d",
