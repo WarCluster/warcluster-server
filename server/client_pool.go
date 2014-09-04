@@ -4,7 +4,11 @@ import (
 	"container/list"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
+	"runtime/debug"
 	"sync"
+	"time"
 
 	"warcluster/entities"
 	"warcluster/server/response"
@@ -12,14 +16,37 @@ import (
 
 // Thread-safe pool of all clients, with opened sockets.
 type ClientPool struct {
-	mutex sync.Mutex
-	pool  map[string]*list.List
+	mutex  sync.Mutex
+	pool   map[string]*list.List
+	ticker *time.Ticker
 }
 
 func NewClientPool() *ClientPool {
 	cp := new(ClientPool)
 	cp.pool = make(map[string]*list.List)
+	cp.ticker = time.NewTicker(cfg.Server.Ticker * time.Millisecond)
+	go cp.runStateChangeCycle()
 	return cp
+}
+
+func (cp *ClientPool) runStateChangeCycle() {
+	defer func() {
+		if panicked := recover(); panicked != nil {
+			log.Println(fmt.Sprintf(
+				"%s\n\nState change cycle has panicked!:\n\n%s",
+				panicked,
+				debug.Stack(),
+			))
+			go cp.runStateChangeCycle()
+		}
+	}()
+	for _ = range cp.ticker.C {
+		for _, clients := range cp.pool {
+			for element := clients.Front(); element != nil; element = element.Next() {
+				element.Value.(*Client).sendStateChange()
+			}
+		}
+	}
 }
 
 // Returns player's instance by username in order not to hit the database
@@ -68,6 +95,21 @@ func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 	}
 }
 
+// Broadcasts state change of an entity to all interested parties
+func (cp *ClientPool) Broadcast(entity entities.Entity) {
+	defer func() {
+		if panicked := recover(); panicked != nil {
+			return
+		}
+	}()
+
+	for _, clients := range cp.pool {
+		for element := clients.Front(); element != nil; element = element.Next() {
+			element.Value.(*Client).pushStateChange(entity)
+		}
+	}
+}
+
 func (cp *ClientPool) UpdateSpyReports(player *entities.Player) {
 	defer func() {
 		if panicked := recover(); panicked != nil {
@@ -76,7 +118,7 @@ func (cp *ClientPool) UpdateSpyReports(player *entities.Player) {
 	}()
 
 	poolMember := cp.pool[player.Username]
-	for element := poolMember.list.Front(); element != nil; element = element.Next() {
+	for element := poolMember.Front(); element != nil; element = element.Next() {
 		client := element.Value.(*Client)
 		client.Player.UpdateSpyReports()
 	}
