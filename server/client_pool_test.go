@@ -10,7 +10,7 @@ import (
 	"warcluster/server/response"
 )
 
-var cp = NewClientPool()
+var cp = NewClientPool(16)
 
 var player1 = entities.Player{
 	Username:       "gophie",

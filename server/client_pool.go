@@ -21,10 +21,10 @@ type ClientPool struct {
 	ticker *time.Ticker
 }
 
-func NewClientPool() *ClientPool {
+func NewClientPool(ticker time.Duration) *ClientPool {
 	cp := new(ClientPool)
 	cp.pool = make(map[string]*list.List)
-	cp.ticker = time.NewTicker(cfg.Server.Ticker * time.Millisecond)
+	cp.ticker = time.NewTicker(ticker * time.Millisecond)
 	go cp.runStateChangeCycle()
 	return cp
 }
