@@ -30,10 +30,7 @@ var panda entities.Player = entities.Player{
 	ScreenPosition: &vec2d.Vector{2, 2},
 }
 
-var client Client = Client{
-	Session: new(testSession),
-	Player:  &gophie,
-}
+var client = *NewClient(new(testSession), &gophie)
 
 var planet1 entities.Planet = entities.Planet{
 	Name:     "GOP6720",

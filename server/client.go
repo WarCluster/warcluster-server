@@ -23,9 +23,18 @@ import (
 type Client struct {
 	Session     sockjs.Session
 	Player      *entities.Player
+	areas       map[string]struct{}
 	poolElement *list.Element
 	stateChange *response.StateChange
 	mutex       sync.Mutex
+}
+
+func NewClient(session sockjs.Session, player *entities.Player) *Client {
+	return &Client{
+		Session: session,
+		Player:  player,
+		areas:   make(map[string]struct{}),
+	}
 }
 
 // Send response directly to the client
@@ -71,10 +80,7 @@ func login(session sockjs.Session) (*Client, response.Responser, error) {
 		return nil, response.NewLoginFailed(), errors.New("Login failed")
 	}
 
-	client := &Client{
-		Session: session,
-		Player:  player,
-	}
+	client := NewClient(session, player)
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
 		return nil, nil, errors.New("Your home planet is missing!")
