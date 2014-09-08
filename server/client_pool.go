@@ -86,6 +86,7 @@ func (cp *ClientPool) Remove(client *Client) {
 }
 
 // Broadcast sends the given message to every session in the pool.
+// WARNING: This method is DEPRECATED! Use cp.Broadcast() instead.
 func (cp *ClientPool) BroadcastToAll(response response.Responser) {
 	for _, clients := range cp.pool {
 
