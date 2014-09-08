@@ -61,10 +61,10 @@ func TestUpdatePlanetShipCount(t *testing.T) {
 	Settings.PlanetMaxShipsMod = 10
 
 	basePlanets := []Planet{
-		{"ABC1231", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(-77, 57), false, 6, 3, time.Now().Unix() - 100, 170, 0, "gophie"},     //160
-		{"ABC1232", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(1470, 300), false, 8, 3, time.Now().Unix() - 6000, 10, 0, "gophie"},   //100
-		{"ABC1233", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(-690, -201), false, 3, 3, time.Now().Unix() - 6000, 110, 0, "gophie"}, //100
-		{"ABC1234", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(1110, 200), false, 2, 3, time.Now().Unix() - 100, 50, 0, "gophie"},    //60
+		{"ABC1231", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(-77, 57), false, 6, 3, time.Now().Unix() - 100, 170, 100, "gophie"},     //160
+		{"ABC1232", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(1470, 300), false, 8, 3, time.Now().Unix() - 6000, 10, 100, "gophie"},   //100
+		{"ABC1233", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(-690, -201), false, 3, 3, time.Now().Unix() - 6000, 110, 100, "gophie"}, //100
+		{"ABC1234", Color{0.59215686, 0.59215686, 0.59215686}, vec2d.New(1110, 200), false, 2, 3, time.Now().Unix() - 100, 50, 100, "gophie"},    //60
 	}
 
 	planetOneShipCount := basePlanets[0].GetShipCount()
