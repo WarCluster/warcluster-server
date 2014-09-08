@@ -68,7 +68,7 @@ func parseAction(request *Request) error {
 		}
 	}
 
-	clients.BroadcastToAll(sendMissionMessage)
+	request.Client.Send(sendMissionMessage)
 
 	return nil
 }
