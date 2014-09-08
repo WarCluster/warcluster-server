@@ -106,6 +106,7 @@ func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Req
 	entities.Save(source)
 	go StartMissionary(mission)
 	entities.Save(mission)
+	clients.Broadcast(mission)
 	clients.Broadcast(source)
 
 	return mission, nil
