@@ -20,7 +20,7 @@ import (
 
 var (
 	cfg         config.Config
-	clients     *ClientPool = NewClientPool()
+	clients     *ClientPool
 	leaderBoard *leaderboard.Leaderboard
 	listener    net.Listener
 )
@@ -35,6 +35,7 @@ func ExportConfig(loadedCfg config.Config) {
 func Start() error {
 	host := cfg.Server.Host
 	port := cfg.Server.Port
+	clients = NewClientPool(cfg.Server.Ticker)
 
 	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", host, port))
 	log.Print("Quit the server with Ctrl-C.")

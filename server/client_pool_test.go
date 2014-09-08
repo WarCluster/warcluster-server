@@ -10,7 +10,7 @@ import (
 	"warcluster/server/response"
 )
 
-var cp = NewClientPool()
+var cp = NewClientPool(16)
 
 var player1 = entities.Player{
 	Username:       "gophie",
@@ -30,25 +30,13 @@ var player2 = entities.Player{
 	ScreenPosition: &vec2d.Vector{2, 8},
 }
 
-var client1 = Client{
-	Session: new(testSession),
-	Player:  &player1,
-}
+var client1 = *NewClient(new(testSession), &player1)
 
-var client2 = Client{
-	Session: new(testSession),
-	Player:  &player1,
-}
+var client2 = *NewClient(new(testSession), &player1)
 
-var client3 = Client{
-	Session: new(testSession),
-	Player:  &player2,
-}
+var client3 = *NewClient(new(testSession), &player2)
 
-var client4 = Client{
-	Session: new(testSession),
-	Player:  &player2,
-}
+var client4 = *NewClient(new(testSession), &player2)
 
 func TestAddClientToClientPool(t *testing.T) {
 	cp.pool = make(map[string]*list.List)

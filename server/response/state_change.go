@@ -15,6 +15,10 @@ type StateChange struct {
 func NewStateChange() *StateChange {
 	r := new(StateChange)
 	r.Command = "state_change"
+	r.Missions = make(map[string]*entities.Mission)
+	r.RawPlanets = make(map[string]*entities.Planet)
+	r.Planets = make(map[string]*entities.PlanetPacket)
+	r.Suns = make(map[string]*entities.Sun)
 	return r
 }
 

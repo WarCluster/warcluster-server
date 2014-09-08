@@ -104,12 +104,7 @@ func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Req
 	entities.Save(source)
 	go StartMissionary(mission)
 	entities.Save(mission)
-
-	stateChange := response.NewStateChange()
-	stateChange.RawPlanets = map[string]*entities.Planet{
-		source.Key(): source,
-	}
-	clients.BroadcastToAll(stateChange)
+	clients.Broadcast(source)
 
 	return mission, nil
 }

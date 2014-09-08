@@ -76,11 +76,7 @@ func StartMissionary(mission *entities.Mission) {
 		time.Sleep(timeToSleep * time.Millisecond)
 		mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
 
-		stateChange := response.NewStateChange()
-		stateChange.Missions = map[string]*entities.Mission{
-			mission.Key(): mission,
-		}
-		clients.BroadcastToAll(stateChange)
+		clients.Broadcast(mission)
 	}
 
 	time.Sleep((mission.TravelTime - timeSlept) * time.Millisecond)
@@ -104,7 +100,7 @@ func StartMissionary(mission *entities.Mission) {
 			log.Print("Error in target planet fetch:", err.Error())
 		}
 		excessShips, ownerHasChanged = mission.EndAttackMission(target)
-		clients.BroadcastToAll(stateChange)
+		clients.Broadcast(target)
 	case "Supply":
 		if err != nil {
 			log.Print("Error in target planet fetch:", err.Error())
@@ -196,10 +192,7 @@ func updateSpyReports(mission *entities.Mission, state *response.StateChange) {
 		return
 	}
 
-	for element := clients.pool[mission.Player].Front(); element != nil; element = element.Next() {
-		client := element.Value.(*Client)
-		client.Player.UpdateSpyReports()
-	}
+	clients.UpdateSpyReports(player)
 	clients.Send(player, state)
 }
 
@@ -215,6 +208,7 @@ func fetchMissionTarget(targetKey string) (*entities.Planet, *response.StateChan
 	stateChange.RawPlanets = map[string]*entities.Planet{
 		target.Key(): target,
 	}
+	clients.Broadcast(target)
 
 	return target, stateChange, nil
 }

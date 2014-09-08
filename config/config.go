@@ -16,6 +16,7 @@ type Config struct {
 		Host    string
 		Port    uint16
 		Console bool
+		Ticker  time.Duration
 	}
 	Database struct {
 		Host string

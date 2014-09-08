@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"sync"
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/fzzy/sockjs-go/sockjs"
@@ -22,7 +23,52 @@ import (
 type Client struct {
 	Session     sockjs.Session
 	Player      *entities.Player
+	areas       map[string]struct{}
 	poolElement *list.Element
+	stateChange *response.StateChange
+	mutex       sync.Mutex
+}
+
+func NewClient(session sockjs.Session, player *entities.Player) *Client {
+	return &Client{
+		Session: session,
+		Player:  player,
+		areas:   make(map[string]struct{}),
+	}
+}
+
+// Send response directly to the client
+func (c *Client) send(response response.Responser) {
+	response.Sanitize(c.Player)
+	message, _ := json.Marshal(response)
+	c.Session.Send(message)
+}
+
+// Send all changes to the client and flush them
+func (c *Client) sendStateChange() {
+	if c.stateChange != nil {
+		c.send(c.stateChange)
+		c.stateChange = nil
+	}
+}
+
+// Add a change to the stateChange
+func (c *Client) pushStateChange(entity entities.Entity) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.stateChange == nil {
+		c.stateChange = response.NewStateChange()
+	}
+
+	switch e := entity.(type) {
+	case *entities.Mission:
+		c.stateChange.Missions[e.Key()] = e
+	case *entities.Planet:
+		c.stateChange.RawPlanets[e.Key()] = e
+	case *entities.Sun:
+		c.stateChange.Suns[e.Key()] = e
+	}
 }
 
 // This function is called from the message handler to parse the first message for every new connection.
@@ -34,10 +80,7 @@ func login(session sockjs.Session) (*Client, response.Responser, error) {
 		return nil, response.NewLoginFailed(), errors.New("Login failed")
 	}
 
-	client := &Client{
-		Session: session,
-		Player:  player,
-	}
+	client := NewClient(session, player)
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
 		return nil, nil, errors.New("Your home planet is missing!")
@@ -144,21 +187,13 @@ func register(setupData *entities.SetupData, nickname, twitterId string) *entiti
 
 	for _, planet := range planets {
 		entities.Save(planet)
-		stateChange := response.NewStateChange()
-		stateChange.RawPlanets = map[string]*entities.Planet{
-			planet.Key(): planet,
-		}
-		clients.BroadcastToAll(stateChange)
+		clients.Broadcast(planet)
 	}
 
 	entities.Save(player)
 	entities.Save(sun)
 
-	stateChange := response.NewStateChange()
-	stateChange.Suns = map[string]*entities.Sun{
-		sun.Key(): sun,
-	}
-	clients.BroadcastToAll(stateChange)
+	clients.Broadcast(sun)
 	leaderBoard.Add(&leaderboard.Player{
 		Username:   player.Username,
 		RaceId:     player.RaceID,
