@@ -21,6 +21,8 @@ func scopeOfView(request *Request) error {
 	request.Client.Player.ScreenPosition = request.Position
 	go entities.Save(request.Client.Player)
 	clients.Send(request.Client.Player, response)
+	request.Client.MoveToAreas(response.Areas())
+
 	return nil
 }
 

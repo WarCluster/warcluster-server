@@ -106,7 +106,10 @@ func (cp *ClientPool) Broadcast(entity entities.Entity) {
 
 	for _, clients := range cp.pool {
 		for element := clients.Front(); element != nil; element = element.Next() {
-			element.Value.(*Client).pushStateChange(entity)
+			client := element.Value.(*Client)
+			if _, in := client.areas[entity.AreaSet()]; in {
+				client.pushStateChange(entity)
+			}
 		}
 	}
 }

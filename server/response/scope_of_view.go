@@ -24,6 +24,11 @@ func (s *ScopeOfView) Sanitize(player *entities.Player) {
 	s.Planets = SanitizePlanets(player, s.rawPlanets)
 }
 
+// Returns all the areas visible in this scope of view
+func (s *ScopeOfView) Areas() []string {
+	return listAreas(s.CanvasPoints.TopLeft, s.CanvasPoints.BottomRight)
+}
+
 // TODO: Use vector for rawPlanets
 func NewScopeOfView(position *vec2d.Vector, resolution []uint64) *ScopeOfView {
 	topLeft, bottomRight := calculateCanvasSize(position, resolution)

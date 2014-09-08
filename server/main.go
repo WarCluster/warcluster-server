@@ -23,6 +23,7 @@ var (
 	clients     *ClientPool
 	leaderBoard *leaderboard.Leaderboard
 	listener    net.Listener
+	empty       = struct{}{}
 )
 
 // Exports to given loaded config file into server.cfg
