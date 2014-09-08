@@ -4,8 +4,8 @@ import "warcluster/entities"
 
 type SendMissions struct {
 	baseResponse
-	Missions       map[string]*entities.Mission
-	FailedMissions map[string]string
+	Missions       map[string]*entities.Mission `json:",omitempty"`
+	FailedMissions map[string]string            `json:",omitempty"`
 }
 
 func NewSendMissions() *SendMissions {
