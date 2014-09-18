@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
+	"strings"
 	"sync"
 	"time"
 
 	"warcluster/entities"
+	"warcluster/entities/db"
 	"warcluster/server/response"
 )
 
@@ -103,8 +105,25 @@ func (cp *ClientPool) Broadcast(entity entities.Entity) {
 			return
 		}
 	}()
+	conn := db.Pool.Get()
+	defer conn.Close()
 
-	for _, clients := range cp.pool {
+	members, err := db.Smembers(conn, entity.AreaSet())
+	if err != nil {
+		log.Printf("SMEMBERS of %s: %s", entity.AreaSet(), err)
+		return
+	}
+
+	for _, member := range members {
+		if !strings.HasPrefix(member, "player.") {
+			continue
+		}
+		player := strings.SplitN(member, ".", 2)[1]
+		clients, ok := cp.pool[player]
+		if !ok {
+			continue
+		}
+
 		for element := clients.Front(); element != nil; element = element.Next() {
 			client := element.Value.(*Client)
 			if _, in := client.areas[entity.AreaSet()]; in {
