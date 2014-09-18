@@ -92,17 +92,6 @@ func (cp *ClientPool) Remove(client *Client) {
 	}
 }
 
-// Broadcast sends the given message to every session in the pool.
-// WARNING: This method is DEPRECATED! Use cp.Broadcast() instead.
-func (cp *ClientPool) BroadcastToAll(response response.Responser) {
-	for _, clients := range cp.pool {
-
-		client := clients.Front().Value.(*Client)
-		response.Sanitize(client.Player)
-		cp.Send(client.Player, response)
-	}
-}
-
 // Broadcasts state change of an entity to all interested parties
 func (cp *ClientPool) Broadcast(entity entities.Entity) {
 	defer func() {

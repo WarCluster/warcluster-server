@@ -112,32 +112,6 @@ func TestSendMessageToSession(t *testing.T) {
 
 }
 
-func TestBroadcastToAll(t *testing.T) {
-	cp.pool = make(map[string]*list.List)
-	resp := response.NewSendMissions()
-	cp.BroadcastToAll(resp)
-
-	cp.Add(&client1)
-	cp.Add(&client2)
-	cp.Add(&client3)
-	l1 := len(client1.Session.(*testSession).Messages)
-	l2 := len(client2.Session.(*testSession).Messages)
-	l3 := len(client3.Session.(*testSession).Messages)
-	cp.BroadcastToAll(resp)
-
-	if len(client1.Session.(*testSession).Messages) != l1+1 {
-		t.Errorf("%d", len(client1.Session.(*testSession).Messages))
-	}
-
-	if len(client2.Session.(*testSession).Messages) != l2+1 {
-		t.Fail()
-	}
-
-	if len(client3.Session.(*testSession).Messages) != l3+1 {
-		t.Fail()
-	}
-}
-
 func TestPlayer(t *testing.T) {
 	cp.pool = make(map[string]*list.List)
 	cp.Add(&client1)
