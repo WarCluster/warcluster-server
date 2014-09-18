@@ -76,10 +76,15 @@ func (cp *ClientPool) Add(client *Client) {
 func (cp *ClientPool) Remove(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
+	conn := db.Pool.Get()
+	defer conn.Close()
 
 	playerInPool, ok := cp.pool[client.Player.Username]
 	if ok {
 		playerInPool.Remove(client.poolElement)
+		for area, _ := range client.areas {
+			db.Srem(conn, area, client.Player.Key())
+		}
 
 		if playerInPool.Len() == 0 {
 			delete(cp.pool, client.Player.Username)
