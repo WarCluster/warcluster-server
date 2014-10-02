@@ -4,6 +4,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"warcluster/config"
@@ -13,6 +14,10 @@ import (
 )
 
 var cfg config.Config
+
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
 
 func main() {
 	go final()
