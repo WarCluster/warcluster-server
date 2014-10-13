@@ -57,6 +57,7 @@ type Entities struct {
 	ShipsPerMinute9            float64
 	ShipsPerMinute10           float64
 	ShipsPerMinuteHome         float64
+	PlanetMaxShipsMod          int64
 	PlanetsRingOffset          uint16
 	SolarSystemRadius          float64
 	SpyReportValidity          time.Duration

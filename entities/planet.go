@@ -115,7 +115,22 @@ func ShipCountTimeMod(size int8, isHome bool) int64 {
 func (p *Planet) UpdateShipCount() {
 	if p.HasOwner() {
 		passedTime := time.Now().Unix() - p.LastShipCountUpdate
-		p.ShipCount += int32(passedTime / ShipCountTimeMod(p.Size, p.IsHome))
+		shipDiff := int32(passedTime / ShipCountTimeMod(p.Size, p.IsHome))
+
+		if p.ShipCount > p.MaxShipCount {
+			if (p.ShipCount - p.MaxShipCount) > shipDiff {
+				p.ShipCount -= shipDiff
+			} else {
+				p.ShipCount = p.MaxShipCount
+			}
+		} else {
+			if (p.MaxShipCount - p.ShipCount) > shipDiff {
+				p.ShipCount += shipDiff
+			} else {
+				p.ShipCount = p.MaxShipCount
+			}
+		}
+
 		p.LastShipCountUpdate = time.Now().Unix()
 	}
 }
@@ -130,6 +145,7 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 	result := []*Planet{}
 	ringOffset := float64(Settings.PlanetsRingOffset)
 	planetRadius := float64(Settings.PlanetRadius)
+	homePlanetIdx := int(hashElement(Settings.PlanetCount*Settings.PlanetHashArgs + 1))
 
 	for ix := 0; ix < Settings.PlanetCount; ix++ {
 		planet := Planet{
@@ -149,11 +165,14 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		planet.Texture = int8(hashElement(4*ix + 2))
 		planet.Size = 1 + int8(hashElement(4*ix+3))
 		planet.LastShipCountUpdate = time.Now().Unix()
+		planet.IsHome = (ix == homePlanetIdx)
+		planet.MaxShipCount = int32(Settings.PlanetMaxShipsMod * ShipCountTimeMod(planet.Size, planet.IsHome))
+		if planet.IsHome {
+			planet.ShipCount = Settings.InitialHomePlanetShipCount
+		}
 		result = append(result, &planet)
 	}
 	// + 1 bellow stands for: after all the planet info is read the next element is the user's home planet idx
-	homePlanetIdx := int8(hashElement(Settings.PlanetCount*Settings.PlanetHashArgs + 1))
-	result[homePlanetIdx].IsHome = true
-	result[homePlanetIdx].ShipCount = Settings.InitialHomePlanetShipCount
+
 	return result, result[homePlanetIdx]
 }
