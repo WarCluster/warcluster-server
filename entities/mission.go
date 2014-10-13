@@ -52,8 +52,14 @@ func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
 
 	if axis == 'X' {
 		x += int64(direction)
+		if x == 0 {
+			x += int64(direction)
+		}
 	} else if axis == 'Y' {
 		y += int64(direction)
+		if y == 0 {
+			y += int64(direction)
+		}
 	}
 
 	oldAreaSet := m.areaSet

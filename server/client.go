@@ -12,6 +12,7 @@ import (
 	"github.com/fzzy/sockjs-go/sockjs"
 
 	"warcluster/entities"
+	"warcluster/entities/db"
 	"warcluster/leaderboard"
 	"warcluster/server/response"
 )
@@ -38,7 +39,7 @@ func NewClient(session sockjs.Session, player *entities.Player) *Client {
 }
 
 // Send response directly to the client
-func (c *Client) send(response response.Responser) {
+func (c *Client) Send(response response.Responser) {
 	response.Sanitize(c.Player)
 	message, _ := json.Marshal(response)
 	c.Session.Send(message)
@@ -47,7 +48,7 @@ func (c *Client) send(response response.Responser) {
 // Send all changes to the client and flush them
 func (c *Client) sendStateChange() {
 	if c.stateChange != nil {
-		c.send(c.stateChange)
+		c.Send(c.stateChange)
 		c.stateChange = nil
 	}
 }
@@ -68,6 +69,38 @@ func (c *Client) pushStateChange(entity entities.Entity) {
 		c.stateChange.RawPlanets[e.Key()] = e
 	case *entities.Sun:
 		c.stateChange.Suns[e.Key()] = e
+	}
+}
+
+// Moves the client to another area
+func (c *Client) MoveToAreas(areaSlice []string) {
+	conn := db.Pool.Get()
+	defer conn.Close()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	player := c.Player.Key()
+	// Create map of the new areas in order
+	// to search in them more easily
+	areas := make(map[string]struct{})
+	for _, area := range areaSlice {
+		areas[area] = empty
+	}
+
+	// Remove left areas
+	for area, _ := range c.areas {
+		if _, in := areas[area]; !in {
+			delete(c.areas, area)
+			db.Srem(conn, area, player)
+		}
+	}
+
+	// Add newly occupied areas
+	for area, _ := range areas {
+		if _, in := c.areas[area]; !in {
+			c.areas[area] = empty
+			db.Sadd(conn, area, player)
+		}
 	}
 }
 

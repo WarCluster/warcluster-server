@@ -170,10 +170,7 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 	excessMission.ShipCount = ships
 	go StartMissionary(excessMission)
 	entities.Save(excessMission)
-
-	sendMission := response.NewSendMissions()
-	sendMission.Missions[excessMission.Key()] = excessMission
-	clients.BroadcastToAll(sendMission)
+	clients.Broadcast(excessMission)
 }
 
 func updateSpyReports(mission *entities.Mission, state *response.StateChange) {

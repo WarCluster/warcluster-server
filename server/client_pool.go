@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
+	"strings"
 	"sync"
 	"time"
 
 	"warcluster/entities"
+	"warcluster/entities/db"
 	"warcluster/server/response"
 )
 
@@ -74,25 +76,19 @@ func (cp *ClientPool) Add(client *Client) {
 func (cp *ClientPool) Remove(client *Client) {
 	cp.mutex.Lock()
 	defer cp.mutex.Unlock()
+	conn := db.Pool.Get()
+	defer conn.Close()
 
 	playerInPool, ok := cp.pool[client.Player.Username]
 	if ok {
 		playerInPool.Remove(client.poolElement)
+		for area, _ := range client.areas {
+			db.Srem(conn, area, client.Player.Key())
+		}
 
 		if playerInPool.Len() == 0 {
 			delete(cp.pool, client.Player.Username)
 		}
-	}
-}
-
-// Broadcast sends the given message to every session in the pool.
-// WARNING: This method is DEPRECATED! Use cp.Broadcast() instead.
-func (cp *ClientPool) BroadcastToAll(response response.Responser) {
-	for _, clients := range cp.pool {
-
-		client := clients.Front().Value.(*Client)
-		response.Sanitize(client.Player)
-		cp.Send(client.Player, response)
 	}
 }
 
@@ -103,10 +99,30 @@ func (cp *ClientPool) Broadcast(entity entities.Entity) {
 			return
 		}
 	}()
+	conn := db.Pool.Get()
+	defer conn.Close()
 
-	for _, clients := range cp.pool {
+	members, err := db.Smembers(conn, entity.AreaSet())
+	if err != nil {
+		log.Printf("SMEMBERS of %s: %s", entity.AreaSet(), err)
+		return
+	}
+
+	for _, member := range members {
+		if !strings.HasPrefix(member, "player.") {
+			continue
+		}
+		player := strings.SplitN(member, ".", 2)[1]
+		clients, ok := cp.pool[player]
+		if !ok {
+			continue
+		}
+
 		for element := clients.Front(); element != nil; element = element.Next() {
-			element.Value.(*Client).pushStateChange(entity)
+			client := element.Value.(*Client)
+			if _, in := client.areas[entity.AreaSet()]; in {
+				client.pushStateChange(entity)
+			}
 		}
 	}
 }

@@ -21,6 +21,8 @@ func scopeOfView(request *Request) error {
 	request.Client.Player.ScreenPosition = request.Position
 	go entities.Save(request.Client.Player)
 	clients.Send(request.Client.Player, response)
+	request.Client.MoveToAreas(response.Areas())
+
 	return nil
 }
 
@@ -68,7 +70,7 @@ func parseAction(request *Request) error {
 		}
 	}
 
-	clients.BroadcastToAll(sendMissionMessage)
+	request.Client.Send(sendMissionMessage)
 
 	return nil
 }
@@ -104,6 +106,7 @@ func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Req
 	entities.Save(source)
 	go StartMissionary(mission)
 	entities.Save(mission)
+	clients.Broadcast(mission)
 	clients.Broadcast(source)
 
 	return mission, nil

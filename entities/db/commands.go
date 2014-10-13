@@ -1,11 +1,15 @@
 package db
 
-import "github.com/garyburd/redigo/redis"
+import (
+	"strings"
+
+	"github.com/garyburd/redigo/redis"
+)
 
 // Save takes a key, name of the set and the marshaled record and writes it in.
 func Save(conn redis.Conn, key, setKey string, value []byte) error {
 	_, err := conn.Do("SET", key, value)
-	if len(setKey) > 0 {
+	if len(setKey) > 0 && !strings.HasPrefix(key, "player") {
 		Sadd(conn, setKey, key)
 	}
 	return err
