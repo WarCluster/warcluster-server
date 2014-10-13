@@ -12,6 +12,11 @@ import (
 
 var cp = NewClientPool(16)
 
+var planet = entities.Planet{
+	Name:     "GOP6720",
+	Position: &vec2d.Vector{2, 2},
+}
+
 var player1 = entities.Player{
 	Username:       "gophie",
 	RaceID:         1,
@@ -122,5 +127,62 @@ func TestPlayer(t *testing.T) {
 
 	if player, err := cp.Player("snoopy"); player != nil || err == nil {
 		t.Errorf("Received %v as player, nil expected", player.Username)
+	}
+}
+
+func TestStackingStateChanges(t *testing.T) {
+	client1.Session.Receive()
+	cp := NewClientPool(1)
+	cp.ticker.Stop()
+	cp.Add(&client1)
+
+	client1.pushStateChange(&planet)
+	if len(client1.Session.Receive()) != 0 {
+		t.Error("Client received messages  without a tick")
+	}
+
+	if client1.stateChange == nil {
+		t.Error("Client has no stacked planets")
+	}
+
+	if len(client1.stateChange.RawPlanets) != 1 {
+		t.Errorf("Client has %d stacked planets instead of 1")
+	}
+}
+
+func TestBroadcast(t *testing.T) {
+	client1.Session.Receive()
+	client2.Session.Receive()
+	client3.Session.Receive()
+
+	cp := NewClientPool(3)
+	cp.ticker.Stop()
+	cp.Add(&client1)
+	cp.Add(&client2)
+	cp.Add(&client3)
+
+	client1.MoveToAreas([]string{"area:1:1"})
+	client2.MoveToAreas([]string{"area:1:1"})
+	client3.MoveToAreas([]string{"area:2:1"})
+
+	cp.Broadcast(&planet)
+	if client1.stateChange == nil {
+		t.Error("Client1 has no stacked planets")
+	}
+
+	if len(client1.stateChange.RawPlanets) != 1 {
+		t.Errorf("Client1 has %d stacked planets instead of 1")
+	}
+
+	if client2.stateChange == nil {
+		t.Error("Client2 has no stacked planets")
+	}
+
+	if len(client2.stateChange.RawPlanets) != 1 {
+		t.Errorf("Client2 has %d stacked planets instead of 1")
+	}
+
+	if client3.stateChange != nil {
+		t.Error("Client3 has stacked planets")
 	}
 }

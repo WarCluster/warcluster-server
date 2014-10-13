@@ -26,13 +26,14 @@ type testSession struct {
 	Messages   [][]byte
 }
 
-func (s *testSession) Receive() (m []byte) {
-	result := s.Messages[0]
+func (s *testSession) Receive() []byte {
 	if len(s.Messages) > 0 {
+		result := s.Messages[0]
 		s.Messages = s.Messages[1:]
+		return result
 	}
 
-	return result
+	return []byte{}
 }
 
 func (s *testSession) Send(m []byte) {
