@@ -6,17 +6,19 @@ import (
 	"time"
 
 	"code.google.com/p/go.net/websocket"
+	"github.com/Vladimiroff/vec2d"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"warcluster/entities"
 	"warcluster/entities/db"
 	"warcluster/leaderboard"
 )
 
 var (
 	incompleteUser = Request{Command: "login", TwitterID: "some twitter ID"}
-	user           = Request{Command: "login", Username: "JohnDoe", TwitterID: "some twitter ID"}
+	user           = Request{Command: "login", Username: "gophie", TwitterID: "some twitter ID"}
 	setupParams    = Request{Command: "setup_parameters", Race: 0, SunTextureId: 0}
 	setup          = Request{Command: "setup", Race: 0, SunTextureId: 0}
 )
@@ -34,13 +36,13 @@ func (s *ClientTestSuite) Dial() (*websocket.Conn, error) {
 	return websocket.Dial(url, "", origin)
 }
 
-func (suite *ClientTestSuite) SetupTest() {
+func (s *ClientTestSuite) SetupTest() {
 	var err error
 
-	suite.message = make(map[string]interface{})
-	suite.conn = db.Pool.Get()
-	suite.conn.Do("FLUSHDB")
-	suite.ws, err = suite.Dial()
+	s.message = make(map[string]interface{})
+	s.conn = db.Pool.Get()
+	s.conn.Do("FLUSHDB")
+	s.ws, err = s.Dial()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,9 +51,9 @@ func (suite *ClientTestSuite) SetupTest() {
 	InitLeaderboard(leaderboard.New())
 }
 
-func (suite *ClientTestSuite) TearDownTest() {
-	suite.ws.Close()
-	suite.conn.Close()
+func (s *ClientTestSuite) TearDownTest() {
+	s.ws.Close()
+	s.conn.Close()
 }
 
 func (s *ClientTestSuite) assertReceive(command string) {
@@ -67,10 +69,10 @@ func (s *ClientTestSuite) assertReceive(command string) {
 	}
 
 	select {
-	case <-time.After(5 * time.Second):
-		s.T().Fatalf("Did not receive %s after 5 seconds", command)
+	case <-time.After(10 * time.Second):
+		s.T().Fatalf("Did not receive %s after 10 seconds", command)
 	case <-receive():
-		assert.Equal(s.T(), s.message["Command"], command)
+		assert.Equal(s.T(), command, s.message["Command"])
 	}
 }
 
@@ -85,8 +87,8 @@ func (s *ClientTestSuite) assertSend(request *Request) {
 	}
 
 	select {
-	case <-time.After(5 * time.Second):
-		s.T().Fatalf("Did not send %s after 5 seconds", request.Command)
+	case <-time.After(10 * time.Second):
+		s.T().Fatalf("Did not send %s after 10 seconds", request.Command)
 	case <-send():
 	}
 }
@@ -111,21 +113,25 @@ func (s *ClientTestSuite) TestRegisterNewUser() {
 }
 
 func (s *ClientTestSuite) TestAuthenticateExcistingUser() {
-	s.assertSend(&user)
-	s.assertReceive("server_params")
-	s.assertReceive("request_setup_params")
-
-	s.assertSend(&setupParams)
-	s.assertReceive("login_success")
-
-	s.ws.Close()
-	s.Dial()
+	entities.Save(&entities.Planet{
+		Name:     "GOP6720",
+		Position: &vec2d.Vector{2, 2},
+	})
+	entities.Save(&entities.Player{
+		Username:       "gophie",
+		RaceID:         1,
+		TwitterID:      "gop",
+		HomePlanet:     "planet.GOP6720",
+		ScreenSize:     []uint64{1, 1},
+		ScreenPosition: &vec2d.Vector{2, 2},
+	})
 
 	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
 	assert.Nil(s.T(), err)
 
 	s.assertSend(&user)
+	s.assertReceive("server_params")
 	s.assertReceive("login_success")
 
 	players_after, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
@@ -151,7 +157,6 @@ func (s *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
 }
 
 func (s *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
-
 	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
 	assert.Nil(s.T(), err)
