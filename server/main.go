@@ -126,7 +126,6 @@ func Handle(ws *websocket.Conn) {
 	client, logResponse, err := login(ws)
 	if err != nil {
 		log.Print("Error in server.main.handler.login:", err.Error())
-		log.Println(err.Error())
 		websocket.JSON.Send(ws, &logResponse)
 		return
 	}

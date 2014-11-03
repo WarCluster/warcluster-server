@@ -4,7 +4,6 @@ import (
 	"container/list"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"sync"
 
@@ -109,18 +108,18 @@ func (c *Client) MoveToAreas(areaSlice []string) {
 func login(ws *websocket.Conn) (*Client, response.Responser, error) {
 	player, err := authenticate(ws)
 	if err != nil {
-		return nil, response.NewLoginFailed(), errors.New("Login failed")
+		return nil, response.NewLoginFailed(), err
 	}
 
 	client := NewClient(ws, player)
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
-		return nil, nil, errors.New("Your home planet is missing!")
+		return nil, nil, errors.New("Player's home planet is missing!")
 	}
 	homePlanet := homePlanetEntity.(*entities.Planet)
 
 	loginSuccess := response.NewLoginSuccess(player, homePlanet)
-	return client, loginSuccess, err
+	return client, loginSuccess, nil
 }
 
 func FetchSetupData(ws *websocket.Conn) (*entities.SetupData, error) {
@@ -137,7 +136,7 @@ func FetchSetupData(ws *websocket.Conn) (*entities.SetupData, error) {
 
 	accountData := new(entities.SetupData)
 	if request.Command != "setup_parameters" {
-		return nil, errors.New("Wrong command")
+		return nil, errors.New("Wrong command. Expected 'setup_parameters'")
 	}
 
 	accountData.Race = request.Race
@@ -169,7 +168,6 @@ func authenticate(ws *websocket.Conn) (*entities.Player, error) {
 		return nil, err
 	}
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
-
 		return nil, errors.New("Incomplete credentials")
 	}
 
@@ -180,13 +178,12 @@ func authenticate(ws *websocket.Conn) (*entities.Player, error) {
 
 	nickname = request.Username
 	twitterId = request.TwitterID
-	log.Println("---")
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
 	if entity == nil {
 		setupData, err := FetchSetupData(ws)
 		if err != nil {
-			return nil, errors.New("Reading client data failed.")
+			return nil, err
 		}
 		player = register(setupData, nickname, twitterId)
 	} else {
