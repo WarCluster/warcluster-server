@@ -1,9 +1,7 @@
 package server
 
 import (
-	"log"
 	"testing"
-	"time"
 
 	"code.google.com/p/go.net/websocket"
 	"github.com/Vladimiroff/vec2d"
@@ -12,8 +10,6 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"warcluster/entities"
-	"warcluster/entities/db"
-	"warcluster/leaderboard"
 )
 
 var (
@@ -24,73 +20,7 @@ var (
 )
 
 type ClientTestSuite struct {
-	suite.Suite
-	conn    redis.Conn
-	ws      *websocket.Conn
-	message map[string]interface{}
-}
-
-func (s *ClientTestSuite) Dial() (*websocket.Conn, error) {
-	origin := "http://localhost/"
-	url := "ws://localhost:7013/websocket"
-	return websocket.Dial(url, "", origin)
-}
-
-func (s *ClientTestSuite) SetupTest() {
-	var err error
-
-	s.message = make(map[string]interface{})
-	s.conn = db.Pool.Get()
-	s.conn.Do("FLUSHDB")
-	s.ws, err = s.Dial()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	cfg.Load()
-	InitLeaderboard(leaderboard.New())
-}
-
-func (s *ClientTestSuite) TearDownTest() {
-	s.ws.Close()
-	s.conn.Close()
-}
-
-func (s *ClientTestSuite) assertReceive(command string) {
-	s.message = make(map[string]interface{})
-
-	receive := func() <-chan struct{} {
-		ch := make(chan struct{})
-		go func() {
-			websocket.JSON.Receive(s.ws, &s.message)
-			ch <- struct{}{}
-		}()
-		return ch
-	}
-
-	select {
-	case <-time.After(10 * time.Second):
-		s.T().Fatalf("Did not receive %s after 10 seconds", command)
-	case <-receive():
-		assert.Equal(s.T(), command, s.message["Command"])
-	}
-}
-
-func (s *ClientTestSuite) assertSend(request *Request) {
-	send := func() <-chan struct{} {
-		ch := make(chan struct{})
-		go func() {
-			websocket.JSON.Send(s.ws, request)
-			ch <- struct{}{}
-		}()
-		return ch
-	}
-
-	select {
-	case <-time.After(10 * time.Second):
-		s.T().Fatalf("Did not send %s after 10 seconds", request.Command)
-	case <-send():
-	}
+	WebSocketTestSuite
 }
 
 func (s *ClientTestSuite) TestRegisterNewUser() {
