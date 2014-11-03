@@ -1,15 +1,15 @@
 package server
 
 import (
-	"fmt"
-	"math/rand"
 	"time"
-
-	"github.com/fzzy/sockjs-go/sockjs"
 
 	"warcluster/config"
 	"warcluster/entities/db"
+
+	"code.google.com/p/go.net/websocket"
 )
+
+var testServer *Server
 
 func init() {
 	var cfg config.Config
@@ -19,45 +19,17 @@ func init() {
 	defer conn.Close()
 
 	conn.Do("FLUSHDB")
-}
+	testServer = NewServer(
+		cfg.Server.Host,
+		7013,
+		Handle,
+	)
 
-type testSession struct {
-	session_id string
-	Messages   [][]byte
-}
-
-func (s *testSession) Receive() []byte {
-	if len(s.Messages) > 0 {
-		result := s.Messages[0]
-		s.Messages = s.Messages[1:]
-		return result
+	go testServer.Start()
+	for !testServer.isRunning {
+		time.Sleep(100 * time.Millisecond)
 	}
-
-	return []byte{}
 }
 
-func (s *testSession) Send(m []byte) {
-	s.Messages = append(s.Messages, m)
-	return
-}
-
-func (s *testSession) Close(code int, reason string) {
-	return
-}
-
-func (s *testSession) End() {
-	return
-}
-
-func (s *testSession) Info() sockjs.RequestInfo {
-	return *new(sockjs.RequestInfo)
-}
-
-func (s *testSession) Protocol() sockjs.Protocol {
-	return *new(sockjs.Protocol)
-}
-
-func (s *testSession) String() string {
-	rand.Seed(time.Now().Unix())
-	return fmt.Sprintf("%d", rand.Int())
+func testHandler(*websocket.Conn) {
 }

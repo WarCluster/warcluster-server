@@ -2,14 +2,14 @@ package server
 
 import (
 	"container/list"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
 	"sync"
 
+	"code.google.com/p/go.net/websocket"
 	"github.com/ChimeraCoder/anaconda"
-	"github.com/fzzy/sockjs-go/sockjs"
 
 	"warcluster/entities"
 	"warcluster/entities/db"
@@ -22,7 +22,7 @@ import (
 // 1.Session holds the curent player session socket for comunication.
 // 2.Player is a pointer to the player struct for easy access.
 type Client struct {
-	Session     sockjs.Session
+	Conn        *websocket.Conn
 	Player      *entities.Player
 	areas       map[string]struct{}
 	poolElement *list.Element
@@ -30,19 +30,18 @@ type Client struct {
 	mutex       sync.Mutex
 }
 
-func NewClient(session sockjs.Session, player *entities.Player) *Client {
+func NewClient(ws *websocket.Conn, player *entities.Player) *Client {
 	return &Client{
-		Session: session,
-		Player:  player,
-		areas:   make(map[string]struct{}),
+		Conn:   ws,
+		Player: player,
+		areas:  make(map[string]struct{}),
 	}
 }
 
 // Send response directly to the client
 func (c *Client) Send(response response.Responser) {
 	response.Sanitize(c.Player)
-	message, _ := json.Marshal(response)
-	c.Session.Send(message)
+	websocket.JSON.Send(c.Conn, &response)
 }
 
 // Send all changes to the client and flush them
@@ -107,13 +106,13 @@ func (c *Client) MoveToAreas(areaSlice []string) {
 // This function is called from the message handler to parse the first message for every new connection.
 // It check for existing user in the DB and logs him if the password is correct.
 // If the user is new he is initiated and a new home planet nad solar system are generated.
-func login(session sockjs.Session) (*Client, response.Responser, error) {
-	player, err := authenticate(session)
+func login(ws *websocket.Conn) (*Client, response.Responser, error) {
+	player, err := authenticate(ws)
 	if err != nil {
 		return nil, response.NewLoginFailed(), errors.New("Login failed")
 	}
 
-	client := NewClient(session, player)
+	client := NewClient(ws, player)
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
 		return nil, nil, errors.New("Your home planet is missing!")
@@ -124,21 +123,15 @@ func login(session sockjs.Session) (*Client, response.Responser, error) {
 	return client, loginSuccess, err
 }
 
-func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
+func FetchSetupData(ws *websocket.Conn) (*entities.SetupData, error) {
+	var request Request
+
 	messageStruct := response.NewLoginInformation()
-	marshalledMessage, err := json.Marshal(messageStruct)
-	if err != nil {
+	if err := websocket.JSON.Send(ws, &messageStruct); err != nil {
 		return nil, err
 	}
-	session.Send(marshalledMessage)
 
-	request := new(Request)
-	message := session.Receive()
-	if message == nil {
-		return nil, errors.New("No credentials provided in setup data")
-	}
-
-	if err := json.Unmarshal(message, request); err != nil {
+	if err := websocket.JSON.Receive(ws, &request); err != nil {
 		return nil, err
 	}
 
@@ -164,38 +157,34 @@ func FetchSetupData(session sockjs.Session) (*entities.SetupData, error) {
 // 3.1.Create a new sun with GenerateSun
 // 3.2.Choose home planet from the newly created solar sysitem.
 // 3.3.Create a reccord of the new player and start comunication.
-func authenticate(session sockjs.Session) (*entities.Player, error) {
-	var player *entities.Player
-	var nickname string
-	var twitterId string
-	request := new(Request)
+func authenticate(ws *websocket.Conn) (*entities.Player, error) {
+	var (
+		player    *entities.Player
+		nickname  string
+		twitterId string
+		request   Request
+	)
 
-	message := session.Receive()
-	if message == nil {
-		return nil, errors.New("No credentials provided")
-	}
-
-	if err := json.Unmarshal(message, request); err != nil {
+	if err := websocket.JSON.Receive(ws, &request); err != nil {
 		return nil, err
 	}
-
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
+
 		return nil, errors.New("Incomplete credentials")
 	}
 
 	serverParamsMessage := response.NewServerParams()
-	marshalledMessage, err := json.Marshal(serverParamsMessage)
-	if err != nil {
-		return nil, errors.New("Failed to provide server params.")
+	if err := websocket.JSON.Send(ws, &serverParamsMessage); err != nil {
+		return nil, err
 	}
-	session.Send(marshalledMessage)
 
 	nickname = request.Username
 	twitterId = request.TwitterID
+	log.Println("---")
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
 	if entity == nil {
-		setupData, err := FetchSetupData(session)
+		setupData, err := FetchSetupData(ws)
 		if err != nil {
 			return nil, errors.New("Reading client data failed.")
 		}
