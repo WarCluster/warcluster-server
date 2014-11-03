@@ -3,6 +3,7 @@ package server
 import (
 	"testing"
 
+	"code.google.com/p/go.net/websocket"
 	"github.com/Vladimiroff/vec2d"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,7 @@ var panda entities.Player = entities.Player{
 	ScreenPosition: &vec2d.Vector{2, 2},
 }
 
-var client = *NewClient(new(testSession), &gophie)
+var client = *NewClient(new(websocket.Conn), &gophie)
 
 var planet1 entities.Planet = entities.Planet{
 	Name:     "GOP6720",
