@@ -16,6 +16,12 @@ import (
 	"warcluster/server/response"
 )
 
+// Codec is implemented by objects that send and receive via websocket
+type Codec interface {
+	Receive(ws *websocket.Conn, v interface{}) (err error)
+	Send(ws *websocket.Conn, v interface{}) (err error)
+}
+
 // The information for each person is stored in two seperate structures. Player and Client.
 // This is one of them. The purpouse of the Client struct is to hold the server(connection) information.
 // 1.Session holds the curent player session socket for comunication.
@@ -27,6 +33,7 @@ type Client struct {
 	poolElement *list.Element
 	stateChange *response.StateChange
 	mutex       sync.Mutex
+	codec       Codec
 }
 
 func NewClient(ws *websocket.Conn, player *entities.Player) *Client {
@@ -34,13 +41,14 @@ func NewClient(ws *websocket.Conn, player *entities.Player) *Client {
 		Conn:   ws,
 		Player: player,
 		areas:  make(map[string]struct{}),
+		codec:  websocket.JSON,
 	}
 }
 
 // Send response directly to the client
 func (c *Client) Send(response response.Responser) {
 	response.Sanitize(c.Player)
-	websocket.JSON.Send(c.Conn, &response)
+	c.codec.Send(c.Conn, &response)
 }
 
 // Send all changes to the client and flush them

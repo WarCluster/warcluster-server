@@ -1,6 +1,8 @@
 package server
 
 import (
+	"encoding/json"
+	"errors"
 	"log"
 	"time"
 
@@ -10,6 +12,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"warcluster/config"
+	"warcluster/entities"
 	"warcluster/entities/db"
 	"warcluster/leaderboard"
 )
@@ -104,4 +107,31 @@ func (w *WebSocketTestSuite) assertSend(request *Request) {
 		w.T().Fatalf("Did not send %s after 10 seconds", request.Command)
 	case <-send():
 	}
+}
+
+func NewFakeClient(player *entities.Player) *Client {
+	client := NewClient(new(websocket.Conn), player)
+	client.codec = new(fakeCodec)
+	return client
+}
+
+type fakeCodec struct {
+	Messages  [][]byte
+	Marshal   func(v interface{}) (data []byte, payloadType byte, err error)
+	Unmarshal func(data []byte, payloadType byte, v interface{}) (err error)
+}
+
+func (c *fakeCodec) Receive(ws *websocket.Conn, v interface{}) error {
+	if len(c.Messages) > 0 {
+		message := c.Messages[0]
+		c.Messages = c.Messages[1:]
+		return json.Unmarshal(message, v)
+	}
+	return errors.New("No message received")
+}
+
+func (c *fakeCodec) Send(ws *websocket.Conn, v interface{}) error {
+	m, err := json.Marshal(v)
+	c.Messages = append(c.Messages, m)
+	return err
 }
