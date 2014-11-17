@@ -6,10 +6,10 @@ import (
 	"log"
 	"time"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/net/websocket"
 
 	"warcluster/config"
 	"warcluster/entities"
@@ -30,7 +30,6 @@ func init() {
 	testServer = NewServer(
 		cfg.Server.Host,
 		7013,
-		Handle,
 	)
 
 	go testServer.Start()
@@ -48,7 +47,7 @@ type WebSocketTestSuite struct {
 
 func (w *WebSocketTestSuite) Dial() (*websocket.Conn, error) {
 	origin := "http://localhost/"
-	url := "ws://localhost:7013/websocket"
+	url := "ws://localhost:7013/universe"
 	return websocket.Dial(url, "", origin)
 }
 

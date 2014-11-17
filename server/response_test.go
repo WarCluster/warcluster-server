@@ -3,11 +3,11 @@ package server
 import (
 	"testing"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/Vladimiroff/vec2d"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/net/websocket"
 
 	"warcluster/entities"
 	"warcluster/entities/db"

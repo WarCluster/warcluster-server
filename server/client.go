@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"sync"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/ChimeraCoder/anaconda"
+	"golang.org/x/net/websocket"
 
 	"warcluster/entities"
 	"warcluster/entities/db"

@@ -29,7 +29,6 @@ func main() {
 	s := server.NewServer(
 		cfg.Server.Host,
 		cfg.Server.Port,
-		server.Handle,
 	)
 	go final(s)
 

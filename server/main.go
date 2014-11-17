@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	"code.google.com/p/go.net/websocket"
+	"golang.org/x/net/websocket"
 
 	"warcluster/config"
 	"warcluster/leaderboard"
@@ -21,7 +21,6 @@ type Server struct {
 	listener  net.Listener
 	host      string
 	port      uint16
-	handler   func(*websocket.Conn)
 	isRunning bool
 }
 
@@ -38,11 +37,10 @@ func ExportConfig(loadedCfg config.Config) {
 	cfg = loadedCfg
 }
 
-func NewServer(host string, port uint16, handler func(*websocket.Conn)) *Server {
+func NewServer(host string, port uint16) *Server {
 	s := new(Server)
 	s.host = host
 	s.port = port
-	s.handler = handler
 	return s
 }
 
@@ -59,7 +57,7 @@ func (s *Server) Start() error {
 	http.HandleFunc("/leaderboard/races/", leaderboardRacesHandler)
 	http.HandleFunc("/leaderboard/races/info/", leaderboardRacesInfoHandler)
 	http.HandleFunc("/search/", searchHandler)
-	http.Handle("/universe", websocket.Handler(s.handler))
+	http.Handle("/universe", websocket.Handler(Handle))
 
 	if err := s.ListenAndServe(fmt.Sprintf("%v:%v", s.host, s.port)); err != nil {
 		log.Println(err)
@@ -75,7 +73,7 @@ func (s *Server) Start() error {
 func (s *Server) ListenAndServe(address string) error {
 	var err error
 
-	server := &http.Server{Addr: address, Handler: websocket.Handler(s.handler)}
+	server := &http.Server{Addr: address, Handler: http.DefaultServeMux}
 	addr := server.Addr
 	if addr == "" {
 		addr = ":http"
@@ -92,7 +90,7 @@ func (s *Server) ListenAndServe(address string) error {
 // Stops the server.
 func (s *Server) Stop() error {
 	log.Println("Server is shutting down...")
-	s.isRunning = true
+	s.isRunning = false
 	s.listener.Close()
 	log.Println("Server has stopped.")
 	return nil
