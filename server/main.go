@@ -139,7 +139,7 @@ func Handle(ws *websocket.Conn) {
 			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
-
+		request.Client = client
 		action, err := ParseRequest(&request)
 		if err != nil {
 			log.Println("Error in server.main.handler.ParseRequest:", err.Error())

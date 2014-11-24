@@ -1,9 +1,7 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
-	"log"
 
 	"github.com/Vladimiroff/vec2d"
 )
@@ -30,21 +28,6 @@ type Request struct {
 	TwitterID    string
 	Race         uint8
 	SunTextureId uint16
-}
-
-// This function transfers the information of a new request from byte list
-// to the special Request struct.
-// Since the data is formated as json the function uses unmarshal to extract the data.
-func UnmarshalRequest(message []byte, client *Client) (*Request, error) {
-	var request Request
-
-	if err := json.Unmarshal(message, &request); err != nil {
-		log.Println("Error in server.request.UnmarshalRequest:", err.Error())
-		return nil, err
-	}
-
-	request.Client = client
-	return &request, nil
 }
 
 // ParseRequest is serving the purpouse of a request manager.
