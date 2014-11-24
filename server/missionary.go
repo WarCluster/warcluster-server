@@ -7,6 +7,8 @@ import (
 
 	"warcluster/entities"
 	"warcluster/server/response"
+
+	"github.com/Vladimiroff/vec2d"
 )
 
 // Spawns missionary for all mission records found
@@ -71,7 +73,7 @@ func StartMissionary(mission *entities.Mission) {
 			}
 		}
 
-		timeToSleep := transferPoint.TravelTime - timeSlept
+		timeToSleep := transferPoint.TravelTime
 		timeSlept += timeToSleep
 		time.Sleep(timeToSleep * time.Millisecond)
 		mission.ChangeAreaSet(transferPoint.CoordinateAxis, transferPoint.Direction)
@@ -170,7 +172,7 @@ func startExcessMission(mission *entities.Mission, homePlanet *entities.Planet, 
 	playerEntity, err := entities.Get(fmt.Sprintf("player.%s", mission.Player))
 	player := playerEntity.(*entities.Player)
 
-	excessMission := player.StartMission(homePlanet, newTargetEntity.(*entities.Planet), 100, "Attack")
+	excessMission := player.StartMission(homePlanet, newTargetEntity.(*entities.Planet), []*vec2d.Vector{}, 100, "Attack")
 	excessMission.ShipCount = ships
 	go StartMissionary(excessMission)
 	entities.Save(excessMission)

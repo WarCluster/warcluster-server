@@ -95,6 +95,7 @@ func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Req
 	mission := request.Client.Player.StartMission(
 		source,
 		endPlanet,
+		request.Path,
 		request.Fleet,
 		request.Type,
 	)

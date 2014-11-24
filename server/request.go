@@ -17,6 +17,7 @@ import (
 // 4. Resolution I think speaks for itself. Its the size of the screan.
 // 5. Start and End plane are containers for general planet information(mostly used for mission requests).
 // 6. Fleet contains the percent of ships to be sent in the start mission requests.
+// 7. Path contains all intermidiate points (waypoints) that define the missions path
 type Request struct {
 	Client       *Client
 	Command      string
@@ -24,6 +25,7 @@ type Request struct {
 	Position     *vec2d.Vector
 	Resolution   []uint64
 	StartPlanets []string
+	Path         []*vec2d.Vector
 	EndPlanet    string
 	Fleet        int32
 	Username     string

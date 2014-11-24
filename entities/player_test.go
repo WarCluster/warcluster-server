@@ -44,7 +44,7 @@ func TestCreateMission(t *testing.T) {
 		ScreenPosition: &vec2d.Vector{2, 2},
 	}
 
-	validMission := player.StartMission(&planetStart, &planetEnd, 80, "Attack")
+	validMission := player.StartMission(&planetStart, &planetEnd, []*vec2d.Vector{}, 80, "Attack")
 
 	planetStart.ShipCount = 100
 

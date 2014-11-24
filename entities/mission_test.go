@@ -125,11 +125,11 @@ func TestEndAttackMissionDenyTakeover(t *testing.T) {
 	}
 }
 
-func TestTravelTime(t *testing.T) {
+func TestSegmentTravelTime(t *testing.T) {
 	source := vec2d.New(100, 200)
 	target := vec2d.New(800, 150)
 	expectedTime := time.Duration(7017)
-	time := calculateTravelTime(source, target, 10)
+	time := calculateSegmentTravelTime(source, target, 10)
 
 	if Settings.MissionSpeed <= 0 {
 		t.Errorf("The mission speed in config is %d\n", Settings.MissionSpeed)
@@ -137,7 +137,7 @@ func TestTravelTime(t *testing.T) {
 
 	if time != expectedTime {
 		t.Errorf(
-			"CalculateTravelTime(%v, %v, 10) = %d instead of %d",
+			"CalculateSegmentTravelTime(%v, %v, 10) = %d instead of %d",
 			source,
 			target,
 			time,
