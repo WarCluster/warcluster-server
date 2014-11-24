@@ -24,3 +24,11 @@ func (a AreaTransferPoints) Swap(i, j int) {
 func (a AreaTransferPoints) Less(i, j int) bool {
 	return a[i].TravelTime < a[j].TravelTime
 }
+
+func (a AreaTransferPoints) Append(elems ...*AreaTransferPoint) {
+	a = append(a, elems...)
+}
+
+func (a AreaTransferPoints) Size() int {
+	return len(a)
+}
