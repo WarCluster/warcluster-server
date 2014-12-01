@@ -26,6 +26,13 @@ func scopeOfView(request *Request) error {
 	return nil
 }
 
+func voronoiDiagram(request *Request) error {
+    response := response.NewVoronoiDiagram(request.Position, request.Resolution)
+    clients.Send(request.Client.Player, response)
+
+    return nil
+}
+
 // This function makes all the checks needed for creation of a new mission.
 func parseAction(request *Request) error {
 	var err error

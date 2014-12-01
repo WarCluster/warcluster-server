@@ -68,6 +68,12 @@ func ParseRequest(request *Request) (func(*Request) error, error) {
 		} else {
 			return nil, errors.New("Not enough arguments")
 		}
+	case "voronoi_diagram":
+		if request.Position != nil && len(request.Resolution) > 0 {
+			return voronoiDiagram, nil
+		} else {
+			return nil, errors.New("Not enough arguments")
+		}
 	}
 	return nil, errors.New("Unknown command")
 }

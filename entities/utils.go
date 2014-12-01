@@ -24,6 +24,14 @@ func NewCartesianEquation(startPoint, endPoint *vec2d.Vector) *CartesianEquation
 	return ce
 }
 
+func (ce *CartesianEquation) GetA() float64 {
+	return ce.a
+}
+
+func (ce *CartesianEquation) GetB() float64 {
+	return ce.b
+}
+
 func (ce *CartesianEquation) GetXByY(y float64) float64 {
 	if ce.a == 0 {
 		return 0
