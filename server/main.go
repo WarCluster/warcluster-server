@@ -2,7 +2,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -11,12 +10,19 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	"github.com/fzzy/sockjs-go/sockjs"
+	"golang.org/x/net/websocket"
 
 	"warcluster/config"
 	"warcluster/leaderboard"
 	"warcluster/server/response"
 )
+
+type Server struct {
+	listener  net.Listener
+	host      string
+	port      uint16
+	isRunning bool
+}
 
 var (
 	cfg         config.Config
@@ -31,57 +37,61 @@ func ExportConfig(loadedCfg config.Config) {
 	cfg = loadedCfg
 }
 
+func NewServer(host string, port uint16) *Server {
+	s := new(Server)
+	s.host = host
+	s.port = port
+	return s
+}
+
 // This function goes trough all the procedurs needed for the werver to be initialized.
 // Create an empty connections pool and start the listening foe messages loop.
-func Start() error {
-	host := cfg.Server.Host
-	port := cfg.Server.Port
-	clients = NewClientPool(cfg.Server.Ticker)
+func (s *Server) Start() error {
+	clients = NewClientPool(13)
 
-	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", host, port))
+	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", s.host, s.port))
 	log.Print("Quit the server with Ctrl-C.")
-
-	mux := sockjs.NewServeMux(http.DefaultServeMux)
-	conf := sockjs.NewConfig()
 
 	http.HandleFunc("/console", consoleHandler)
 	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
 	http.HandleFunc("/leaderboard/races/", leaderboardRacesHandler)
 	http.HandleFunc("/leaderboard/races/info/", leaderboardRacesInfoHandler)
 	http.HandleFunc("/search/", searchHandler)
-	mux.Handle("/universe", handler, conf)
+	http.Handle("/universe", websocket.Handler(Handle))
 
-	if err := ListenAndServe(fmt.Sprintf("%v:%v", host, port), mux); err != nil {
+	if err := s.ListenAndServe(fmt.Sprintf("%v:%v", s.host, s.port)); err != nil {
 		log.Println(err)
 		return err
 	}
 
-	return Stop()
+	return s.Stop()
 }
 
 // ListenAndServe listens on the TCP network address srv.Addr and then
 // calls Serve to handle requests on incoming connections.  If
 // srv.Addr is blank, ":http" is used.
-func ListenAndServe(address string, mux *sockjs.ServeMux) error {
+func (s *Server) ListenAndServe(address string) error {
 	var err error
 
-	server := &http.Server{Addr: address, Handler: mux}
+	server := &http.Server{Addr: address, Handler: http.DefaultServeMux}
 	addr := server.Addr
 	if addr == "" {
 		addr = ":http"
 	}
-	listener, err = net.Listen("tcp", addr)
+	s.listener, err = net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
 
-	return server.Serve(listener)
+	s.isRunning = true
+	return server.Serve(s.listener)
 }
 
-// Die biatch and get the fuck out.
-func Stop() error {
+// Stops the server.
+func (s *Server) Stop() error {
 	log.Println("Server is shutting down...")
-	listener.Close()
+	s.isRunning = false
+	s.listener.Close()
 	log.Println("Server has stopped.")
 	return nil
 }
@@ -101,26 +111,20 @@ func consoleHandler(response http.ResponseWriter, request *http.Request) {
 // On the first received message from each connection the server will call the handler.
 // Add new session to the session pool, call the login func to validate the connection and
 // if the connection is valid enters "while true" state and uses ParseRequest to parse the requests.
-//
-// Shocking right?!?!
-func handler(session sockjs.Session) {
+func Handle(ws *websocket.Conn) {
+	var request Request
 	defer func() {
 		if panicked := recover(); panicked != nil {
 			log.Println(fmt.Sprintf("%s\n\nStacktrace:\n\n%s", panicked, debug.Stack()))
 			return
 		}
 	}()
-	defer session.End()
+	defer ws.Close()
 
-	client, logResponse, err := login(session)
+	client, logResponse, err := login(ws)
 	if err != nil {
 		log.Print("Error in server.main.handler.login:", err.Error())
-		log.Println(err.Error())
-		message, err := json.Marshal(logResponse)
-		if err != nil {
-			log.Println(err.Error())
-		}
-		session.Send(message)
+		websocket.JSON.Send(ws, &logResponse)
 		return
 	}
 	clients.Add(client)
@@ -130,25 +134,20 @@ func handler(session sockjs.Session) {
 
 	client.Player.UpdateSpyReports()
 	for {
-		message := session.Receive()
-		if message == nil {
-			break
-		}
-
-		request, err := UnmarshalRequest(message, client)
+		err := websocket.JSON.Receive(client.Conn, &request)
 		if err != nil {
 			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
-
-		action, err := ParseRequest(request)
+		request.Client = client
+		action, err := ParseRequest(&request)
 		if err != nil {
 			log.Println("Error in server.main.handler.ParseRequest:", err.Error())
 			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
 
-		if err := action(request); err != nil {
+		if err := action(&request); err != nil {
 			log.Println(err)
 			continue
 		}

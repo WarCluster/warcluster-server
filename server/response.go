@@ -84,7 +84,6 @@ func prepareMission(startPlanet string, endPlanet *entities.Planet, request *Req
 	source := sourceEntity.(*entities.Planet)
 
 	if source.Owner != request.Client.Player.Username {
-
 		return nil, errors.New("The mission owner does not own the start planet.")
 	}
 

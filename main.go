@@ -20,23 +20,28 @@ func init() {
 }
 
 func main() {
-	go final()
-
 	cfg.Load()
 	db.InitPool(cfg.Database.Host, cfg.Database.Port, 8)
 	server.ExportConfig(cfg)
 	server.InitLeaderboard(leaderboard.New())
 	server.SpawnDbMissions()
-	server.Start()
+
+	s := server.NewServer(
+		cfg.Server.Host,
+		cfg.Server.Port,
+	)
+	go final(s)
+
+	s.Start()
 }
 
-func final() {
+func final(s *server.Server) {
 	exitChan := make(chan os.Signal, 1)
 	signal.Notify(exitChan, syscall.SIGINT)
 	signal.Notify(exitChan, syscall.SIGKILL)
 	signal.Notify(exitChan, syscall.SIGTERM)
 	<-exitChan
 
-	server.Stop()
+	s.Stop()
 	os.Exit(0)
 }

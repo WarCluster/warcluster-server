@@ -1,15 +1,23 @@
 package server
 
 import (
-	"fmt"
-	"math/rand"
+	"encoding/json"
+	"errors"
+	"log"
 	"time"
 
-	"github.com/fzzy/sockjs-go/sockjs"
+	"github.com/garyburd/redigo/redis"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"golang.org/x/net/websocket"
 
 	"warcluster/config"
+	"warcluster/entities"
 	"warcluster/entities/db"
+	"warcluster/leaderboard"
 )
+
+var testServer *Server
 
 func init() {
 	var cfg config.Config
@@ -19,45 +27,110 @@ func init() {
 	defer conn.Close()
 
 	conn.Do("FLUSHDB")
+	testServer = NewServer(
+		cfg.Server.Host,
+		7013,
+	)
+
+	go testServer.Start()
+	for !testServer.isRunning {
+		time.Sleep(100 * time.Millisecond)
+	}
 }
 
-type testSession struct {
-	session_id string
-	Messages   [][]byte
+type WebSocketTestSuite struct {
+	suite.Suite
+	conn    redis.Conn
+	ws      *websocket.Conn
+	message map[string]interface{}
 }
 
-func (s *testSession) Receive() []byte {
-	if len(s.Messages) > 0 {
-		result := s.Messages[0]
-		s.Messages = s.Messages[1:]
-		return result
+func (w *WebSocketTestSuite) Dial() (*websocket.Conn, error) {
+	origin := "http://localhost/"
+	url := "ws://localhost:7013/universe"
+	return websocket.Dial(url, "", origin)
+}
+
+func (w *WebSocketTestSuite) SetupTest() {
+	var err error
+
+	w.message = make(map[string]interface{})
+	w.conn = db.Pool.Get()
+	w.conn.Do("FLUSHDB")
+	w.ws, err = w.Dial()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return []byte{}
+	cfg.Load()
+	InitLeaderboard(leaderboard.New())
 }
 
-func (s *testSession) Send(m []byte) {
-	s.Messages = append(s.Messages, m)
-	return
+func (w *WebSocketTestSuite) TearDownTest() {
+	w.ws.Close()
+	w.conn.Close()
 }
 
-func (s *testSession) Close(code int, reason string) {
-	return
+func (w *WebSocketTestSuite) assertReceive(command string) {
+	w.message = make(map[string]interface{})
+
+	receive := func() <-chan struct{} {
+		ch := make(chan struct{})
+		go func() {
+			websocket.JSON.Receive(w.ws, &w.message)
+			ch <- struct{}{}
+		}()
+		return ch
+	}
+
+	select {
+	case <-time.After(10 * time.Second):
+		w.T().Fatalf("Did not receive %s after 10 seconds", command)
+	case <-receive():
+		assert.Equal(w.T(), command, w.message["Command"])
+	}
 }
 
-func (s *testSession) End() {
-	return
+func (w *WebSocketTestSuite) assertSend(request *Request) {
+	send := func() <-chan struct{} {
+		ch := make(chan struct{})
+		go func() {
+			websocket.JSON.Send(w.ws, request)
+			ch <- struct{}{}
+		}()
+		return ch
+	}
+
+	select {
+	case <-time.After(10 * time.Second):
+		w.T().Fatalf("Did not send %s after 10 seconds", request.Command)
+	case <-send():
+	}
 }
 
-func (s *testSession) Info() sockjs.RequestInfo {
-	return *new(sockjs.RequestInfo)
+func NewFakeClient(player *entities.Player) *Client {
+	client := NewClient(new(websocket.Conn), player)
+	client.codec = new(fakeCodec)
+	return client
 }
 
-func (s *testSession) Protocol() sockjs.Protocol {
-	return *new(sockjs.Protocol)
+type fakeCodec struct {
+	Messages  [][]byte
+	Marshal   func(v interface{}) (data []byte, payloadType byte, err error)
+	Unmarshal func(data []byte, payloadType byte, v interface{}) (err error)
 }
 
-func (s *testSession) String() string {
-	rand.Seed(time.Now().Unix())
-	return fmt.Sprintf("%d", rand.Int())
+func (c *fakeCodec) Receive(ws *websocket.Conn, v interface{}) error {
+	if len(c.Messages) > 0 {
+		message := c.Messages[0]
+		c.Messages = c.Messages[1:]
+		return json.Unmarshal(message, v)
+	}
+	return errors.New("No message received")
+}
+
+func (c *fakeCodec) Send(ws *websocket.Conn, v interface{}) error {
+	m, err := json.Marshal(v)
+	c.Messages = append(c.Messages, m)
+	return err
 }

@@ -2,7 +2,6 @@ package server
 
 import (
 	"container/list"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -150,10 +149,8 @@ func (cp *ClientPool) Send(player *entities.Player, response response.Responser)
 	}()
 	response.Sanitize(player)
 
-	message, _ := json.Marshal(response)
-
 	for element := cp.pool[player.Username].Front(); element != nil; element = element.Next() {
 		client := element.Value.(*Client)
-		client.Session.Send(message)
+		client.Send(response)
 	}
 }

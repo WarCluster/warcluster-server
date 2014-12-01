@@ -3,133 +3,125 @@ package server
 import (
 	"testing"
 
+	"github.com/Vladimiroff/vec2d"
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/net/websocket"
 
-	"warcluster/entities/db"
-	"warcluster/leaderboard"
+	"warcluster/entities"
 )
 
-const (
-	user        = "{\"Command\": \"login\", \"Username\": \"JohnDoe\", \"TwitterId\": \"some twitter ID\"}"
-	setupParams = "{\"Command\": \"setup_parameters\", \"Race\": 0, \"SunTextureId\": 0}"
+var (
+	incompleteUser = Request{Command: "login", TwitterID: "some twitter ID"}
+	user           = Request{Command: "login", Username: "gophie", TwitterID: "some twitter ID"}
+	setupParams    = Request{Command: "setup_parameters", Race: 0, SunTextureId: 0}
+	setup          = Request{Command: "setup", Race: 0, SunTextureId: 0}
 )
 
 type ClientTestSuite struct {
-	suite.Suite
-	conn    redis.Conn
-	session *testSession
+	WebSocketTestSuite
 }
 
-func (suite *ClientTestSuite) SetupTest() {
-	suite.conn = db.Pool.Get()
-	suite.conn.Do("FLUSHDB")
-	suite.session = new(testSession)
-
-	cfg.Load()
-	InitLeaderboard(leaderboard.New())
-}
-
-func (suite *ClientTestSuite) TearDownTest() {
-	suite.conn.Close()
-}
-
-func (suite *ClientTestSuite) TestRegisterNewUser() {
-	suite.session.Send([]byte(user))
-	suite.session.Send([]byte(setupParams))
-
-	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+func (s *ClientTestSuite) TestRegisterNewUser() {
+	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
+	assert.Nil(s.T(), err)
 	before := len(players_before)
 
-	_, err = authenticate(suite.session)
+	s.assertSend(&user)
+	s.assertReceive("server_params")
+	s.assertReceive("request_setup_params")
 
-	assert.Nil(suite.T(), err)
+	s.assertSend(&setupParams)
+	s.assertReceive("login_success")
 
-	players_after, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	players_after, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
+	assert.Nil(s.T(), err)
 	after := len(players_after)
 
-	assert.Nil(suite.T(), err)
-
-	assert.Equal(suite.T(), before+1, after)
+	assert.Equal(s.T(), before+1, after)
 }
 
-func (suite *ClientTestSuite) TestAuthenticateExcistingUser() {
-	suite.session.Send([]byte(user))
-	suite.session.Send([]byte(setupParams))
-	suite.session.Send([]byte(user))
+func (s *ClientTestSuite) TestAuthenticateExcistingUser() {
+	entities.Save(&entities.Planet{
+		Name:     "GOP6720",
+		Position: &vec2d.Vector{2, 2},
+	})
+	entities.Save(&entities.Player{
+		Username:       "gophie",
+		RaceID:         1,
+		TwitterID:      "gop",
+		HomePlanet:     "planet.GOP6720",
+		ScreenSize:     []uint64{1, 1},
+		ScreenPosition: &vec2d.Vector{2, 2},
+	})
 
-	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
+	assert.Nil(s.T(), err)
 
-	authenticate(suite.session)
-	authenticate(suite.session)
+	s.assertSend(&user)
+	s.assertReceive("server_params")
+	s.assertReceive("login_success")
 
-	players_after, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	players_after, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	after := len(players_after)
+	assert.Nil(s.T(), err)
 
-	assert.Nil(suite.T(), err)
-
-	assert.Equal(suite.T(), before+1, after)
+	assert.Equal(s.T(), before, after)
 }
 
-func (suite *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
-	suite.session.Send([]byte("{\"Command\": \"login\", \"TwitterId\": \"some twitter ID\"}"))
-
-	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+func (s *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
+	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
+	assert.Nil(s.T(), err)
 
-	authenticate(suite.session)
+	s.assertSend(&incompleteUser)
+	s.assertReceive("login_failed")
 
-	players_after, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	players_after, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	after := len(players_after)
+	assert.Nil(s.T(), err)
 
-	assert.Nil(suite.T(), err)
-
-	assert.Equal(suite.T(), before, after)
+	assert.Equal(s.T(), before, after)
 }
 
-func (suite *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
-	setup := "{\"Command\": \"setup\", \"Race\": 0, \"SunTextureId\": 0}"
-
-	suite.session.Send([]byte(user))
-	suite.session.Send([]byte(setup))
-
-	players_before, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+func (s *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
+	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
+	assert.Nil(s.T(), err)
 
-	_, err = authenticate(suite.session)
+	s.assertSend(&user)
+	s.assertReceive("server_params")
+	s.assertReceive("request_setup_params")
 
-	assert.NotNil(suite.T(), err)
+	s.assertSend(&setup)
+	s.assertReceive("login_failed")
 
-	players_after, err := redis.Strings(suite.conn.Do("KEYS", "player.*"))
+	players_after, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	after := len(players_after)
+	assert.Nil(s.T(), err)
 
-	assert.Nil(suite.T(), err)
-
-	assert.Equal(suite.T(), before, after)
+	assert.Equal(s.T(), before, after)
 }
 
-func (suite *ClientTestSuite) TestAuthenticateUserWithNilData() {
-	suite.session.Send(nil)
-	_, err := authenticate(suite.session)
-
-	assert.NotNil(suite.T(), err)
+func (s *ClientTestSuite) TestAuthenticateUserWithNilData() {
+	s.assertSend(nil)
+	s.assertReceive("login_failed")
 }
 
-func (suite *ClientTestSuite) TestAuthenticateUserWithInvalidJSONData() {
-	suite.session.Send([]byte("panda"))
-	_, err := authenticate(suite.session)
-
-	assert.NotNil(suite.T(), err)
+func (s *ClientTestSuite) TestAuthenticateUserWithInvalidJSONData() {
+	websocket.Message.Send(s.ws, "panda")
+	s.assertReceive("login_failed")
 }
 
-func (suite *ClientTestSuite) TestAuthenticateUserWithNilSetupData() {
-	suite.session.Send([]byte(user))
-	suite.session.Send(nil)
-	_, err := authenticate(suite.session)
+func (s *ClientTestSuite) TestAuthenticateUserWithNilSetupData() {
+	s.assertSend(&user)
+	s.assertReceive("server_params")
+	s.assertReceive("request_setup_params")
 
-	assert.NotNil(suite.T(), err)
+	s.assertSend(nil)
+	s.assertReceive("login_failed")
 }
 
 func TestClientTestSuite(t *testing.T) {
