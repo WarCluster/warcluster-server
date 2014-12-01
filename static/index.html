@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-        <script src="//cdn.sockjs.org/sockjs-0.3.4.min.js"></script>
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+
         <script>
             $(function() {
-                var conn = null;
-
-                function setup_parameters() {
-                    alert("wtf");
-                }
+                hljs.initHighlightingOnLoad();
+                conn = null;
 
                 function log(msg) {
                     var control = $('#json');
                     try {
                         var prettyMessage = JSON.stringify(JSON.parse(msg), undefined, 2);
-                        control.html($("#json").html() + "<br/>" + prettyMessage + "<br/>-----------------------------------");
+                        control.html($("#json").html() + "<br>" + prettyMessage + "<br> ----------------");
                     } catch (e) {
                         control.html(control.html() + msg + '<br/>');
                     }
-                    control.scrollTop(control.scrollTop() + 1000);
+                    control.scrollTop(control.scrollTop() + $("#json").height());
+                    $('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
                 }
 
                 function disconnect() {
                     if (conn != null) {
-                        log('Disconnecting...');
-
                         conn.close();
                         conn = null;
 
@@ -34,90 +34,160 @@
                 }
 
                 function updateUi() {
-                    if (conn == null || conn.readyState != SockJS.OPEN) {
+                    if (conn == null) {
                         $('#status').text('disconnected');
-                        $('#connect').text('Connect');
+                        $('input').prop('disabled', true);
                     }
                     else {
                         $('#status').text('connected');
-                        $('#connect').text('Disconnect');
+                        $('input').prop('disabled', false);
                     }
                 }
 
-                $('#chatform').submit(function() {
+                $('#rawForm').submit(function(e) {
+                    e.preventDefault();
                     var text = $('#message').val();
                     conn.send(text);
                     $('#message').val('').focus();
                     return false;
                 });
 
-                $('#loginform').submit(function() {
+                $('#loginForm').submit(function(e) {
+                    e.preventDefault();
                     var text = {
                         "Command": "login",
-                        "Username": $('#loginName').val(),
+                        "Username": $('input[name=loginName]').val(),
                         "TwitterId": "some twitter ID"
-                    }
+                    };
                     conn.send(JSON.stringify(text));
                     return false;
                 });
 
-                $('#paramsform').submit(function() {
+                $('#paramsForm').submit(function(e) {
+                    e.preventDefault();
                     var text = {
                         "Command": "setup_parameters",
-                        "Race": parseInt($('#race').val()),
-                        "SunTextureId": parseInt($('#sunTextureId').val())
+                        "Race": parseInt($('input[name=race]').val()),
+                        "SunTextureId": parseInt($('input[name=sunTextureId]').val())
+                    };
+                    conn.send(JSON.stringify(text));
+                    return false;
+                });
+
+                $('#scopeOfViewForm').submit(function(e) {
+                    e.preventDefault();
+                    var text = {
+                        "Command": "scope_of_view",
+                        "Position": {
+                                "X": parseInt($('input[name=positionX]').val()),
+                                "Y": parseInt($('input[name=positionY]').val())
+                        },
+                        "Resolution": [
+                                parseInt($('input[name=resolutionX]').val()),
+                                parseInt($('input[name=resolutionY]').val())
+                        ]
+                    };
+                    conn.send(JSON.stringify(text));
+                    return false;
+                });
+
+                $('#startMissionForm').submit(function(e) {
+                    e.preventDefault();
+                    var text = {
+                        "Command": "start_mission",
+                        "Type": $('input[name=type]').val(),
+                        "StartPlanets": $('input[name=startPlanets]').val().split(','),
+                        "Path": JSON.parse($('input[name=path]').val()),
+                        "EndPlanet": $('input[name=endPlanet]').val(),
+                        "Fleet": parseInt($('input[name=fleet]').val())
                     }
                     conn.send(JSON.stringify(text));
                     return false;
                 });
 
+                function connect() {
+                    if(conn != null) {
+                        return;
+                    }
+                    conn = new WebSocket('ws://' + window.location.host + '/universe');
 
-                conn = new SockJS('http://' + window.location.host + '/universe');
-                log('Connecting...');
+                    conn.onopen = function() {
+                        updateUi();
+                    };
 
-                conn.onopen = function() {
-                    log('Connected.');
-                    updateUi();
-                };
+                    conn.onmessage = function(e) {
+                        log(e.data);
+                    };
 
-                conn.onmessage = function(e) {
-                    log(e.data);
-                };
+                    conn.onclose = function() {
+                        conn = null;
+                        updateUi();
+                    };
+                }
 
-                conn.onclose = function() {
-                    log('Disconnected.');
-                    conn = null;
-                    updateUi();
-                };
-
+                $("#connectButton").click(connect);
+                $("#disconnectButton").click(disconnect);
+                connect();
                 $('#message').val('').focus();
             });
         </script>
+        <style>
+            input[type=number] { width: 40px }
+        </style>
         <title>War Cluster Development shell</title>
     </head>
     <body>
-        <h1>War Cluster Development shell</h1>
+        <h1>War Cluster Development shell (<span id="status">disconnected</span>)</h1>
 
-        <div>
-            Status: <span id="status">disconnected</span>
+        <div style="float: left; width: 49vw; height: 80vh;  border: 1px solid black; padding: 0; margin-bottom: 8px">
+                <pre style="height: 100%; overflow:auto;margin:0"><code class="javascript" id="json" style="height: 100%"></code></pre>
         </div>
-        <pre id="json" style="width: 90%; height: 30em; overflow:auto; border: 1px solid black">
-        </pre>
-        <form id="chatform">
-            <label for="message">Command:</label>
-            <input id="message" type="text" style="width: 80%">
+
+        <div style="float: right; width: 48vw; margin-left: 8px">
+
+            <button id="connectButton">Connect</button> <button id="disconnectButton">Disconnect</button><br>
+            <hr>
+            <form id="loginForm" action="">
+                Login with:
+                <input name="loginName" type="text" value="john">
+                <input type="submit" value="Send">
+            </form>
+            <hr>
+            <form id="paramsForm" action="">
+                Request setup params:
+                Race <input name="race" type="number" value="0">
+                SunTextureId <input name="sunTextureId" type="number" value="0">
+                <input type="submit" value="Send"><br>
+            </form>
+            <hr>
+            <form id="scopeOfViewForm" action="">
+                <h4>Scope of view:</h4>
+                Position { X:<input name="positionX" type="number" value="0">, Y:<input name="positionY" type="number" value="0"> }<br>
+                Resolution [ <input name="resolutionX" type="number" value="800">, <input name="resolutionY" type="number" value="600"> ]<br>
+                <input type="submit" value="Send">
+            </form>
+            <hr>
+            <form id="startMissionForm" action="">
+                <h4>StartMission:</h4>
+                Type:
+                <ul style="list-style-type: none">
+                        <li><input type="radio" name="type" value="Attack"> Attack </li>
+                        <li><input type="radio" name="type" value="Spy"> Spy </li>
+                        <li><input type="radio" name="type" value="Supply"> Supply </li>
+                </ul>
+                StartPlanets <input name="startPlanets" type="text" value="" size="70"><br>
+                Path <input name="path" type="text" value="" size="70"><br>
+                EndPlanet <input name="endPlanet" type="text" value=""><br>
+                Fleet <input name="fleet" type="number" min="0" max="100" step="10" value="10"><br>
+                <input type="submit" value="Send">
+            </form>
+        </div>
+        <div style="clear: both">
+        <form id="rawForm" action="">
+            <label for="command">Command:</label>
+            <input id="command" type="text" style="width: 80vw">
             <input type="submit" value="Send">
         </form>
-        <form id="loginform">
-            Login with:
-            <input id="loginName" type="text" value="john">
-            <input type="submit" value="login">
-        </form>
-        <form id="paramsform">
-            Request params ->
-            <input type="submit" value="setup_parameters">
-            Race: <input id="race" type="text" value="0">
-            SunTextureId:  <input id="sunTextureId" type="text" value="0">
-        </form>
+        </div>
     </body>
 </html>
