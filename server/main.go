@@ -9,6 +9,7 @@ import (
 	"path"
 	"runtime"
 	"runtime/debug"
+	"sync"
 
 	"golang.org/x/net/websocket"
 
@@ -19,6 +20,7 @@ import (
 
 type Server struct {
 	http.Server
+	once      sync.Once
 	listener  net.Listener
 	isRunning bool
 }
@@ -40,11 +42,23 @@ func ExportConfig(loadedCfg config.Config) {
 func NewServer(host string, port uint16) *Server {
 	s := new(Server)
 	s.Addr = fmt.Sprintf("%v:%v", host, port)
+	s.setupRoutes()
 	return s
 }
 
-// This function goes trough all the procedurs needed for the werver to be initialized.
-// Create an empty connections pool and start the listening foe messages loop.
+// Sets http routes if this haven't been done before.
+func (s *Server) setupRoutes() {
+	s.once.Do(func() {
+		http.HandleFunc("/console", consoleHandler)
+		http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
+		http.HandleFunc("/leaderboard/races/", leaderboardRacesHandler)
+		http.HandleFunc("/leaderboard/races/info/", leaderboardRacesInfoHandler)
+		http.HandleFunc("/search/", searchHandler)
+		http.Handle("/universe", websocket.Handler(Handle))
+	})
+}
+
+// Create an empty connections pool and start listening.
 func (s *Server) Start() error {
 	clients = NewClientPool(13)
 
