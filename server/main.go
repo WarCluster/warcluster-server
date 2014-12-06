@@ -100,14 +100,15 @@ func (s *Server) Stop() error {
 
 // Returns the HTML page needed to display the debug page (server "chat" window).
 func consoleHandler(response http.ResponseWriter, request *http.Request) {
+	if !cfg.Server.Console {
+		http.NotFound(response, request)
+		return
+	}
+
 	response.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
 	response.Header().Add("Pragma", "no-cache")                                   // HTTP 1.0.
 	response.Header().Add("Expires", "0")                                         // Proxies
-	if cfg.Server.Console {
-		http.ServeFile(response, request, path.Join(getStaticDir(), "/index.html"))
-	} else {
-		http.NotFound(response, request)
-	}
+	http.ServeFile(response, request, path.Join(getStaticDir(), "/index.html"))
 }
 
 // On the first received message from each connection the server will call the handler.
