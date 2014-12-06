@@ -18,9 +18,8 @@ import (
 )
 
 type Server struct {
+	http.Server
 	listener  net.Listener
-	host      string
-	port      uint16
 	isRunning bool
 }
 
@@ -37,10 +36,10 @@ func ExportConfig(loadedCfg config.Config) {
 	cfg = loadedCfg
 }
 
+// Create new server and setup its routes.
 func NewServer(host string, port uint16) *Server {
 	s := new(Server)
-	s.host = host
-	s.port = port
+	s.Addr = fmt.Sprintf("%v:%v", host, port)
 	return s
 }
 
@@ -49,17 +48,10 @@ func NewServer(host string, port uint16) *Server {
 func (s *Server) Start() error {
 	clients = NewClientPool(13)
 
-	log.Print(fmt.Sprintf("Server is running at http://%v:%v/", s.host, s.port))
+	log.Print(fmt.Sprintf("Server is running at http://%s/", s.Addr))
 	log.Print("Quit the server with Ctrl-C.")
 
-	http.HandleFunc("/console", consoleHandler)
-	http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
-	http.HandleFunc("/leaderboard/races/", leaderboardRacesHandler)
-	http.HandleFunc("/leaderboard/races/info/", leaderboardRacesInfoHandler)
-	http.HandleFunc("/search/", searchHandler)
-	http.Handle("/universe", websocket.Handler(Handle))
-
-	if err := s.ListenAndServe(fmt.Sprintf("%v:%v", s.host, s.port)); err != nil {
+	if err := s.ListenAndServe(); err != nil {
 		log.Println(err)
 		return err
 	}
@@ -68,23 +60,19 @@ func (s *Server) Start() error {
 }
 
 // ListenAndServe listens on the TCP network address srv.Addr and then
-// calls Serve to handle requests on incoming connections.  If
-// srv.Addr is blank, ":http" is used.
-func (s *Server) ListenAndServe(address string) error {
+// calls Serve to handle requests on incoming connections.o
+// It's re-defined here in order to have the listener which allows us
+// to stop listening and clean up before exit.
+func (s *Server) ListenAndServe() error {
 	var err error
 
-	server := &http.Server{Addr: address, Handler: http.DefaultServeMux}
-	addr := server.Addr
-	if addr == "" {
-		addr = ":http"
-	}
-	s.listener, err = net.Listen("tcp", addr)
+	s.listener, err = net.Listen("tcp", s.Addr)
 	if err != nil {
 		return err
 	}
 
 	s.isRunning = true
-	return server.Serve(s.listener)
+	return s.Serve(s.listener)
 }
 
 // Stops the server.
