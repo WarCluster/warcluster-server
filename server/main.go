@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"path"
-	"runtime"
 	"runtime/debug"
 	"sync"
 
@@ -159,6 +158,5 @@ func Handle(ws *websocket.Conn) {
 
 // getStaticDir return an absolute path to the static files
 func getStaticDir() string {
-	_, filename, _, _ := runtime.Caller(1)
-	return path.Join(path.Dir(filename), "../static")
+	return path.Join(config.ConfigDir, "../static")
 }
