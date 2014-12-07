@@ -19,7 +19,6 @@ import (
 
 type Server struct {
 	http.Server
-	once      sync.Once
 	listener  net.Listener
 	isRunning bool
 }
@@ -29,6 +28,7 @@ var (
 	clients     *ClientPool
 	leaderBoard *leaderboard.Leaderboard
 	listener    net.Listener
+	once        sync.Once
 	empty       = struct{}{}
 )
 
@@ -47,7 +47,7 @@ func NewServer(host string, port uint16) *Server {
 
 // Sets http routes if this haven't been done before.
 func (s *Server) setupRoutes() {
-	s.once.Do(func() {
+	once.Do(func() {
 		http.HandleFunc("/console", consoleHandler)
 		http.HandleFunc("/leaderboard/players/", leaderboardPlayersHandler)
 		http.HandleFunc("/leaderboard/races/", leaderboardRacesHandler)
