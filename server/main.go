@@ -138,19 +138,20 @@ func Handle(ws *websocket.Conn) {
 	for {
 		err := websocket.JSON.Receive(client.Conn, &request)
 		if err != nil {
-			clients.Send(client.Player, response.NewError(err.Error()))
-			continue
+			log.Println("Error in server.main.Handler.Receive:", err.Error())
+			return
 		}
 		request.Client = client
 		action, err := ParseRequest(&request)
 		if err != nil {
-			log.Println("Error in server.main.handler.ParseRequest:", err.Error())
+			log.Println("Error in server.main.Handler.ParseRequest:", err.Error())
 			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
 
 		if err := action(&request); err != nil {
-			log.Println(err)
+			log.Println("Error in server.main.Handler.action:", err.Error())
+			clients.Send(client.Player, response.NewError(err.Error()))
 			continue
 		}
 	}
