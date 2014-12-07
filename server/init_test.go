@@ -17,7 +17,13 @@ import (
 	"warcluster/leaderboard"
 )
 
-var testServer *Server
+var (
+	testServer     *Server
+	incompleteUser = Request{Command: "login", TwitterID: "some twitter ID"}
+	user           = Request{Command: "login", Username: "gophie", TwitterID: "some twitter ID"}
+	setupParams    = Request{Command: "setup_parameters", Race: 0, SunTextureId: 0}
+	setup          = Request{Command: "setup", Race: 0, SunTextureId: 0}
+)
 
 func init() {
 	var cfg config.Config

@@ -12,18 +12,11 @@ import (
 	"warcluster/entities"
 )
 
-var (
-	incompleteUser = Request{Command: "login", TwitterID: "some twitter ID"}
-	user           = Request{Command: "login", Username: "gophie", TwitterID: "some twitter ID"}
-	setupParams    = Request{Command: "setup_parameters", Race: 0, SunTextureId: 0}
-	setup          = Request{Command: "setup", Race: 0, SunTextureId: 0}
-)
-
-type ClientTestSuite struct {
+type AuthTest struct {
 	WebSocketTestSuite
 }
 
-func (s *ClientTestSuite) TestRegisterNewUser() {
+func (s *AuthTest) TestRegisterNewUser() {
 	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	assert.Nil(s.T(), err)
 	before := len(players_before)
@@ -42,7 +35,7 @@ func (s *ClientTestSuite) TestRegisterNewUser() {
 	assert.Equal(s.T(), before+1, after)
 }
 
-func (s *ClientTestSuite) TestAuthenticateExcistingUser() {
+func (s *AuthTest) TestAuthenticateExcistingUser() {
 	entities.Save(&entities.Planet{
 		Name:     "GOP6720",
 		Position: &vec2d.Vector{2, 2},
@@ -71,7 +64,7 @@ func (s *ClientTestSuite) TestAuthenticateExcistingUser() {
 	assert.Equal(s.T(), before, after)
 }
 
-func (s *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
+func (s *AuthTest) TestAuthenticateUserWithIncompleteData() {
 	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
 	assert.Nil(s.T(), err)
@@ -86,7 +79,7 @@ func (s *ClientTestSuite) TestAuthenticateUserWithIncompleteData() {
 	assert.Equal(s.T(), before, after)
 }
 
-func (s *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
+func (s *AuthTest) TestUnableToRegisterNewUserWithWrongCommand() {
 	players_before, err := redis.Strings(s.conn.Do("KEYS", "player.*"))
 	before := len(players_before)
 	assert.Nil(s.T(), err)
@@ -105,17 +98,17 @@ func (s *ClientTestSuite) TestUnableToRegisterNewUserWithWrongCommand() {
 	assert.Equal(s.T(), before, after)
 }
 
-func (s *ClientTestSuite) TestAuthenticateUserWithNilData() {
+func (s *AuthTest) TestAuthenticateUserWithNilData() {
 	s.assertSend(nil)
 	s.assertReceive("login_failed")
 }
 
-func (s *ClientTestSuite) TestAuthenticateUserWithInvalidJSONData() {
+func (s *AuthTest) TestAuthenticateUserWithInvalidJSONData() {
 	websocket.Message.Send(s.ws, "panda")
 	s.assertReceive("login_failed")
 }
 
-func (s *ClientTestSuite) TestAuthenticateUserWithNilSetupData() {
+func (s *AuthTest) TestAuthenticateUserWithNilSetupData() {
 	s.assertSend(&user)
 	s.assertReceive("server_params")
 	s.assertReceive("request_setup_params")
@@ -124,6 +117,6 @@ func (s *ClientTestSuite) TestAuthenticateUserWithNilSetupData() {
 	s.assertReceive("login_failed")
 }
 
-func TestClientTestSuite(t *testing.T) {
-	suite.Run(t, new(ClientTestSuite))
+func TestAuthTest(t *testing.T) {
+	suite.Run(t, new(AuthTest))
 }

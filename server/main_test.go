@@ -40,6 +40,7 @@ func (st *ServerTest) TestStopping() {
 func (st *ServerTest) TestConsolePermissions() {
 	defer func(consoleStatus bool) {
 		cfg.Server.Console = consoleStatus
+		ExportConfig(cfg)
 	}(cfg.Server.Console)
 
 	w := httptest.NewRecorder()
