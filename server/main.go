@@ -107,7 +107,7 @@ func consoleHandler(response http.ResponseWriter, request *http.Request) {
 	response.Header().Add("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
 	response.Header().Add("Pragma", "no-cache")                                   // HTTP 1.0.
 	response.Header().Add("Expires", "0")                                         // Proxies
-	http.ServeFile(response, request, path.Join(getStaticDir(), "/index.html"))
+	http.ServeFile(response, request, path.Join(getStaticDir(), "index.html"))
 }
 
 // On the first received message from each connection the server will call the handler.
