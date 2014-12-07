@@ -10,12 +10,20 @@ import (
 	"warcluster/server/response"
 )
 
-var cp = NewClientPool(16)
+var (
+	cp = NewClientPool(16)
 
-var planet = entities.Planet{
-	Name:     "GOP6720",
-	Position: &vec2d.Vector{2, 2},
-}
+	planet = entities.Planet{
+		Name:     "GOP6720",
+		Position: &vec2d.Vector{2, 2},
+	}
+
+	sun = entities.Sun{
+		Name:     "GOP672",
+		Username: "gophie",
+		Position: vec2d.New(20, 20),
+	}
+)
 
 var player1 = entities.Player{
 	Username:       "gophie",
@@ -50,6 +58,7 @@ func TestAddClientToClientPool(t *testing.T) {
 	if len(cp.pool) != l+1 {
 		t.Fail()
 	}
+	client1.MoveToAreas([]string{"area:1:1"})
 	cp.Remove(&client1)
 }
 
@@ -159,13 +168,14 @@ func TestBroadcast(t *testing.T) {
 	client2.MoveToAreas([]string{"area:1:1"})
 	client3.MoveToAreas([]string{"area:2:1"})
 
+	cp.Broadcast(&sun)
 	cp.Broadcast(&planet)
 	if client1.stateChange == nil {
 		t.Error("Client1 has no stacked planets")
 	}
 
 	if len(client1.stateChange.RawPlanets) != 1 {
-		t.Errorf("Client1 has %d stacked planets instead of 1")
+		t.Errorf("Client1 has %d stacked planets instead of 1", len(client1.stateChange.RawPlanets))
 	}
 
 	if client2.stateChange == nil {
@@ -173,10 +183,15 @@ func TestBroadcast(t *testing.T) {
 	}
 
 	if len(client2.stateChange.RawPlanets) != 1 {
-		t.Errorf("Client2 has %d stacked planets instead of 1")
+		t.Errorf("Client2 has %d stacked planets instead of 1", len(client2.stateChange.RawPlanets))
 	}
 
 	if client3.stateChange != nil {
 		t.Error("Client3 has stacked planets")
 	}
+
+	// Just to make sure nothing breaks with ghost users
+	client3.MoveToAreas([]string{"area:1:1"})
+	delete(cp.pool, client3.Player.Username)
+	cp.Broadcast(&sun)
 }
