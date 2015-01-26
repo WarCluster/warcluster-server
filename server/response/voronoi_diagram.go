@@ -2,7 +2,6 @@ package response
 
 import (
 	"github.com/Vladimiroff/vec2d"
-	"github.com/pzsz/voronoi"
 
 	"warcluster/entities"
 )
@@ -23,33 +22,10 @@ type VoronoiDiagram struct {
 
 func NewVoronoiDiagram(position *vec2d.Vector, resolution []uint64) *VoronoiDiagram {
 	topLeft, bottomRight := calculateCanvasSize(position, resolution)
-	planetEntities := entities.Find("planet.*")
-	planets := make([]*entities.Planet, 0, len(planetEntities))
-	sites := make([]voronoi.Vertex, 0, len(planetEntities))
-	x0, xn, y0, yn := 0.0, 0.0, 0.0, 0.0
-	for i, planetEntity := range planetEntities {
-		planets = append(planets, planetEntity.(*entities.Planet))
-		if x0 > planets[i].Position.X {
-			x0 = planets[i].Position.X
-		}
-		if xn < planets[i].Position.X {
-			xn = planets[i].Position.X
-		}
-		if y0 > planets[i].Position.Y {
-			y0 = planets[i].Position.Y
-		}
-		if yn < planets[i].Position.Y {
-			yn = planets[i].Position.Y
-		}
-		sites = append(sites, voronoi.Vertex{planets[i].Position.X, planets[i].Position.Y})
-	}
-
-	bbox := voronoi.NewBBox(x0, xn, y0, yn)
 
 	voronoiDiagram := new(VoronoiDiagram)
 	voronoiDiagram.Command = "voronoi_diagram"
-	diagram := voronoi.ComputeDiagram(sites, bbox, true)
-	for _, cell := range diagram.Cells {
+	for _, cell := range Diagram.Cells {
 		polygon := new(Polygon)
 		for _, hedge := range cell.Halfedges {
 			edge := Edge{
