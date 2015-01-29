@@ -46,7 +46,7 @@ func (st *ServerTest) TestConsolePermissions() {
 	w := httptest.NewRecorder()
 	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s/console", st.server.Addr), nil)
 	if err != nil {
-		st.Error(err)
+		st.T().Error(err)
 	}
 
 	cfg.Server.Console = true
