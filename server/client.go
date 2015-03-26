@@ -28,14 +28,16 @@ type Client struct {
 	stateChange *response.StateChange
 	mutex       sync.Mutex
 	codec       Codec
+	twitter     *anaconda.TwitterApi
 }
 
-func NewClient(ws *websocket.Conn, player *entities.Player) *Client {
+func NewClient(ws *websocket.Conn, player *entities.Player, twitter *anaconda.TwitterApi) *Client {
 	return &Client{
-		Conn:   ws,
-		Player: player,
-		areas:  make(map[string]struct{}),
-		codec:  websocket.JSON,
+		Conn:    ws,
+		Player:  player,
+		areas:   make(map[string]struct{}),
+		codec:   websocket.JSON,
+		twitter: twitter,
 	}
 }
 

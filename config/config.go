@@ -27,6 +27,7 @@ type Config struct {
 		ConsumerSecret    string
 		AccessToken       string
 		AccessTokenSecret string
+		SecureLogin       bool
 	}
 	Race map[string]*struct {
 		Id    uint8

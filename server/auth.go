@@ -18,12 +18,12 @@ import (
 // It check for existing user in the DB and logs him if the password is correct.
 // If the user is new he is initiated and a new home planet nad solar system are generated.
 func login(ws *websocket.Conn) (*Client, response.Responser, error) {
-	player, err := authenticate(ws)
+	player, twitter, err := authenticate(ws)
 	if err != nil {
 		return nil, response.NewLoginFailed(), err
 	}
 
-	client := NewClient(ws, player)
+	client := NewClient(ws, player, twitter)
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
 		return nil, nil, errors.New("Player's home planet is missing!")
@@ -92,24 +92,36 @@ func FetchSetupData(ws *websocket.Conn) (*entities.SetupData, error) {
 // 3.1.Create a new sun with GenerateSun
 // 3.2.Choose home planet from the newly created solar sysitem.
 // 3.3.Create a reccord of the new player and start comunication.
-func authenticate(ws *websocket.Conn) (*entities.Player, error) {
+func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anaconda.TwitterApi, err error) {
 	var (
-		player    *entities.Player
 		nickname  string
 		twitterId string
 		request   Request
+		setupData *entities.SetupData
 	)
 
-	if err := websocket.JSON.Receive(ws, &request); err != nil {
-		return nil, err
+	if err = websocket.JSON.Receive(ws, &request); err != nil {
+		return
 	}
+
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
-		return nil, errors.New("Incomplete credentials")
+		err = errors.New("Incomplete credentials")
+		return
+	}
+
+	if cfg.Twitter.SecureLogin {
+		var ok bool
+		anaconda.SetConsumerKey(request.ConsumerKey)
+		anaconda.SetConsumerSecret(request.ConsumerSecret)
+		twitter = anaconda.NewTwitterApi(cfg.Twitter.AccessToken, cfg.Twitter.AccessTokenSecret)
+		if ok, err = twitter.VerifyCredentials(); !ok {
+			return
+		}
 	}
 
 	serverParamsMessage := response.NewServerParams()
-	if err := websocket.JSON.Send(ws, &serverParamsMessage); err != nil {
-		return nil, err
+	if err = websocket.JSON.Send(ws, &serverParamsMessage); err != nil {
+		return
 	}
 
 	nickname = request.Username
@@ -117,15 +129,15 @@ func authenticate(ws *websocket.Conn) (*entities.Player, error) {
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
 	if entity == nil {
-		setupData, err := FetchSetupData(ws)
+		setupData, err = FetchSetupData(ws)
 		if err != nil {
-			return nil, err
+			return
 		}
 		player = register(setupData, nickname, twitterId)
 	} else {
 		player = entity.(*entities.Player)
 	}
-	return player, nil
+	return
 }
 
 // Registration process is quite simple:
