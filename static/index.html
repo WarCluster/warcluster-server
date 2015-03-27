@@ -57,7 +57,9 @@
                     var text = {
                         "Command": "login",
                         "Username": $('input[name=loginName]').val(),
-                        "TwitterId": "some twitter ID"
+                        "TwitterId": $('input[name=twitterId]').val(),
+                        "AccessToken": $('input[name=accessToken]').val(),
+                        "AccessTokenSecret": $('input[name=accessTokenSecret]').val()
                     };
                     conn.send(JSON.stringify(text));
                     return false;
@@ -148,9 +150,13 @@
             <button id="connectButton">Connect</button> <button id="disconnectButton">Disconnect</button><br>
             <hr>
             <form id="loginForm" action="">
-                Login with:
-                <input name="loginName" type="text" value="john">
-                <input type="submit" value="Send">
+                <ul style="list-style-type: none">
+                    <li>Twitter Name: <input name="loginName" type="text" placeholder="john"></li>
+                    <li>Twitter ID: <input name="twitterId" type="text" placeholder="1099448875"></li>
+                    <li>Twitter Access Token: <input name="accessToken" type="text" value="1099448875-VWhp6eyLUE20vhHpOcGB4lMJDMQQFlMUt4hRqIu"></li>
+                    <li>Twitter Access Token Seret: <input name="accessTokenSecret" type="text" value="4bxZVKF2GTDEpSHMoBv0ankVEJr6oX1FAleImuDKk"></li>
+                    <li><input type="submit" value="Send"></li>
+                </ul>
             </form>
             <hr>
             <form id="paramsForm" action="">
@@ -171,9 +177,9 @@
                 <h4>StartMission:</h4>
                 Type:
                 <ul style="list-style-type: none">
-                        <li><input type="radio" name="type" value="Attack"> Attack </li>
-                        <li><input type="radio" name="type" value="Spy"> Spy </li>
-                        <li><input type="radio" name="type" value="Supply"> Supply </li>
+                    <li><input type="radio" name="type" value="Attack"> Attack </li>
+                    <li><input type="radio" name="type" value="Spy"> Spy </li>
+                    <li><input type="radio" name="type" value="Supply"> Supply </li>
                 </ul>
                 StartPlanets <input name="startPlanets" type="text" value="" size="70"><br>
                 Path <input name="path" type="text" value="" size="70"><br>

@@ -115,7 +115,7 @@ func (w *WebSocketTestSuite) assertSend(request *Request) {
 }
 
 func NewFakeClient(player *entities.Player) *Client {
-	client := NewClient(new(websocket.Conn), player)
+	client := NewClient(new(websocket.Conn), player, nil)
 	client.codec = new(fakeCodec)
 	return client
 }
