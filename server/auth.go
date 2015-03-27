@@ -111,9 +111,9 @@ func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anacond
 
 	if cfg.Twitter.SecureLogin {
 		var ok bool
-		anaconda.SetConsumerKey(request.ConsumerKey)
-		anaconda.SetConsumerSecret(request.ConsumerSecret)
-		twitter = anaconda.NewTwitterApi(cfg.Twitter.AccessToken, cfg.Twitter.AccessTokenSecret)
+		anaconda.SetConsumerKey(cfg.Twitter.ConsumerKey)
+		anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
+		twitter = anaconda.NewTwitterApi(request.AccessToken, request.AccessTokenSecret)
 		if ok, err = twitter.VerifyCredentials(); !ok {
 			return
 		}
