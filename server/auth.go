@@ -172,6 +172,12 @@ func register(setupData *entities.SetupData, nickname, twitterId string, twitter
 
 // Returns a slice with twitter ids of the given user's friends
 func fetchTwitterFriends(screenName string, api *anaconda.TwitterApi) ([]string, error) {
+	if api == nil {
+		// Let's just pretend he has no friends, because we can't actually ask
+		// Twitter about it
+		return []string{}, nil
+	}
+
 	v := url.Values{}
 	v.Set("count", "100")
 	v.Set("cursor", "-1")
