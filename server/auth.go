@@ -133,7 +133,7 @@ func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anacond
 		if err != nil {
 			return
 		}
-		player = register(setupData, nickname, twitterId)
+		player = register(setupData, nickname, twitterId, twitter)
 	} else {
 		player = entity.(*entities.Player)
 	}
@@ -146,8 +146,8 @@ func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anacond
 // - Create a new sun with GenerateSun.
 // - Choose home planet from the newly created solar sysitem.
 // - Create a reccord of the new player and start comunication.
-func register(setupData *entities.SetupData, nickname, twitterId string) *entities.Player {
-	friendsSuns := fetchFriendsSuns(nickname)
+func register(setupData *entities.SetupData, nickname, twitterId string, twitterApi *anaconda.TwitterApi) *entities.Player {
+	friendsSuns := fetchFriendsSuns(nickname, twitterApi)
 	sun := entities.GenerateSun(nickname, friendsSuns, setupData)
 	planets, homePlanet := entities.GeneratePlanets(nickname, sun)
 	player := entities.CreatePlayer(nickname, twitterId, homePlanet, setupData)
@@ -171,11 +171,7 @@ func register(setupData *entities.SetupData, nickname, twitterId string) *entiti
 }
 
 // Returns a slice with twitter ids of the given user's friends
-func fetchTwitterFriends(screenName string) ([]string, error) {
-	anaconda.SetConsumerKey(cfg.Twitter.ConsumerKey)
-	anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
-	api := anaconda.NewTwitterApi(cfg.Twitter.AccessToken, cfg.Twitter.AccessTokenSecret)
-
+func fetchTwitterFriends(screenName string, api *anaconda.TwitterApi) ([]string, error) {
 	v := url.Values{}
 	v.Set("count", "100")
 	v.Set("cursor", "-1")
@@ -200,8 +196,8 @@ func fetchTwitterFriends(screenName string) ([]string, error) {
 }
 
 // Returns a slice of friend's suns
-func fetchFriendsSuns(twitterName string) (suns []*entities.Sun) {
-	friendsNames, twitterErr := fetchTwitterFriends(twitterName)
+func fetchFriendsSuns(twitterName string, api *anaconda.TwitterApi) (suns []*entities.Sun) {
+	friendsNames, twitterErr := fetchTwitterFriends(twitterName, api)
 	if twitterErr != nil {
 		return
 	}
