@@ -18,12 +18,12 @@ import (
 // It check for existing user in the DB and logs him if the password is correct.
 // If the user is new he is initiated and a new home planet nad solar system are generated.
 func login(ws *websocket.Conn) (*Client, response.Responser, error) {
-	player, err := authenticate(ws)
+	player, twitter, err := authenticate(ws)
 	if err != nil {
 		return nil, response.NewLoginFailed(), err
 	}
 
-	client := NewClient(ws, player)
+	client := NewClient(ws, player, twitter)
 	homePlanetEntity, err := entities.Get(player.HomePlanet)
 	if err != nil {
 		return nil, nil, errors.New("Player's home planet is missing!")
@@ -92,24 +92,38 @@ func FetchSetupData(ws *websocket.Conn) (*entities.SetupData, error) {
 // 3.1.Create a new sun with GenerateSun
 // 3.2.Choose home planet from the newly created solar sysitem.
 // 3.3.Create a reccord of the new player and start comunication.
-func authenticate(ws *websocket.Conn) (*entities.Player, error) {
+func authenticate(ws *websocket.Conn) (*entities.Player, *anaconda.TwitterApi, error) {
 	var (
-		player    *entities.Player
 		nickname  string
 		twitterId string
+		err       error
 		request   Request
+		setupData *entities.SetupData
+		player    *entities.Player
+		twitter   *anaconda.TwitterApi
 	)
 
-	if err := websocket.JSON.Receive(ws, &request); err != nil {
-		return nil, err
+	if err = websocket.JSON.Receive(ws, &request); err != nil {
+		return nil, nil, err
 	}
+
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
-		return nil, errors.New("Incomplete credentials")
+		return nil, nil, errors.New("Incomplete credentials")
+	}
+
+	if cfg.Twitter.SecureLogin {
+		var ok bool
+		anaconda.SetConsumerKey(cfg.Twitter.ConsumerKey)
+		anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
+		twitter = anaconda.NewTwitterApi(request.AccessToken, request.AccessTokenSecret)
+		if ok, err = twitter.VerifyCredentials(); !ok {
+			return nil, nil, err
+		}
 	}
 
 	serverParamsMessage := response.NewServerParams()
-	if err := websocket.JSON.Send(ws, &serverParamsMessage); err != nil {
-		return nil, err
+	if err = websocket.JSON.Send(ws, &serverParamsMessage); err != nil {
+		return nil, nil, err
 	}
 
 	nickname = request.Username
@@ -117,15 +131,15 @@ func authenticate(ws *websocket.Conn) (*entities.Player, error) {
 
 	entity, _ := entities.Get(fmt.Sprintf("player.%s", nickname))
 	if entity == nil {
-		setupData, err := FetchSetupData(ws)
+		setupData, err = FetchSetupData(ws)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		player = register(setupData, nickname, twitterId)
+		player = register(setupData, nickname, twitterId, twitter)
 	} else {
 		player = entity.(*entities.Player)
 	}
-	return player, nil
+	return player, twitter, nil
 }
 
 // Registration process is quite simple:
@@ -134,8 +148,8 @@ func authenticate(ws *websocket.Conn) (*entities.Player, error) {
 // - Create a new sun with GenerateSun.
 // - Choose home planet from the newly created solar sysitem.
 // - Create a reccord of the new player and start comunication.
-func register(setupData *entities.SetupData, nickname, twitterId string) *entities.Player {
-	friendsSuns := fetchFriendsSuns(nickname)
+func register(setupData *entities.SetupData, nickname, twitterId string, twitterApi *anaconda.TwitterApi) *entities.Player {
+	friendsSuns := fetchFriendsSuns(nickname, twitterApi)
 	sun := entities.GenerateSun(nickname, friendsSuns, setupData)
 	planets, homePlanet := entities.GeneratePlanets(nickname, sun)
 	player := entities.CreatePlayer(nickname, twitterId, homePlanet, setupData)
@@ -159,10 +173,12 @@ func register(setupData *entities.SetupData, nickname, twitterId string) *entiti
 }
 
 // Returns a slice with twitter ids of the given user's friends
-func fetchTwitterFriends(screenName string) ([]string, error) {
-	anaconda.SetConsumerKey(cfg.Twitter.ConsumerKey)
-	anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
-	api := anaconda.NewTwitterApi(cfg.Twitter.AccessToken, cfg.Twitter.AccessTokenSecret)
+func fetchTwitterFriends(screenName string, api *anaconda.TwitterApi) ([]string, error) {
+	if api == nil {
+		// Let's just pretend he has no friends, because we can't actually ask
+		// Twitter about it
+		return []string{}, nil
+	}
 
 	v := url.Values{}
 	v.Set("count", "100")
@@ -188,8 +204,8 @@ func fetchTwitterFriends(screenName string) ([]string, error) {
 }
 
 // Returns a slice of friend's suns
-func fetchFriendsSuns(twitterName string) (suns []*entities.Sun) {
-	friendsNames, twitterErr := fetchTwitterFriends(twitterName)
+func fetchFriendsSuns(twitterName string, api *anaconda.TwitterApi) (suns []*entities.Sun) {
+	friendsNames, twitterErr := fetchTwitterFriends(twitterName, api)
 	if twitterErr != nil {
 		return
 	}

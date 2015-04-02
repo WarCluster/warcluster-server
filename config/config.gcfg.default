@@ -13,6 +13,7 @@
    consumerSecret = "c7DMDAV5Ag3oYhrn67nkN7xHg3NXRBwtoxKpVl6AIo"
    accessToken = "1099448875-VWhp6eyLUE20vhHpOcGB4lMJDMQQFlMUt4hRqIu"
    accessTokenSecret = "4bxZVKF2GTDEpSHMoBv0ankVEJr6oX1FAleImuDKk"
+   secureLogin = false
 
 [entities]
     areaSize = 10000

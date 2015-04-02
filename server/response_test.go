@@ -31,7 +31,7 @@ var panda entities.Player = entities.Player{
 	ScreenPosition: &vec2d.Vector{2, 2},
 }
 
-var client = *NewClient(new(websocket.Conn), &gophie)
+var client = *NewClient(new(websocket.Conn), &gophie, nil)
 
 var planet1 entities.Planet = entities.Planet{
 	Name:     "GOP6720",
