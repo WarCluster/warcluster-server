@@ -92,21 +92,23 @@ func FetchSetupData(ws *websocket.Conn) (*entities.SetupData, error) {
 // 3.1.Create a new sun with GenerateSun
 // 3.2.Choose home planet from the newly created solar sysitem.
 // 3.3.Create a reccord of the new player and start comunication.
-func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anaconda.TwitterApi, err error) {
+func authenticate(ws *websocket.Conn) (*entities.Player, *anaconda.TwitterApi, error) {
 	var (
 		nickname  string
 		twitterId string
+		err       error
 		request   Request
 		setupData *entities.SetupData
+		player    *entities.Player
+		twitter   *anaconda.TwitterApi
 	)
 
 	if err = websocket.JSON.Receive(ws, &request); err != nil {
-		return
+		return nil, nil, err
 	}
 
 	if len(request.Username) <= 0 || len(request.TwitterID) <= 0 {
-		err = errors.New("Incomplete credentials")
-		return
+		return nil, nil, errors.New("Incomplete credentials")
 	}
 
 	if cfg.Twitter.SecureLogin {
@@ -115,13 +117,13 @@ func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anacond
 		anaconda.SetConsumerSecret(cfg.Twitter.ConsumerSecret)
 		twitter = anaconda.NewTwitterApi(request.AccessToken, request.AccessTokenSecret)
 		if ok, err = twitter.VerifyCredentials(); !ok {
-			return
+			return nil, nil, err
 		}
 	}
 
 	serverParamsMessage := response.NewServerParams()
 	if err = websocket.JSON.Send(ws, &serverParamsMessage); err != nil {
-		return
+		return nil, nil, err
 	}
 
 	nickname = request.Username
@@ -131,13 +133,13 @@ func authenticate(ws *websocket.Conn) (player *entities.Player, twitter *anacond
 	if entity == nil {
 		setupData, err = FetchSetupData(ws)
 		if err != nil {
-			return
+			return nil, nil, err
 		}
 		player = register(setupData, nickname, twitterId, twitter)
 	} else {
 		player = entity.(*entities.Player)
 	}
-	return
+	return player, twitter, nil
 }
 
 // Registration process is quite simple:
