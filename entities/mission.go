@@ -13,6 +13,7 @@ import (
 type Mission struct {
 	Color      Color
 	Source     embeddedPlanet
+	Path       []*vec2d.Vector
 	Target     embeddedPlanet
 	Type       string
 	StartTime  int64
@@ -67,72 +68,111 @@ func (m *Mission) ChangeAreaSet(axis rune, direction int8) {
 	moveToArea(m.Key(), oldAreaSet, m.areaSet)
 }
 
+func fillAxises(startPoint, endPoint float64) (container []int64) {
+	startAxis := RoundCoordinateTo(startPoint)
+	endAxis := RoundCoordinateTo(endPoint)
+	axises := []int64{startAxis, endAxis}
+	if endAxis < startAxis {
+		axises = []int64{endAxis, startAxis}
+	}
+
+	for i := axises[0] + 1; i < axises[1]; i += 1 {
+		container = append(container, i*Settings.AreaSize)
+	}
+	return
+}
+
+func axisDirection(xA, xB float64) int8 {
+	if xB > xA {
+		return 1
+	} else if xB == xA {
+		return 0
+	} else {
+		return -1
+	}
+}
+
 // Returns all transfer points this mission will ever cross
 func (m *Mission) TransferPoints() AreaTransferPoints {
 	result := make(AreaTransferPoints, 0, 10)
 
-	fillAxises := func(startPoint, endPoint float64) (container []int64) {
-		startAxis := RoundCoordinateTo(startPoint)
-		endAxis := RoundCoordinateTo(endPoint)
-		axises := []int64{startAxis, endAxis}
-		if endAxis < startAxis {
-			axises = []int64{endAxis, startAxis}
+	calculateSegmentTransfers := func(source, target *vec2d.Vector) AreaTransferPoints {
+		result := make(AreaTransferPoints, 0, 10)
+		var baseTravelTime time.Duration
+
+		xAxises := fillAxises(source.X, target.X)
+		yAxises := fillAxises(source.Y, target.Y)
+
+		missionVectorEquation := NewCartesianEquation(source, target)
+
+		direction := []int8{
+			axisDirection(source.X, target.X),
+			axisDirection(source.Y, target.Y),
 		}
 
-		for i := axises[0] + 1; i < axises[1]; i += 1 {
-			container = append(container, i*Settings.AreaSize)
+		for _, axis := range xAxises {
+			crossPoint := vec2d.New(float64(axis), missionVectorEquation.GetYByX(float64(axis)))
+			transferPoint := &AreaTransferPoint{
+				TravelTime:     calculateSegmentTravelTime(source, crossPoint, Settings.MissionSpeed),
+				Direction:      direction[0],
+				CoordinateAxis: 'X',
+			}
+			result.Append(transferPoint)
 		}
-		return
-	}
 
-	axisDirection := func(xA, xB float64) int8 {
-		if xB > xA {
-			return 1
-		} else if xB == xA {
-			return 0
-		} else {
-			return -1
+		for _, axis := range yAxises {
+			crossPoint := vec2d.New(missionVectorEquation.GetXByY(float64(axis)), float64(axis))
+			transferPoint := &AreaTransferPoint{
+				TravelTime:     calculateSegmentTravelTime(source, crossPoint, Settings.MissionSpeed),
+				Direction:      direction[1],
+				CoordinateAxis: 'Y',
+			}
+			result.Append(transferPoint)
 		}
-	}
+		sort.Sort(result)
 
-	xAxises := fillAxises(m.Source.Position.X, m.Target.Position.X)
-	yAxises := fillAxises(m.Source.Position.Y, m.Target.Position.Y)
-
-	missionVectorEquation := NewCartesianEquation(m.Source.Position, m.Target.Position)
-
-	direction := []int8{
-		axisDirection(m.Source.Position.X, m.Target.Position.X),
-		axisDirection(m.Source.Position.Y, m.Target.Position.Y),
-	}
-
-	for _, axis := range xAxises {
-		crossPoint := vec2d.New(float64(axis), missionVectorEquation.GetYByX(float64(axis)))
-		transferPoint := &AreaTransferPoint{
-			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, Settings.MissionSpeed),
-			Direction:      direction[0],
-			CoordinateAxis: 'X',
+		if result.Size() >= 1 {
+			baseTravelTime = result[0].TravelTime
+			for idx, point := range result {
+				if idx != 0 {
+					point.TravelTime -= baseTravelTime
+					baseTravelTime += point.TravelTime
+				}
+			}
 		}
-		result = append(result, transferPoint)
+		return result
 	}
 
-	for _, axis := range yAxises {
-		crossPoint := vec2d.New(missionVectorEquation.GetXByY(float64(axis)), float64(axis))
-		transferPoint := &AreaTransferPoint{
-			TravelTime:     calculateTravelTime(m.Source.Position, crossPoint, Settings.MissionSpeed),
-			Direction:      direction[1],
-			CoordinateAxis: 'Y',
-		}
-		result = append(result, transferPoint)
+	prevWaypoint := m.Source.Position
+
+	for _, waypoint := range m.Path {
+		result.Append(calculateSegmentTransfers(prevWaypoint, waypoint)...)
+		prevWaypoint = waypoint
 	}
 
-	sort.Sort(result)
+	result.Append(calculateSegmentTransfers(prevWaypoint, m.Target.Position)...)
+
 	return result
 }
 
-// Calculates the travel time in milliseconds between two planets with given speed.
+// Calculates the travel time in milliseconds between two points with given speed.
 // Traveling is implemented like a simple time.Sleep from our side.
-func calculateTravelTime(source, target *vec2d.Vector, speed int64) time.Duration {
+func calculateSegmentTravelTime(source, target *vec2d.Vector, speed int64) time.Duration {
 	distance := vec2d.GetDistance(source, target)
+	return time.Duration(distance / float64(speed) * 100)
+}
+
+// Calculates the travel time in milliseconds between two points with given speed.
+// Traveling is implemented like a simple time.Sleep from our side.
+func calculateMissionTravelTime(source, target *vec2d.Vector, waypoints []*vec2d.Vector, speed int64) time.Duration {
+	var distance float64
+	prevPoint := source
+	distance = 0
+	for _, point := range waypoints {
+		distance += vec2d.GetDistance(prevPoint, point)
+		prevPoint = point
+	}
+	distance += vec2d.GetDistance(prevPoint, target)
 	return time.Duration(distance / float64(speed) * 100)
 }
 

@@ -66,15 +66,15 @@ type Entities struct {
 	SunTextures                uint16
 }
 
-var configDir string
+var ConfigDir string
 
 func init() {
 	_, filename, _, _ := runtime.Caller(1)
-	configDir = path.Dir(filename)
+	ConfigDir = path.Dir(filename)
 }
 
 func (c *Config) Load() {
-	if err := gcfg.ReadFileInto(c, path.Join(configDir, "config.gcfg")); err != nil {
+	if err := gcfg.ReadFileInto(c, path.Join(ConfigDir, "config.gcfg")); err != nil {
 		if os.IsNotExist(err) {
 			c.LoadDefault()
 		} else {
@@ -84,7 +84,7 @@ func (c *Config) Load() {
 }
 
 func (c *Config) LoadDefault() {
-	if err := gcfg.ReadFileInto(c, path.Join(configDir, "config.gcfg.default")); err != nil {
+	if err := gcfg.ReadFileInto(c, path.Join(ConfigDir, "config.gcfg.default")); err != nil {
 		log.Fatal("Error loading default cfg:", err)
 	}
 }

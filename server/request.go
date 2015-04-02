@@ -1,56 +1,30 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
-	"log"
 
 	"github.com/Vladimiroff/vec2d"
 )
 
-// The Request struct is used to created to make the request manipulation easier by creating a template
-// that can hold the information needed by all request types.
-// 1. In client we keep the reference to the client struct to be able to edit data and return feedback
-// 	  to the connection.
-// 2. The command is the container for a key word used to swith between different input Request.
-// 3. The Position field is used as a general position container for the different requests.
-// 4. Resolution I think speaks for itself. Its the size of the screan.
-// 5. Start and End plane are containers for general planet information(mostly used for mission requests).
-// 6. Fleet contains the percent of ships to be sent in the start mission requests.
+// Request type hold player's requests data
 type Request struct {
-	Client       *Client
-	Command      string
-	Type         string
-	Position     *vec2d.Vector
-	Resolution   []uint64
-	StartPlanets []string
-	EndPlanet    string
-	Fleet        int32
-	Username     string
-	TwitterID    string
-	Race         uint8
-	SunTextureId uint16
+	Client       *Client         // Reference to the client who sent this. Populated by the server.
+	Command      string          // Used to parse the request (required)
+	Type         string          // Type of mission (possible values are: Attach, Supply, Spy)
+	Position     *vec2d.Vector   // Position of the client when he sent the request
+	Resolution   []uint64        // Clients resolution
+	StartPlanets []string        // Planets from which to start a mission
+	Path         []*vec2d.Vector // All intermidiate points (waypoints) that define the missions path
+	EndPlanet    string          // Mission's destination
+	Fleet        int32           // Percentge of ships to be sent in the start mission request
+	Username     string          // Client's username needed while loggin in
+	TwitterID    string          // Client's twitter id needed while logging in
+	Race         uint8           // Race ID chosen during registration
+	SunTextureId uint16          // Sun Texture ID chosen during registration
 }
 
-// This function transfers the information of a new request from byte list
-// to the special Request struct.
-// Since the data is formated as json the function uses unmarshal to extract the data.
-func UnmarshalRequest(message []byte, client *Client) (*Request, error) {
-	var request Request
-
-	if err := json.Unmarshal(message, &request); err != nil {
-		log.Println("Error in server.request.UnmarshalRequest:", err.Error())
-		return nil, err
-	}
-
-	request.Client = client
-	return &request, nil
-}
-
-// ParseRequest is serving the purpouse of a request manager.
-// After the request is parsed to the more usable Request struct
-// ParseRequest will determine the type of the request and will
-// return a function that will manage it.
+// ParseRequest is serving the purpouse of a request manager. Determines the
+// type of the request and will return a function that will manage it.
 func ParseRequest(request *Request) (func(*Request) error, error) {
 	switch request.Command {
 	case "start_mission":

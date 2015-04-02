@@ -37,7 +37,7 @@ func (p *Player) Sun() string {
 
 // Starts missions to one of the players planet to some other. Each mission have type
 // and the user decides which part of the planet's fleet he would like to send.
-func (p *Player) StartMission(source, target *Planet, fleet int32, missionType string) *Mission {
+func (p *Player) StartMission(source, target *Planet, path []*vec2d.Vector, fleet int32, missionType string) *Mission {
 	currentTime := time.Now().UnixNano() / 1e6
 	baseShipCount := source.GetShipCount()
 	shipCount := int32(baseShipCount * fleet / 100)
@@ -55,13 +55,14 @@ func (p *Player) StartMission(source, target *Planet, fleet int32, missionType s
 			Owner:    target.Owner,
 			Position: target.Position,
 		},
+		Path:      path,
 		Type:      missionType,
 		StartTime: currentTime,
 		Player:    p.Username,
 		ShipCount: shipCount,
 		areaSet:   source.AreaSet(),
 	}
-	mission.TravelTime = calculateTravelTime(source.Position, target.Position, Settings.MissionSpeed)
+	mission.TravelTime = calculateMissionTravelTime(source.Position, target.Position, path, Settings.MissionSpeed)
 	return &mission
 }
 
