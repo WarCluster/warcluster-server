@@ -8,9 +8,10 @@ import (
 
 type ServerParams struct {
 	baseResponse
-	HomeSPM    float64 //ships per minute
-	PlanetsSPM map[string]float64
-	Races      map[string]entities.Race
+	HomeSPM            float64 //ships per minute
+	PlanetsSPM         map[string]float64
+	ShipsDeathModifier float64
+	Races              map[string]entities.Race
 }
 
 func NewServerParams() *ServerParams {
@@ -30,6 +31,7 @@ func NewServerParams() *ServerParams {
 		planetSPM := float64(entities.ShipCountTimeMod(planetSizeIdx, false))
 		r.PlanetsSPM[fmt.Sprintf("%v", planetSizeIdx)] = 60 / planetSPM
 	}
+	r.ShipsDeathModifier = entities.Settings.ShipsDeathModifier
 	return r
 }
 
