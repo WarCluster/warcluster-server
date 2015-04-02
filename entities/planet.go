@@ -118,6 +118,7 @@ func (p *Planet) UpdateShipCount() {
 		shipDiff := int32(passedTime / ShipCountTimeMod(p.Size, p.IsHome))
 
 		if p.ShipCount > p.MaxShipCount {
+			shipDiff *= int32(Settings.ShipsDeathModifier)
 			if (p.ShipCount - p.MaxShipCount) > shipDiff {
 				p.ShipCount -= shipDiff
 			} else {

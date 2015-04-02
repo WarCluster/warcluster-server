@@ -38,6 +38,7 @@
     shipsPerMinute9 = 2
     shipsPerMinute10 = 2
     shipsPerMinuteHome = 1
+    shipsDeathModifier = 1
     planetMaxShipsMod = 1000
     spyReportValidity = 30
     sunCanvasOffsetX = 10000
