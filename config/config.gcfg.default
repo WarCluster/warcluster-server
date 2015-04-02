@@ -19,14 +19,14 @@
     areaSize = 10000
     areaTemplate = "area:%d:%d"
     initialPlanetShipCount = 10
-    initialHomePlanetShipCount = 100
-    missionSpeed = 7
+    initialHomePlanetShipCount = 120
+    missionSpeed = 5
     planetCount = 10
     planetHashArgs = 4
     planetRadius = 300
     planetsRingOffset = 300
     solarSystemRadius = 9000
-    ;To get the propper shipsPerMinute you need to devide 60 by shipsPerMinute1 parameter 
+    ;To get the propper shipsPerMinute you need to devide 60 by shipsPerMinute1 parameter
     shipsPerMinute1 = 3
     shipsPerMinute2 = 3
     shipsPerMinute3 = 2.7
@@ -38,7 +38,7 @@
     shipsPerMinute9 = 2
     shipsPerMinute10 = 2
     shipsPerMinuteHome = 1
-    shipsDeathModifier = 1
+    shipsDeathModifier = 3
     planetMaxShipsMod = 1000
     spyReportValidity = 30
     sunCanvasOffsetX = 10000
