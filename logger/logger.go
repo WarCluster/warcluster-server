@@ -13,7 +13,7 @@
 // the user of it should think about), but the exact timestamp is preserved
 // and all the records are sorted by it right before dumping to the system
 // log.
-package log
+package logger
 
 import (
 	"fmt"
