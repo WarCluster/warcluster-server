@@ -1,9 +1,10 @@
-package server
+package log
 
 import (
 	"bytes"
 	"fmt"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func benchmarkWithLoggerSizes(b *testing.B, masterMaxSize, loggerMaxSize int) {
 		record      *LogRecord
 	)
 
-	master := NewMasterLogger(masterMaxSize)
+	master := NewMasterLogger(os.Stdout, masterMaxSize)
 	master.stream = &mockedOuput
 	logger := NewLogger(master, loggerMaxSize)
 
@@ -46,7 +47,7 @@ func benchmarkWritingBack(b *testing.B, masterMaxSize, loggerMaxSize int) {
 		message:   string("No, lamma, no!"),
 	}
 
-	master := NewMasterLogger(masterMaxSize)
+	master := NewMasterLogger(os.Stdout, masterMaxSize)
 	master.stream = &mockedOuput
 	logger := NewLogger(master, loggerMaxSize)
 
@@ -79,7 +80,7 @@ func randomizeTime(timestamp time.Time) time.Time {
 }
 
 func TestSimpleLoggerWithMaster(t *testing.T) {
-	master := NewMasterLogger(0)
+	master := NewMasterLogger(os.Stdout, 0)
 	logger := NewLogger(master, 8)
 
 	for i := 0; i < 5; i++ {
@@ -91,7 +92,7 @@ func TestSimpleLoggerWithMaster(t *testing.T) {
 }
 
 func TestOverflowedLogger(t *testing.T) {
-	master := NewMasterLogger(15)
+	master := NewMasterLogger(os.Stdout, 15)
 	logger := NewLogger(master, 8)
 
 	for i := 0; i < 10; i++ {
@@ -106,7 +107,7 @@ func TestOverflowedLogger(t *testing.T) {
 
 func TestOverflowedMasterLogger(t *testing.T) {
 	var mockedOuput bytes.Buffer
-	master := NewMasterLogger(16)
+	master := NewMasterLogger(os.Stdout, 16)
 	master.stream = &mockedOuput
 	logger := NewLogger(master, 8)
 

@@ -1,10 +1,24 @@
-package server
+// Implement fairly smart logger with stashes and less system calls.
+//
+// The idea is to have one master logger that is the only one who can
+// actually writes to the system logs.
+//
+// All of our logged in players will have a regular logger in their Client
+// type. Each logger has a max size. When the stash of the logger is full
+// or when the player logs out the logger writes back his records to the
+// master logger.
+//
+// When the master's stash is full, writes back to the system logs. All of
+// the logging is happening in a seperate goroutine (which is not something
+// the user of it should think about), but the exact timestamp is preserved
+// and all the records are sorted by it right before dumping to the system
+// log.
+package log
 
 import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"sort"
 	"sync"
 	"time"
@@ -48,9 +62,9 @@ type MasterLogger struct {
 }
 
 // Constructor of the master logger. Again, there shall be only one of these.
-func NewMasterLogger(maxSize int) *MasterLogger {
+func NewMasterLogger(outStream io.Writer, maxSize int) *MasterLogger {
 	logger := &MasterLogger{
-		stream:  os.Stdout,
+		stream:  outStream,
 		mutex:   new(sync.Mutex),
 		stash:   make([]*LogRecord, 0, maxSize),
 		maxSize: maxSize,
