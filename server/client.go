@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"golang.org/x/net/websocket"
-
 	"warcluster/entities"
 	"warcluster/entities/db"
 	"warcluster/server/response"

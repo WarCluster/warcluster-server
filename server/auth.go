@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/pzsz/voronoi"
 	"golang.org/x/net/websocket"
 
 	"warcluster/entities"
@@ -30,6 +31,30 @@ func login(ws *websocket.Conn) (*Client, response.Responser, error) {
 	homePlanet := homePlanetEntity.(*entities.Planet)
 
 	loginSuccess := response.NewLoginSuccess(player, homePlanet)
+	planetEntities := entities.Find("planet.*")
+	planets := make([]*entities.Planet, 0, len(planetEntities))
+	sites := make([]voronoi.Vertex, 0, len(planetEntities))
+	x0, xn, y0, yn := 0.0, 0.0, 0.0, 0.0
+	for i, planetEntity := range planetEntities {
+		planets = append(planets, planetEntity.(*entities.Planet))
+		if x0 > planets[i].Position.X {
+			x0 = planets[i].Position.X
+		}
+		if xn < planets[i].Position.X {
+			xn = planets[i].Position.X
+		}
+		if y0 > planets[i].Position.Y {
+			y0 = planets[i].Position.Y
+		}
+		if yn < planets[i].Position.Y {
+			yn = planets[i].Position.Y
+		}
+		sites = append(sites, voronoi.Vertex{planets[i].Position.X, planets[i].Position.Y})
+	}
+
+	bbox := voronoi.NewBBox(x0, xn, y0, yn)
+
+	response.Diagram = voronoi.ComputeDiagram(sites, bbox, true)
 	return client, loginSuccess, nil
 }
 

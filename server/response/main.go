@@ -5,8 +5,12 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pzsz/voronoi"
+
 	"warcluster/entities"
 )
+
+var Diagram *voronoi.Diagram
 
 type Responser interface {
 	Sanitize(*entities.Player)
