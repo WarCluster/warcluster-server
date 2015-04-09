@@ -69,6 +69,7 @@ func (w *WebSocketTestSuite) SetupTest() {
 	}
 
 	cfg.Load()
+	cfg.Twitter.SecureLogin = false
 	InitLeaderboard(leaderboard.New())
 }
 
