@@ -11,7 +11,7 @@
 [twitter]
    consumerKey = "y65cmSKRKI3TnaUFsAbQ"
    consumerSecret = "uwLIgSNDqWPfSnySydV46gWBkISwPN9XaHW4yrpd3g"
-   secureLogin = true
+   secureLogin = false
 
 [entities]
     areaSize = 10000
