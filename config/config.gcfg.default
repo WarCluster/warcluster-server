@@ -24,7 +24,7 @@
     planetRadius = 300
     planetsRingOffset = 300
     solarSystemRadius = 9000
-    ;To get the propper shipsPerMinute you need to devide 60 by shipsPerMinute1 parameter 
+    ;To get the propper shipsPerMinute you need to divide 60 by shipsPerMinute1
     shipsPerMinute1 = 3
     shipsPerMinute2 = 3
     shipsPerMinute3 = 2.7
