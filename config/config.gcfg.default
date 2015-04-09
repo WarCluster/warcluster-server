@@ -9,11 +9,9 @@
     port = 6379
 
 [twitter]
-   consumerKey = "PWlHfyxHf78KUjOTXBNVA"
-   consumerSecret = "c7DMDAV5Ag3oYhrn67nkN7xHg3NXRBwtoxKpVl6AIo"
-   accessToken = "1099448875-VWhp6eyLUE20vhHpOcGB4lMJDMQQFlMUt4hRqIu"
-   accessTokenSecret = "4bxZVKF2GTDEpSHMoBv0ankVEJr6oX1FAleImuDKk"
-   secureLogin = false
+   consumerKey = "y65cmSKRKI3TnaUFsAbQ"
+   consumerSecret = "uwLIgSNDqWPfSnySydV46gWBkISwPN9XaHW4yrpd3g"
+   secureLogin = true
 
 [entities]
     areaSize = 10000
