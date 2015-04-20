@@ -20,7 +20,7 @@
     areaTemplate = "area:%d:%d"
     initialPlanetShipCount = 10
     initialHomePlanetShipCount = 120
-    missionSpeed = 5
+    missionSpeed = 6
     planetCount = 10
     planetHashArgs = 4
     planetRadius = 300
