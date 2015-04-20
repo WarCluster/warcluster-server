@@ -167,7 +167,8 @@ func GeneratePlanets(nickname string, sun *Sun) ([]*Planet, *Planet) {
 		planet.Size = 1 + int8(hashElement(4*ix+3))
 		planet.LastShipCountUpdate = time.Now().Unix()
 		planet.IsHome = (ix == homePlanetIdx)
-		planet.MaxShipCount = int32(Settings.PlanetMaxShipsMod * ShipCountTimeMod(planet.Size, planet.IsHome))
+		planet.MaxShipCount = int32(Settings.PlanetMaxShipsMod * (60 / ShipCountTimeMod(planet.Size, planet.IsHome))) // the 60 is added so we have the propper spm and not the mod
+		// this is needed due to the last change to the ShipCountTimeMod change
 		if planet.IsHome {
 			planet.ShipCount = Settings.InitialHomePlanetShipCount
 		}
