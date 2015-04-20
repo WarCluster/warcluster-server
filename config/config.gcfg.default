@@ -75,7 +75,7 @@
     green = 0.81568627
     blue = 1
 
-[race "MegaDev"]
+[race "ZaraLab"]
     id = 5
     red = 1
     green = 0
