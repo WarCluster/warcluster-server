@@ -23,11 +23,9 @@ type Config struct {
 		Port uint16
 	}
 	Twitter struct {
-		ConsumerKey       string
-		ConsumerSecret    string
-		AccessToken       string
-		AccessTokenSecret string
-		SecureLogin       bool
+		ConsumerKey    string
+		ConsumerSecret string
+		SecureLogin    bool
 	}
 	Race map[string]*struct {
 		Id    uint8
