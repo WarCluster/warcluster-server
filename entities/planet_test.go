@@ -68,8 +68,8 @@ func TestUpdatePlanetShipCount(t *testing.T) {
 	}
 
 	planetOneShipCount := basePlanets[0].GetShipCount()
-	if planetOneShipCount != 160 {
-		t.Error("Planet[", basePlanets[0].Key(), "] Expected", 160, "Actual ", planetOneShipCount)
+	if planetOneShipCount != 140 {
+		t.Error("Planet[", basePlanets[0].Key(), "] Expected", 140, "Actual ", planetOneShipCount)
 	}
 
 	planetTwoShipCount := basePlanets[1].GetShipCount()
