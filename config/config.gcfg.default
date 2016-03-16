@@ -9,8 +9,8 @@
     port = 6379
 
 [twitter]
-   consumerKey = "PWlHfyxHf78KUjOTXBNVA"
-   consumerSecret = "c7DMDAV5Ag3oYhrn67nkN7xHg3NXRBwtoxKpVl6AIo"
+   consumerKey = ""
+   consumerSecret = ""
    secureLogin = false
 
 [entities]
