@@ -9,8 +9,8 @@
     port = 6379
 
 [twitter]
-   consumerKey = ""
-   consumerSecret = ""
+   consumerKey = "your twitter consumer key"
+   consumerSecret = "your twitter secret key"
    secureLogin = false
 
 [entities]

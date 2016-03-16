@@ -23,7 +23,7 @@ long story short: We wanted to learn something new ♪┏(・o･)┛♪┗ ( �
 
 #### [Setting](https://mir-s3-cdn-cf.behance.net/project_modules/1400/b2e9fc26279733.563593bb12d20.png)
 
-It has 6 different races. Each race has it's own unique color. 
+It has 6 different races. Each race has it's own unique color.
 ![six races](https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/0cbb1626279733.56353fde29024.png)
 
 Each color corresponds to unique twitter #hashtag used for race wide communication (eg. #WarClusterRed). There're only verbal alliences between players.
@@ -41,9 +41,9 @@ At some point the army can grow bigger than the allowed population of the planet
 
 A player can send army pilots to *attack, spy or support* other planets depending on their verbal agreements with its owner. The spaceships travel slow so moves are carefully plotted. Imagine it as a real time game of [Go](https://en.wikipedia.org/wiki/Go_%28game%29)
 ![warcluster red armada](https://trello-attachments.s3.amazonaws.com/56e9cf6ad708c73bd6d0d26b/1221x604/91b0f6877364a81aa7368e2c1afbb7d3/WarClusterRed-armada.png):
- 
+
  - Upon *attacking* a player conquers a planet if his attacking army is `> 1` than the other army. Everything is lost otherwise.
- - Upon *spying* a player gets the number of the army on the targeted planet. 
+ - Upon *spying* a player gets the number of the army on the targeted planet.
  - Upon *supporting* a player is donating his army to the planet's owner.
 
 A player should spend extra effort to pick his enemies wiser and his allies patiently. Plot twists are around every hour.
@@ -69,6 +69,8 @@ system. Now it's time to fetch warcluster and install its requirements.
     $ cd $GOPATH/src/warcluster/
     $ go get -v github.com/stretchr/testify
     $ go get -v
+
+Add your twitter consumer/secret keys [here](https://github.com/vladimiroff/WarCluster/blob/develop/config/config.gcfg.default#L12-L13) in order to have working social twitter login.
 
 If you run redis on your localhost without any custom configuration and you're
 okay with the game running on port 7000, then you should be able to run the
