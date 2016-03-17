@@ -19,7 +19,7 @@ Related links:
  - The awesome UI designer @Denitsa that also made the art of the game:
    https://www.behance.net/gallery/26279733/War-Cluster
  - The team behind this project:
-   [humans.txt](https://github.com/vladimiroff/warcluster-site/blob/develop/public/humans.txt)
+   [humans.txt](https://github.com/WarCluster/warcluster-client/blob/develop/public/humans.txt)
 
 What can you expect to see in this ~3-year old repo:
 
@@ -111,7 +111,7 @@ system. Now it's time to fetch warcluster and install its requirements.
     $ go get -v
 
 Add your twitter consumer/secret keys
-[here](https://github.com/vladimiroff/WarCluster/blob/develop/config/config.gcfg.default#L12-L13)
+[here](https://github.com/WarCluster/warcluster-server/blob/develop/config/config.gcfg.default#L12-L13)
 in order to have working social twitter login.
 
 If you run redis on your localhost without any custom configuration and you're
