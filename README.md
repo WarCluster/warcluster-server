@@ -13,7 +13,7 @@ players and dozens small scale inhouse tests) ;)
 
 Related links:
 
- - The javascript client repo: https://github.com/vladimiroff/warcluster-site
+ - The javascript client repo: https://github.com/WarCluster/warcluster-site
  - Amazingly strong NodeJS AI player with fuzzy logic (written at 2 day
    hackathon) here: https://github.com/lepovica/WarCluster-AI  ლ(ಠ益ಠლ)
  - The awesome UI designer @Denitsa that also made the art of the game:
@@ -105,7 +105,7 @@ It's a good idea to place these two _export_ commands somewhere in your .bashrc
 file, though. Otherwise you would have to execute them on each re-login in your
 system. Now it's time to fetch warcluster and install its requirements.
 
-    $ git clone git@github.com:vladimiroff/WarCluster.git $GOPATH/src/warcluster
+    $ git clone git@github.com:WarCluster/warcluster-server.git $GOPATH/src/warcluster
     $ cd $GOPATH/src/warcluster/
     $ go get -v github.com/stretchr/testify
     $ go get -v
